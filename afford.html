@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=50">
+  <link rel="stylesheet" href="styles.css?v=52">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -195,6 +195,7 @@
             <span class="horizon-edge-label">12%</span>
           </div>
           <div class="helper">Use the interest rate, not APR</div>
+          <div class="helper" id="effectiveRateNote" style="display:none;color:var(--green);font-weight:500">Effective rate after points: <span id="effectiveRateVal"></span></div>
         </div>
 
         <div class="field" style="margin-bottom:0">
@@ -284,6 +285,35 @@
             <div class="helper" id="pmiHelper">Annual PMI as % of loan; applies only if down payment &lt; 20%</div>
           </div>
         </div>
+        <div class="two-col">
+          <div class="field">
+            <div class="label-tip-row">
+              <label>DISCOUNT POINTS</label>
+              <button class="tip-btn" aria-label="Learn more" data-tip="Discount points are upfront fees paid at closing to reduce your mortgage interest rate. One point equals 1% of the loan amount — so 1 point on a $400,000 loan costs $4,000 upfront. The benefit is a permanently lower rate and monthly payment. To model the tradeoff, reduce your down payment by the amount you'd spend on points and enter the number of points here — you'll see the net effect on buying power and monthly cost.">?</button>
+            </div>
+            <div class="input-wrap suffix">
+              <input type="number" id="discountPoints" min="0" max="4" step="0.125" placeholder="0">
+              <span class="affix">pts</span>
+            </div>
+            <div class="helper" id="pointsHelper">0 = no rate buydown; each point costs 1% of loan at closing</div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <div class="label-tip-row">
+              <label>RATE REDUCTION / POINT</label>
+              <button class="tip-btn" aria-label="Learn more" data-tip="How much your interest rate drops for each discount point paid. The common rule of thumb is 0.25% per point, but the actual reduction varies by lender, loan type, and market conditions. When comparing lenders, ask for a rate sheet showing options with and without points — the reduction is explicit. A higher reduction per point means buying points is a better deal.">?</button>
+            </div>
+            <div class="input-wrap" style="padding:0">
+              <select id="pointsReduction" class="input-select" style="height:36px;padding:0 10px;width:100%">
+                <option value="0.15">0.15% per point</option>
+                <option value="0.2">0.20% per point</option>
+                <option value="0.25" selected>0.25% per point (typical)</option>
+                <option value="0.3">0.30% per point</option>
+                <option value="0.35">0.35% per point</option>
+              </select>
+            </div>
+            <div class="helper">Rate drop per point; ask your lender for their rate sheet</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -338,7 +368,7 @@
     </div>
 
     <!-- Payment breakdown -->
-    <div class="card-inner-section">
+    <div class="card-inner-section" style="padding-top:16px">
       <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px">MONTHLY PAYMENT BREAKDOWN</div>
 
       <div class="afford-breakdown-row">
@@ -364,6 +394,18 @@
       <div class="afford-breakdown-total">
         <span>Total Monthly</span>
         <span id="break-total">—</span>
+      </div>
+      <div id="break-points-wrap" style="display:none;border-top:1px solid var(--border);margin-top:10px;padding-top:10px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">UPFRONT COST (ONE-TIME)</div>
+        <div class="afford-breakdown-row">
+          <span>Discount Points</span>
+          <strong id="break-points">—</strong>
+        </div>
+        <div class="afford-breakdown-row" id="break-power-gain-row" style="margin-bottom:0">
+          <span style="color:var(--text-muted)">Buying power gained</span>
+          <strong id="break-power-gain" style="color:var(--green)">—</strong>
+        </div>
+        <div id="points-note" style="margin-top:12px;padding:10px 12px;background:var(--surface-alt,#f9f9f9);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-muted);line-height:1.5"></div>
       </div>
     </div>
 
@@ -396,7 +438,7 @@
       <table class="afford-sens-table">
         <thead>
           <tr>
-            <th>Rate</th>
+            <th id="sensRateHeader">Rate</th>
             <th>Max Purchase Price</th>
             <th>Monthly Payment</th>
           </tr>
@@ -527,7 +569,7 @@
 
 </div><!-- /app -->
 
-<script src="afford.js?v=1"></script>
+<script src="afford.js?v=2"></script>
 <script>
 /* ── Field tip tooltips ── */
 (function () {

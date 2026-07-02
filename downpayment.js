@@ -13,18 +13,20 @@ function trackCalc(name, action) {
 const DP_LS_KEY = 'dpCalc_v1';
 
 const DEFAULTS = {
-  homePrice:      500000,
-  savings:        150000,
-  mortgageRate:   6.75,
-  loanTerm:       30,
-  horizon:        10,
-  investReturn:   7.0,
-  pmiRate:        0.85,
-  pmiMode:        'pct',
-  pmiDollar:      0,
-  appreciation:   3.0,
-  customDpMode:   'pct',
-  customDp:       0,
+  homePrice:       500000,
+  savings:         150000,
+  mortgageRate:    6.75,
+  loanTerm:        30,
+  horizon:         10,
+  investReturn:    7.0,
+  pmiRate:         0.85,
+  pmiMode:         'pct',
+  pmiDollar:       0,
+  appreciation:    3.0,
+  customDpMode:    'pct',
+  customDp:        0,
+  discountPoints:  0,
+  pointsReduction: 0.25,
 };
 
 let state = { ...DEFAULTS };
@@ -38,6 +40,8 @@ function fmt(n) {
   const abs = Math.abs(Math.round(n));
   return (n < 0 ? '−$' : '$') + abs.toLocaleString('en-US');
 }
+
+function fmtRate(r) { return parseFloat(r.toFixed(3)) + '%'; }
 
 function fmtMonths(m) {
   if (!isFinite(m) || m <= 0) return '—';
@@ -77,20 +81,27 @@ const SC_COLORS = { min: '#64748b', twenty: '#4f46e5', max: '#0d9488', custom: '
 function buildScenarios(s) {
   const p   = s.homePrice;
   const sav = s.savings;
+  const ptsFrac = (s.discountPoints || 0) / 100;
+
+  // When points are being paid, the max down payment is constrained:
+  // dp + ptsFrac * (price - dp) <= sav  →  dp <= (sav - ptsFrac * price) / (1 - ptsFrac)
+  const effectiveMaxSav = ptsFrac > 0 && ptsFrac < 1
+    ? Math.max(0, (sav - ptsFrac * p) / (1 - ptsFrac))
+    : sav;
 
   // Minimum: 5% down (or less if savings are tight, floor at 3%)
-  const minDp = Math.max(p * 0.03, Math.min(p * 0.05, sav * 0.99));
+  const minDp = Math.max(p * 0.03, Math.min(p * 0.05, effectiveMaxSav * 0.99));
 
   // 20% threshold (avoids PMI)
   const dp20 = p * 0.20;
 
-  // Maximum: all available cash (cap at 90% of price to keep some liquidity note)
-  const dpMax = Math.min(sav, p * 0.90);
+  // Maximum: all available cash (after reserving for points), cap at 90% of price
+  const dpMax = Math.min(effectiveMaxSav, p * 0.90);
 
   const dps = [{ dp: minDp, key: 'min' }];
 
   // Only add 20% scenario if savings can reach it and it's meaningfully above min
-  if (sav >= dp20 * 1.02 && dp20 > minDp * 1.08) {
+  if (effectiveMaxSav >= dp20 * 1.02 && dp20 > minDp * 1.08) {
     dps.push({ dp: dp20, key: 'twenty' });
   }
 
@@ -103,7 +114,7 @@ function buildScenarios(s) {
   // Custom scenario (user-defined, appended as 4th card)
   if (s.customDp > 0) {
     const raw = s.customDpMode === 'pct' ? p * s.customDp / 100 : s.customDp;
-    const clamped = Math.min(Math.max(raw, 0), Math.min(sav, p * 0.99));
+    const clamped = Math.min(Math.max(raw, 0), Math.min(effectiveMaxSav, p * 0.99));
     if (clamped > 0) dps.push({ dp: clamped, key: 'custom' });
   }
 
@@ -124,22 +135,28 @@ function buildScenarios(s) {
 // Wealth at horizon = home equity + investment portfolio.
 
 function simulate(scenarios, s) {
+  const pts           = s.discountPoints  || 0;
+  const red           = s.pointsReduction || 0.25;
+  const effectiveRate = Math.max(0.5, s.mortgageRate - pts * red);
+
   const N_mo     = s.horizon * 12;
-  const r_mort   = s.mortgageRate / 100 / 12;
+  const r_mort   = effectiveRate / 100 / 12;
   const r_inv    = s.investReturn / 100 / 12;
   const termMo   = s.loanTerm * 12;
   const appMoFac = Math.pow(1 + s.appreciation / 100, 1 / 12);
 
   // Pre-compute per-scenario static values
   const meta = scenarios.map(({ dp }) => {
-    const loan    = Math.max(0, s.homePrice - dp);
-    const pmt     = monthlyPmt(loan, s.mortgageRate, termMo);
-    const hasPMI  = (dp / s.homePrice) < 0.20 && loan > 0;
-    const pmiMo   = hasPMI
+    const loan       = Math.max(0, s.homePrice - dp);
+    const pointsCost = pts > 0 ? pts / 100 * loan : 0;
+    const pmt        = monthlyPmt(loan, effectiveRate, termMo);
+    const hasPMI     = (dp / s.homePrice) < 0.20 && loan > 0;
+    const pmiMo      = hasPMI
       ? (s.pmiMode === 'dollar' ? (s.pmiDollar || 0) : loan * (s.pmiRate / 100) / 12)
       : 0;
-    const pmiStop = hasPMI ? pmiDropoffMonth(loan, s.homePrice, s.mortgageRate, pmt) : 0;
-    return { loan, pmt, hasPMI, pmiMo, pmiStop, initialInvest: Math.max(0, s.savings - dp) };
+    const pmiStop    = hasPMI ? pmiDropoffMonth(loan, s.homePrice, effectiveRate, pmt) : 0;
+    return { loan, pmt, hasPMI, pmiMo, pmiStop, pointsCost,
+             initialInvest: Math.max(0, s.savings - dp - pointsCost) };
   });
 
   const balances   = meta.map(m => m.loan);
@@ -201,7 +218,7 @@ function simulate(scenarios, s) {
     finalHomeValue: homeValue,
   }));
 
-  return { results, yearlyWealth };
+  return { results, yearlyWealth, effectiveRate };
 }
 
 // ── Calculate ────────────────────────────────────────────────────────────────
@@ -217,7 +234,8 @@ function calculate() {
 
 // ── Render ───────────────────────────────────────────────────────────────────
 
-function renderScenarioCards(results) {
+function renderScenarioCards(results, effectiveRate) {
+  const pts     = state.discountPoints || 0;
   const bestIdx = results.reduce((b, r, i) => r.totalWealth > results[b].totalWealth ? i : b, 0);
   const grid = document.getElementById('dpScenarioCards');
   grid.innerHTML = '';
@@ -240,7 +258,11 @@ function renderScenarioCards(results) {
       </div>
       <div class="dp-sc-body">
         <div class="dp-sc-row"><span>Loan amount</span><b>${fmt(r.loan)}</b></div>
-        <div class="dp-sc-row"><span>Monthly P&amp;I</span><b>${fmt(Math.round(r.pmt))}/mo</b></div>
+        ${pts > 0 ? `<div class="dp-sc-row"><span>Points cost (upfront)</span><b style="color:var(--red)">${fmt(Math.round(r.pointsCost))}</b></div>` : ''}
+        <div class="dp-sc-row">
+          <span>Monthly P&amp;I${pts > 0 ? ` <span class="dp-sc-note">(${fmtRate(effectiveRate)} eff.)</span>` : ''}</span>
+          <b>${fmt(Math.round(r.pmt))}/mo</b>
+        </div>
         <div class="dp-sc-row">
           <span>PMI</span>
           <b>${r.hasPMI
@@ -271,7 +293,7 @@ function renderScenarioCards(results) {
   return bestIdx;
 }
 
-function renderInsight(results, bestIdx) {
+function renderInsight(results, bestIdx, effectiveRate) {
   const el     = document.getElementById('dpInsight');
   const s      = state;
   const winner = results[bestIdx];
@@ -303,10 +325,28 @@ function renderInsight(results, bestIdx) {
     msg = `<strong>20% down is the sweet spot after ${s.horizon} years.</strong> Eliminating PMI (which costs ${fmt(Math.round(pmiCost))} over the period) while keeping some capital invested beats both extremes — by ${fmt(gap)} vs. the minimum down scenario. The 20% threshold is the clearest threshold in residential mortgage math.`;
   }
 
+  const pts = s.discountPoints || 0;
+  let pointsNote = '';
+  if (pts > 0 && effectiveRate != null) {
+    const termMo  = s.loanTerm * 12;
+    const fBase   = monthlyPmt(1, s.mortgageRate, termMo);
+    const fEff    = monthlyPmt(1, effectiveRate, termMo);
+    const moDiff  = fBase - fEff;
+    const beYears = moDiff > 0 ? (pts / 100 / moDiff / 12).toFixed(1) : null;
+    const beMonths = moDiff > 0 ? Math.round(pts / 100 / moDiff) : Infinity;
+    const horizonNote = beMonths <= s.horizon * 12
+      ? `within your ${s.horizon}-year horizon`
+      : `beyond your ${s.horizon}-year horizon`;
+    pointsNote = `<p style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.2);font-size:12px;opacity:0.85">` +
+      `With ${pts} point${pts !== 1 ? 's' : ''} applied, the effective rate is ${fmtRate(effectiveRate)} (vs. ${fmtRate(s.mortgageRate)} without). ` +
+      `Points cost 1% of each scenario's loan at closing and are deducted from investable cash. ` +
+      `Break-even on monthly savings: ~${beYears} years (${horizonNote}).</p>`;
+  }
+
   el.className = 'refi-verdict ' + cls;
   el.innerHTML = `
     <div class="refi-verdict-icon">${icon}</div>
-    <div class="refi-verdict-text"><p>${msg}</p></div>`;
+    <div class="refi-verdict-text"><p>${msg}</p>${pointsNote}</div>`;
 }
 
 function renderChart(c) {
@@ -365,6 +405,21 @@ function renderLegend(results) {
   el.innerHTML = results.map(r =>
     `<span class="leg-item" style="color:${r.color}">● ${r.label}</span>`
   ).join('');
+}
+
+// ── Effective rate display ───────────────────────────────────────────────────
+
+function updateEffectiveRateNote(effectiveRate) {
+  const note = document.getElementById('effectiveRateNote');
+  const val  = document.getElementById('effectiveRateVal');
+  const pts  = state.discountPoints || 0;
+  if (!note) return;
+  if (pts > 0 && effectiveRate != null) {
+    note.style.display = '';
+    if (val) val.textContent = fmtRate(effectiveRate);
+  } else {
+    note.style.display = 'none';
+  }
 }
 
 // ── PMI mode helpers ─────────────────────────────────────────────────────────
@@ -427,16 +482,18 @@ function recalc() {
     lastCalc = c;
     wrap.style.display  = '';
     empty.style.display = 'none';
-    const bestIdx = renderScenarioCards(c.results);
-    renderInsight(c.results, bestIdx);
+    const bestIdx = renderScenarioCards(c.results, c.effectiveRate);
+    renderInsight(c.results, bestIdx, c.effectiveRate);
     renderChart(c);
     renderLegend(c.results);
     updateMobileBar(c.results, bestIdx);
+    updateEffectiveRateNote(c.effectiveRate);
     trackCalc('downpayment', 'used');
   } else {
     wrap.style.display  = 'none';
     empty.style.display = '';
     updateMobileBar(null, -1);
+    updateEffectiveRateNote(null);
   }
   updatePmiHint();
   saveState();
@@ -481,6 +538,8 @@ function populateFields() {
     appreciation: s.appreciation,
     customDpPct:    cdpMode === 'pct'    ? (s.customDp || '') : '',
     customDpDollar: cdpMode === 'dollar' ? (s.customDp || '') : '',
+    discountPoints:  s.discountPoints  || 0,
+    pointsReduction: s.pointsReduction || 0.25,
   };
   Object.entries(map).forEach(([id, val]) => {
     const el = document.getElementById(id);
@@ -573,6 +632,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Discount points and rate reduction selects
+  document.getElementById('discountPoints')?.addEventListener('change', () => {
+    state.discountPoints = parseFloat(document.getElementById('discountPoints').value) || 0;
+    recalc();
+  });
+  document.getElementById('pointsReduction')?.addEventListener('change', () => {
+    state.pointsReduction = parseFloat(document.getElementById('pointsReduction').value) || 0.25;
+    recalc();
+  });
 
   // Custom scenario inputs
   ['customDpPct', 'customDpDollar'].forEach(id => {

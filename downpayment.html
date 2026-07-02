@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=50">
+  <link rel="stylesheet" href="styles.css?v=52">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -168,6 +168,7 @@
             <span class="horizon-edge-label">12%</span>
           </div>
           <div class="helper">Use the interest rate, not APR</div>
+          <div class="helper" id="effectiveRateNote" style="display:none;color:var(--green);font-weight:500">Effective rate after points: <span id="effectiveRateVal"></span></div>
         </div>
         <div class="field">
           <label>LOAN TERM</label>
@@ -178,6 +179,43 @@
               <option value="15">15 years</option>
             </select>
           </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <div class="label-tip-row">
+            <label>DISCOUNT POINTS</label>
+            <button class="tip-btn" aria-label="Learn more" data-tip="Discount points are upfront fees paid at closing to reduce your mortgage rate. One point = 1% of the loan amount. Paying points lowers your monthly payment but reduces the cash you have left to invest. This calculator deducts the points cost from investable cash for each scenario, so you see the true tradeoff between buying down the rate and keeping more capital working in the market.">?</button>
+          </div>
+          <div class="input-wrap" style="padding:0">
+            <select id="discountPoints" class="input-select" style="height:36px;padding:0 10px;width:100%">
+              <option value="0" selected>0 points (no buydown)</option>
+              <option value="0.5">0.5 points</option>
+              <option value="1">1 point</option>
+              <option value="1.5">1.5 points</option>
+              <option value="2">2 points</option>
+              <option value="2.5">2.5 points</option>
+              <option value="3">3 points</option>
+            </select>
+          </div>
+          <div class="helper">Points cost reduces the savings pool available for each scenario</div>
+        </div>
+        <div class="field">
+          <div class="label-tip-row">
+            <label>RATE REDUCTION / POINT</label>
+            <button class="tip-btn" aria-label="Learn more" data-tip="How much the interest rate drops per discount point paid. The common rule of thumb is 0.25% per point, but the actual reduction varies by lender, loan type, and market conditions. Ask your lender for a rate sheet showing the specific options available to you.">?</button>
+          </div>
+          <div class="input-wrap" style="padding:0">
+            <select id="pointsReduction" class="input-select" style="height:36px;padding:0 10px;width:100%">
+              <option value="0.15">0.15% per point</option>
+              <option value="0.2">0.20% per point</option>
+              <option value="0.25" selected>0.25% per point (typical)</option>
+              <option value="0.3">0.30% per point</option>
+              <option value="0.35">0.35% per point</option>
+            </select>
+          </div>
+          <div class="helper">Rate drop per point; ask your lender for their rate sheet</div>
         </div>
       </div>
 

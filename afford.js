@@ -9,7 +9,9 @@
     taxRate: 1.2,
     insRate: 0.5,
     hoa: 0,
-    pmiRate: 0.85
+    pmiRate: 0.85,
+    discountPoints: 0,
+    pointsReduction: 0.25
   };
 
   var STORAGE_KEY = 'afford_v2';
@@ -27,6 +29,8 @@
   }
   function fmtPct(p) { return (p * 100).toFixed(1) + '%'; }
 
+  function fmtRate(r) { return parseFloat(r.toFixed(3)) + '%'; }
+
   function pmtFactor(r, n) {
     if (r === 0) return 1 / n;
     return r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
@@ -34,7 +38,10 @@
 
   function solve(inp) {
     if (inp.income <= 0) return null;
-    var r       = inp.rate / 100 / 12;
+    var pts           = inp.discountPoints  || 0;
+    var red           = inp.pointsReduction || 0.25;
+    var effectiveRate = Math.max(0.5, inp.rate - pts * red);
+    var r       = effectiveRate / 100 / 12;
     var n       = inp.term * 12;
     var grossMo = inp.income / 12;
     var factor  = pmtFactor(r, n);
@@ -81,29 +88,35 @@
     var mPmi   = hasPmi ? (pmiMoF || L * pmiMoR) : 0;
     var mTotal = mPni + mTax + mIns + mPmi + hoa;
 
+    var pointsCost = pts > 0 ? pts / 100 * L : 0;
+
     return {
       P: P, L: L, ltv: ltv, hasPmi: hasPmi,
       mTotal: mTotal, mPni: mPni, mTax: mTax, mIns: mIns, mPmi: mPmi, mHoa: hoa,
       frontDTI: mTotal / grossMo,
       backDTI:  (mTotal + inp.debts) / grossMo,
-      binding: binding
+      binding: binding,
+      effectiveRate: effectiveRate,
+      pointsCost: pointsCost
     };
   }
 
   function getInputs() {
     return {
-      income:      parseFloat(document.getElementById('income').value)      || 0,
-      debts:       parseFloat(document.getElementById('debts').value)       || 0,
-      downPayment: parseFloat(document.getElementById('downPayment').value) || 0,
-      rate:        parseFloat(document.getElementById('rate').value)        || 6.75,
-      term:        parseInt(document.getElementById('term').value)          || 30,
-      taxRate:     parseFloat(document.getElementById('taxRate').value)     || (taxMode === 'dollar' ? 4800 : 1.2),
-      insRate:     parseFloat(document.getElementById('insRate').value)     || (insMode === 'dollar' ? 2000 : 0.5),
-      hoa:         parseFloat(document.getElementById('hoa').value)        || 0,
-      pmiRate:     parseFloat(document.getElementById('pmiRate').value)    || (pmiMode === 'dollar' ? 200 : 0.85),
-      taxMode:     taxMode,
-      insMode:     insMode,
-      pmiMode:     pmiMode
+      income:          parseFloat(document.getElementById('income').value)          || 0,
+      debts:           parseFloat(document.getElementById('debts').value)           || 0,
+      downPayment:     parseFloat(document.getElementById('downPayment').value)     || 0,
+      rate:            parseFloat(document.getElementById('rate').value)            || 6.75,
+      term:            parseInt(document.getElementById('term').value)              || 30,
+      taxRate:         parseFloat(document.getElementById('taxRate').value)         || (taxMode === 'dollar' ? 4800 : 1.2),
+      insRate:         parseFloat(document.getElementById('insRate').value)         || (insMode === 'dollar' ? 2000 : 0.5),
+      hoa:             parseFloat(document.getElementById('hoa').value)             || 0,
+      pmiRate:         parseFloat(document.getElementById('pmiRate').value)         || (pmiMode === 'dollar' ? 200 : 0.85),
+      discountPoints:  parseFloat(document.getElementById('discountPoints').value)  || 0,
+      pointsReduction: parseFloat(document.getElementById('pointsReduction').value) || 0.25,
+      taxMode:         taxMode,
+      insMode:         insMode,
+      pmiMode:         pmiMode
     };
   }
 
@@ -117,6 +130,10 @@
   function render(res) {
     if (!res) {
       ['stat-maxprice','stat-monthly','stat-frontdti','stat-backdti','stat-frontdti-2','stat-backdti-2'].forEach(function (id) { setEl(id, '—'); });
+      var pw = document.getElementById('break-points-wrap');
+      if (pw) pw.style.display = 'none';
+      var en = document.getElementById('effectiveRateNote');
+      if (en) en.style.display = 'none';
       return;
     }
 
@@ -139,6 +156,63 @@
 
     var pmiRow = document.getElementById('break-pmi-row');
     if (pmiRow) pmiRow.style.opacity = res.hasPmi ? '1' : '0.4';
+
+    // Points cost (upfront) and effective rate note
+    var pointsWrap        = document.getElementById('break-points-wrap');
+    var effectiveRateNote = document.getElementById('effectiveRateNote');
+    if (res.pointsCost > 0) {
+      setEl('break-points', fmtDollar(res.pointsCost));
+      // Buying power gain vs. no-points scenario
+      var inpPts = getInputs();
+      var res0 = solve(Object.assign({}, inpPts, {discountPoints: 0}));
+      var gain = res0 && res0.P > 0 ? Math.round(res.P - res0.P) : 0;
+      setEl('break-power-gain', gain > 0 ? '+' + fmtDollar(gain) : '—');
+
+      // Break-even: months to recoup points cost via lower P&I at a fixed price
+      // = (pts/100) / (factor_base - factor_eff) — independent of loan size
+      var n0 = inpPts.term * 12;
+      var fBase = pmtFactor(inpPts.rate / 100 / 12, n0);
+      var fEff  = pmtFactor(res.effectiveRate / 100 / 12, n0);
+      var moDiff = fBase - fEff;
+      var pointsNote = document.getElementById('points-note');
+      if (pointsNote) {
+        if (moDiff > 0) {
+          var beMonths = Math.round((inpPts.discountPoints / 100) / moDiff);
+          var beYears  = (beMonths / 12).toFixed(1);
+          pointsNote.innerHTML = '<strong style="color:var(--text)">Tradeoff to consider:</strong> Points lower your rate but shift cost from monthly to upfront; that cash could also go toward a larger down payment instead. ' +
+            'At a fixed purchase price, each point saves roughly <strong style="color:var(--text)">' + fmtDollar(moDiff * 100000) + '/mo per $100k borrowed</strong>. ' +
+            'The break-even on ' + inpPts.discountPoints + ' point' + (inpPts.discountPoints !== 1 ? 's' : '') + ' is approximately <strong style="color:var(--text)">' + beYears + ' years</strong>. If you sell or refinance before then, the upfront cost won\'t pay off.';
+        } else {
+          pointsNote.textContent = '';
+        }
+      }
+
+      if (pointsWrap) pointsWrap.style.display = '';
+      if (effectiveRateNote) {
+        effectiveRateNote.style.display = '';
+        setEl('effectiveRateVal', fmtRate(res.effectiveRate));
+      }
+    } else {
+      if (pointsWrap) pointsWrap.style.display = 'none';
+      if (effectiveRateNote) effectiveRateNote.style.display = 'none';
+      var pn = document.getElementById('points-note');
+      if (pn) pn.textContent = '';
+    }
+
+    // Points helper text
+    var pointsHelper = document.getElementById('pointsHelper');
+    if (pointsHelper) {
+      var pts = parseFloat(document.getElementById('discountPoints').value) || 0;
+      var red = parseFloat(document.getElementById('pointsReduction').value) || 0.25;
+      var baseR = parseFloat(document.getElementById('rate').value) || 6.75;
+      if (pts > 0) {
+        var eff = Math.max(0.5, baseR - pts * red);
+        var drop = parseFloat((pts * red).toFixed(3));
+        pointsHelper.textContent = pts + ' pt' + (pts !== 1 ? 's' : '') + ' × ' + red + '% = −' + drop + '% → effective rate: ' + fmtRate(eff);
+      } else {
+        pointsHelper.textContent = '0 = no rate buydown; each point costs 1% of loan at closing';
+      }
+    }
 
     // DTI bars
     var frontFill = document.getElementById('dti-front-fill');
@@ -181,8 +255,10 @@
 
   function renderSensitivity() {
     var tbody = document.getElementById('sensRows');
+    var sensRateHeader = document.getElementById('sensRateHeader');
     if (!tbody) return;
     var inp = getInputs();
+    var pts = inp.discountPoints || 0;
     var offsets = [-1, -0.5, 0, 0.5, 1];
     var html = '';
     offsets.forEach(function (off) {
@@ -191,13 +267,21 @@
       var r = solve(Object.assign({}, inp, {rate: rt}));
       if (!r) return;
       var cur = off === 0;
+      var rateLabel = pts > 0
+        ? fmtRate(r.effectiveRate) + ' <span style="color:var(--text-muted);font-size:11px">eff.</span>'
+        : rt.toFixed(2) + '%';
       html += '<tr' + (cur ? ' class="afford-sens-current"' : '') + '>' +
-        '<td>' + rt.toFixed(2) + '%' + (cur ? ' <span class="afford-sens-badge">current</span>' : '') + '</td>' +
+        '<td>' + rateLabel + (cur ? ' <span class="afford-sens-badge">current</span>' : '') + '</td>' +
         '<td>' + fmtDollar(r.P) + '</td>' +
         '<td>' + fmtDollar(r.mTotal) + '/mo</td>' +
         '</tr>';
     });
     tbody.innerHTML = html;
+    if (sensRateHeader) {
+      sensRateHeader.textContent = pts > 0
+        ? 'Eff. Rate (' + pts + ' pt' + (pts !== 1 ? 's' : '') + ')'
+        : 'Rate';
+    }
   }
 
   function refreshAdvPanel() {
@@ -282,8 +366,10 @@
     document.getElementById('term').value        = v.term        != null ? v.term        : DEFAULTS.term;
     document.getElementById('taxRate').value     = v.taxRate     != null ? v.taxRate     : DEFAULTS.taxRate;
     document.getElementById('insRate').value     = v.insRate     != null ? v.insRate     : DEFAULTS.insRate;
-    document.getElementById('hoa').value         = v.hoa || '';
-    document.getElementById('pmiRate').value     = v.pmiRate     != null ? v.pmiRate     : DEFAULTS.pmiRate;
+    document.getElementById('hoa').value              = v.hoa || '';
+    document.getElementById('pmiRate').value          = v.pmiRate          != null ? v.pmiRate          : DEFAULTS.pmiRate;
+    document.getElementById('discountPoints').value   = v.discountPoints   != null ? v.discountPoints   : DEFAULTS.discountPoints;
+    document.getElementById('pointsReduction').value  = v.pointsReduction  != null ? v.pointsReduction  : DEFAULTS.pointsReduction;
     if (v.taxMode) applyTaxMode(v.taxMode);
     if (v.insMode) applyInsMode(v.insMode);
     if (v.pmiMode) applyPmiMode(v.pmiMode);
@@ -296,9 +382,10 @@
     rateInput.addEventListener('input', function () { rateSlider.value = this.value; update(); });
     rateSlider.addEventListener('input', function () { rateInput.value = parseFloat(this.value).toFixed(2); update(); });
 
-    ['income','debts','downPayment','taxRate','insRate','hoa','pmiRate'].forEach(function (id) {
+    ['income','debts','downPayment','taxRate','insRate','hoa','pmiRate','discountPoints'].forEach(function (id) {
       document.getElementById(id).addEventListener('input', update);
     });
+    document.getElementById('pointsReduction').addEventListener('change', update);
     document.getElementById('term').addEventListener('change', update);
 
     document.querySelectorAll('[data-tax-mode]').forEach(function (btn) {
@@ -394,7 +481,7 @@
     var vals = DEFAULTS;
     if (params.has('income')) {
       vals = {};
-      ['income','debts','downPayment','rate','term','taxRate','insRate','hoa','pmiRate'].forEach(function (k) {
+      ['income','debts','downPayment','rate','term','taxRate','insRate','hoa','pmiRate','discountPoints','pointsReduction'].forEach(function (k) {
         vals[k] = params.has(k) ? parseFloat(params.get(k)) : DEFAULTS[k];
       });
       ['taxMode','insMode','pmiMode'].forEach(function (k) {
