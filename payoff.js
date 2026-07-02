@@ -108,13 +108,13 @@ function calculate() {
     oppCost = Math.max(0, fvGrown - totalInvested);
   }
 
-  // After early payoff, the freed-up standard payment can be invested for the remaining months
+  // After early payoff, the freed-up standard payment can be invested for the remaining months.
+  // Use gain only (not total FV) to stay symmetric with oppCost, which also uses gain only.
   const postPayoffMonths = Math.max(0, n - nNew);
   let postPayoffBenefit = 0;
-  if (postPayoffMonths > 0 && orig.P > 0) {
-    postPayoffBenefit = r_inv > 0
-      ? orig.P * (Math.pow(1 + r_inv, postPayoffMonths) - 1) / r_inv
-      : orig.P * postPayoffMonths;
+  if (postPayoffMonths > 0 && orig.P > 0 && r_inv > 0) {
+    const fvTotal = orig.P * (Math.pow(1 + r_inv, postPayoffMonths) - 1) / r_inv;
+    postPayoffBenefit = Math.max(0, fvTotal - orig.P * postPayoffMonths);
   }
 
   const netBenefit = interestSaved + postPayoffBenefit - oppCost;
@@ -341,7 +341,7 @@ function render() {
     const rate = state.interestRate;
     const inv  = state.investReturn;
 
-    const postPayoffStr = r.postPayoffMonths > 0 ? ` Paying off ${fmtMonths(r.monthsSaved)} early also frees up ${fmt(r.stdPayment)}/mo for ${fmtMonths(r.postPayoffMonths)} — estimated at ${fmt(r.postPayoffBenefit)} if invested (included in net benefit above).` : '';
+    const postPayoffStr = r.postPayoffMonths > 0 ? ` Paying off ${fmtMonths(r.monthsSaved)} early also frees up ${fmt(r.stdPayment)}/mo for ${fmtMonths(r.postPayoffMonths)} — estimated investment gain of ${fmt(r.postPayoffBenefit)} (included in net benefit above).` : '';
     if (noExtra) {
       cls = 'refi-verdict--info'; icon = 'ℹ';
       heading = 'Enter an extra payment amount';
@@ -353,7 +353,7 @@ function render() {
     } else if (r.netBenefit > 0) {
       cls = 'refi-verdict--green'; icon = '✓';
       heading = 'Extra payments come out ahead';
-      body = `Even with an expected investment return of ${inv}%, extra payments come out ${fmt(r.netBenefit)} ahead — combining ${fmt(r.interestSaved)} in interest savings and ${fmt(r.postPayoffBenefit)} in freed-up payments invested after payoff, against an estimated ${fmt(r.oppCost)} gain if the extra payments had been invested instead.`;
+      body = `Even with an expected investment return of ${inv}%, extra payments come out ${fmt(r.netBenefit)} ahead — combining ${fmt(r.interestSaved)} in interest savings and ${fmt(r.postPayoffBenefit)} in investment gains on freed-up payments after payoff, against an estimated ${fmt(r.oppCost)} gain if the extra payments had been invested instead.`;
     } else if (Math.abs(r.netBenefit) < r.interestSaved * 0.15) {
       cls = 'refi-verdict--amber'; icon = '⚠';
       heading = 'Close call — largely a personal finance decision';
@@ -361,7 +361,7 @@ function render() {
     } else {
       cls = 'refi-verdict--info'; icon = 'ℹ';
       heading = `Investing may outperform at ${inv}%`;
-      body = `At your expected investment return of ${inv}%, investing the same dollars would earn an estimated ${fmt(r.oppCost)} in gains — more than the ${fmt(r.interestSaved)} in interest savings plus ${fmt(r.postPayoffBenefit)} in freed-up payment returns (net: ${fmt(Math.abs(r.netBenefit))} behind investing). That said, extra mortgage payments deliver a guaranteed ${rate}% return, while ${inv}% is an estimate and not guaranteed.`;
+      body = `At your expected investment return of ${inv}%, investing the same dollars would earn an estimated ${fmt(r.oppCost)} in gains — more than the ${fmt(r.interestSaved)} in interest savings plus ${fmt(r.postPayoffBenefit)} in investment gains on freed-up payments (net: ${fmt(Math.abs(r.netBenefit))} behind investing). That said, extra mortgage payments deliver a guaranteed ${rate}% return, while ${inv}% is an estimate and not guaranteed.`;
     }
 
     verdict.className = 'refi-verdict ' + cls;
@@ -409,7 +409,7 @@ function render() {
   set('detail-postpayoff', noExtra ? '—' : fmt(r.postPayoffBenefit), !noExtra ? 'var(--green)' : '');
   const ppLabel = document.getElementById('detail-postpayoff-label');
   if (ppLabel && !noExtra && r.postPayoffMonths > 0) {
-    ppLabel.textContent = 'Freed-up payment invested (' + fmtMonths(r.postPayoffMonths) + ')';
+    ppLabel.textContent = 'Freed-up payment gain (' + fmtMonths(r.postPayoffMonths) + ')';
   }
 
   set('detail-opp-cost',  noExtra ? '—' : '-' + fmt(r.oppCost),  !noExtra ? 'var(--red)' : '');
