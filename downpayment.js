@@ -634,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Discount points and rate reduction selects
-  document.getElementById('discountPoints')?.addEventListener('change', () => {
+  document.getElementById('discountPoints')?.addEventListener('input', () => {
     state.discountPoints = parseFloat(document.getElementById('discountPoints').value) || 0;
     recalc();
   });

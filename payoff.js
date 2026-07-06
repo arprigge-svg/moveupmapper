@@ -179,7 +179,6 @@ function renderAmortTable(r) {
 
   function fc(n) { return '$' + Math.round(n).toLocaleString(); }
 
-  let _tableIdx = 0;
   function buildTable(rows, title, accentColor) {
     const hdrs = '<tr><th>Mo</th><th>Pmt</th><th>Principal</th><th>Interest</th><th>Balance</th></tr>';
     function buildRow(row, i) {
@@ -188,11 +187,9 @@ function renderAmortTable(r) {
     }
     const previewTrs = rows.slice(0, PREVIEW).map((row, i) => buildRow(row, i)).join('');
     const restTrs    = rows.slice(PREVIEW).map((row, i) => buildRow(row, PREVIEW + i)).join('');
-    const moreId = 'amortMore' + (_tableIdx++);
     return `<div>
       <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:${accentColor};text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid ${accentColor}30">${title}</div>
-      <table class="payoff-amort-table"><thead>${hdrs}</thead><tbody>${previewTrs}</tbody><tbody id="${moreId}" style="display:none">${restTrs}</tbody></table>
-      <button class="payoff-amort-expand" data-target="${moreId}">Show all 12 months ↓</button>
+      <table class="payoff-amort-table"><thead>${hdrs}</thead><tbody>${previewTrs}</tbody><tbody class="payoff-amort-more" style="display:none">${restTrs}</tbody></table>
     </div>`;
   }
 
@@ -200,19 +197,23 @@ function renderAmortTable(r) {
     ? 'With ' + fmt(r.lump) + ' lump sum'
     : 'With +' + fmt(r.extraMo) + '/mo extra';
 
+  const hasMore = stdRows.length > PREVIEW || accelRows.length > PREVIEW;
   container.innerHTML =
     '<div class="two-col" style="gap:20px;align-items:start">' +
     buildTable(stdRows, 'Standard Schedule', '#9ca3af') +
     buildTable(accelRows, accelLabel, '#16a34a') +
-    '</div>';
+    '</div>' +
+    (hasMore ? '<button class="payoff-amort-expand" id="amortExpandAll">Show all months ↓</button>' : '');
 
-  container.querySelectorAll('.payoff-amort-expand').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const tbody = document.getElementById(this.dataset.target);
-      if (tbody) tbody.style.display = '';
+  const expandBtn = container.querySelector('#amortExpandAll');
+  if (expandBtn) {
+    expandBtn.addEventListener('click', function () {
+      container.querySelectorAll('.payoff-amort-more').forEach(function (tbody) {
+        tbody.style.display = '';
+      });
       this.style.display = 'none';
     });
-  });
+  }
 }
 
 // ── Chart ─────────────────────────────────────────────────────────────
