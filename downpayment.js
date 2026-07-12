@@ -638,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.discountPoints = parseFloat(document.getElementById('discountPoints').value) || 0;
     recalc();
   });
-  document.getElementById('pointsReduction')?.addEventListener('change', () => {
+  document.getElementById('pointsReduction')?.addEventListener('input', () => {
     state.pointsReduction = parseFloat(document.getElementById('pointsReduction').value) || 0.25;
     recalc();
   });

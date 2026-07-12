@@ -218,6 +218,7 @@
               <span class="horizon-edge-label">10%</span>
             </div>
             <div class="helper">Use the interest rate, not APR</div>
+            <div class="helper" id="effectiveRateNote" style="display:none;color:var(--green);font-weight:500">Effective rate after points: <span id="effectiveRateVal"></span></div>
           </div>
           <div class="field">
             <label>NEW LOAN TERM</label>
@@ -233,13 +234,23 @@
           </div>
         </div>
 
-        <div class="field">
-          <div class="label-tip-row"><label>DISCOUNT POINTS</label><button class="tip-btn" aria-label="Learn more" data-tip="Discount points are an upfront fee paid to the lender to buy down your interest rate. 1 point = 1% of your loan balance, and typically reduces your rate by 0.125–0.25% (varies by lender and market conditions). Enter the number of points your lender is quoting, and the calculator will add the cost to your upfront expenses and show you whether the rate reduction justifies the extra cost.">?</button></div>
-          <div class="input-wrap suffix">
-            <input type="number" id="points" min="0" max="4" step="0.25" value="0">
-            <span class="affix">pts</span>
+        <div class="two-col">
+          <div class="field">
+            <div class="label-tip-row"><label>DISCOUNT POINTS</label><button class="tip-btn" aria-label="Learn more" data-tip="Discount points are an upfront fee paid to the lender to buy down your interest rate. 1 point = 1% of your loan balance. Enter the number of points your lender is quoting alongside the rate reduction per point — the calculator will apply the rate reduction and add the cost to your upfront expenses.">?</button></div>
+            <div class="input-wrap suffix">
+              <input type="number" id="points" min="0" max="4" step="0.25" value="0">
+              <span class="affix">pts</span>
+            </div>
+            <div class="helper" id="pointsCostDisplay">Each point = 1% of loan balance; rate reduction per point set above</div>
           </div>
-          <div class="helper" id="pointsCostDisplay">Each point = 1% of loan balance, typically reduces your rate by ~0.125–0.25%.</div>
+          <div class="field">
+            <div class="label-tip-row"><label>RATE REDUCTION / POINT</label><button class="tip-btn" aria-label="Learn more" data-tip="How much your interest rate drops for each discount point paid. The common rule of thumb is 0.25% per point, but the actual reduction varies by lender, loan type, and market conditions. Ask your lender for a rate sheet showing options with and without points.">?</button></div>
+            <div class="input-wrap suffix">
+              <input type="number" id="pointsReduction" min="0.15" max="0.35" step="0.01" placeholder="0.25">
+              <span class="affix">%</span>
+            </div>
+            <div class="helper">Rate drop per point; ask your lender for their rate sheet</div>
+          </div>
         </div>
 
         <div class="two-col">
@@ -565,7 +576,7 @@
 </div><!-- /app -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="refi.js?v=10"></script>
+<script src="refi.js?v=11"></script>
 <script>
 /* ── Field tip tooltips ── */
 (function () {

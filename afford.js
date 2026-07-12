@@ -385,7 +385,7 @@
     ['income','debts','downPayment','taxRate','insRate','hoa','pmiRate','discountPoints'].forEach(function (id) {
       document.getElementById(id).addEventListener('input', update);
     });
-    document.getElementById('pointsReduction').addEventListener('change', update);
+    document.getElementById('pointsReduction').addEventListener('input', update);
     document.getElementById('term').addEventListener('change', update);
 
     document.querySelectorAll('[data-tax-mode]').forEach(function (btn) {

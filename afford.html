@@ -302,14 +302,9 @@
               <label>RATE REDUCTION / POINT</label>
               <button class="tip-btn" aria-label="Learn more" data-tip="How much your interest rate drops for each discount point paid. The common rule of thumb is 0.25% per point, but the actual reduction varies by lender, loan type, and market conditions. When comparing lenders, ask for a rate sheet showing options with and without points — the reduction is explicit. A higher reduction per point means buying points is a better deal.">?</button>
             </div>
-            <div class="input-wrap" style="padding:0">
-              <select id="pointsReduction" class="input-select" style="height:36px;padding:0 10px;width:100%">
-                <option value="0.15">0.15% per point</option>
-                <option value="0.2">0.20% per point</option>
-                <option value="0.25" selected>0.25% per point (typical)</option>
-                <option value="0.3">0.30% per point</option>
-                <option value="0.35">0.35% per point</option>
-              </select>
+            <div class="input-wrap suffix">
+              <input type="number" id="pointsReduction" min="0.15" max="0.35" step="0.01" placeholder="0.25">
+              <span class="affix">%</span>
             </div>
             <div class="helper">Rate drop per point; ask your lender for their rate sheet</div>
           </div>

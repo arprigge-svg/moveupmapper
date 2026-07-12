@@ -10,7 +10,7 @@ function trackCalc(name, action) {
   if (typeof gtag === 'function') gtag('event', 'calculator_' + action, { calculator: name });
 }
 
-const REFI_LS_KEY = 'refiCalc_v5';
+const REFI_LS_KEY = 'refiCalc_v6';
 
 const DEFAULTS = {
   loanBalance:      350000,
@@ -21,6 +21,7 @@ const DEFAULTS = {
   closingCosts:     4000,
   prepaidCosts:     2000,
   points:           0,
+  pointsReduction:  0.25,
   monthlyPMI:       0,
   pmiEliminated:    false,
   stayYears:        7,
@@ -67,7 +68,8 @@ function calculate() {
   const H  = Math.round(s.stayYears * 12);
 
   // Points cost (always out-of-pocket; not rollable)
-  const pointsCost   = (s.points || 0) * s.loanBalance / 100;
+  const pointsCost     = (s.points || 0) * s.loanBalance / 100;
+  const effectiveNewRate = Math.max(0.5, s.newRate - (s.points || 0) * (s.pointsReduction || 0.25));
 
   // Rolled closing costs (only base lender fees can be rolled; points and prepaids cannot)
   const prepaidCosts = s.prepaidCosts || 0;
@@ -83,7 +85,7 @@ function calculate() {
   const pmi = (s.pmiEliminated && s.monthlyPMI > 0) ? s.monthlyPMI : 0;
 
   const P1 = monthlyPmt(s.loanBalance, s.currentRate, n1);
-  const P2 = monthlyPmt(newLoanBal,    s.newRate,     n2);
+  const P2 = monthlyPmt(newLoanBal, effectiveNewRate, n2);
 
   const monthlySavings = (P1 + pmi) - P2;
 
@@ -113,7 +115,7 @@ function calculate() {
     totalIntCurrent, totalIntNew, interestSaved,
     grossSavings, oppCost, netBenefit,
     termExtended, termShortened, n1, n2, H, savingsHorizon,
-    rolledAmt, outOfPocket, newLoanBal, prepaidCosts, totalCosts, pointsCost,
+    rolledAmt, outOfPocket, newLoanBal, prepaidCosts, totalCosts, pointsCost, effectiveNewRate,
   };
 }
 
@@ -438,14 +440,25 @@ function render() {
     if (g) { g.textContent = unknown ? '—' : fmt(r.grossSavings); g.style.color = ''; }
   }
 
-  // Points cost display helper
+  // Points cost display helper and effective rate note
   const ptsDisplay = document.getElementById('pointsCostDisplay');
+  const effRateNote = document.getElementById('effectiveRateNote');
+  const effRateVal  = document.getElementById('effectiveRateVal');
   if (ptsDisplay) {
     const pts = state.points || 0;
     if (pts > 0) {
       ptsDisplay.textContent = pts + (pts === 1 ? ' point' : ' points') + ' × ' + fmt(state.loanBalance) + ' = ' + fmt(r.pointsCost) + ' added to upfront costs';
     } else {
-      ptsDisplay.textContent = 'Each point = 1% of loan balance, typically reduces your rate by ~0.125–0.25%.';
+      ptsDisplay.textContent = 'Each point = 1% of loan balance; rate reduction per point set above';
+    }
+  }
+  if (effRateNote) {
+    const pts = state.points || 0;
+    if (pts > 0) {
+      effRateNote.style.display = '';
+      if (effRateVal) effRateVal.textContent = parseFloat(r.effectiveNewRate.toFixed(3)) + '%';
+    } else {
+      effRateNote.style.display = 'none';
     }
   }
 
@@ -639,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Number inputs
-  ['loanBalance', 'currentRate', 'remainingYears', 'newRate', 'points', 'closingCosts', 'prepaidCosts', 'monthlyPMI', 'investmentReturn', 'rolledCosts'].forEach(function (id) {
+  ['loanBalance', 'currentRate', 'remainingYears', 'newRate', 'points', 'pointsReduction', 'closingCosts', 'prepaidCosts', 'monthlyPMI', 'investmentReturn', 'rolledCosts'].forEach(function (id) {
     const el = document.getElementById(id);
     if (!el) return;
     el.addEventListener('input', function () {
