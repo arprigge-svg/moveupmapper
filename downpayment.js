@@ -274,7 +274,7 @@ function renderScenarioCards(results, effectiveRate) {
         <div class="dp-sc-divider"></div>
         <div class="dp-sc-section-lbl">After ${state.horizon} ${state.horizon === 1 ? 'year' : 'years'}</div>
         <div class="dp-sc-row"><span>Home equity</span><b>${fmt(r.equity)}</b></div>
-        <div class="dp-sc-row"><span>Investment portfolio</span><b>${fmt(r.portfolio)}</b></div>
+        <div class="dp-sc-row"><span>Investment portfolio <button class="tip-btn" aria-label="Learn more" data-tip="Starts with any cash left over after the down payment, invested as a lump sum. Each month, the difference between this scenario's housing cost and the minimum-down scenario's cost is added to the portfolio and compounded at your investment return rate. So even when you put all savings toward the down payment, the lower monthly payment generates investable cash over time.">?</button></span><b>${fmt(r.portfolio)}</b></div>
         <div class="dp-sc-row">
           <span>Total PMI paid</span>
           <b style="color:${r.pmiPaid > 0 ? 'var(--red)' : 'var(--green)'}">${fmt(Math.round(r.pmiPaid))}</b>
