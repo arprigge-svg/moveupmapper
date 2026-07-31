@@ -1088,4 +1088,10 @@ function init() {
   $('printBtn').addEventListener('click', () => window.print());
 }
 
-document.addEventListener('DOMContentLoaded', init);
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', init);
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { DEFAULTS, mortgageFactor, calcEquity, calcAnnualPropertyTax, calcAffordablePrice, calculate };
+}

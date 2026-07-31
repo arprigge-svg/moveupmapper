@@ -817,4 +817,10 @@ function init() {
   recalc();
 }
 
-document.addEventListener('DOMContentLoaded', init);
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', init);
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { DEFAULTS, mortgagePI, loanBalance, computePMIDropOff, calculate };
+}

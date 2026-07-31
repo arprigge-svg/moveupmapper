@@ -484,6 +484,7 @@ function syncInputs() {
 }
 
 // ── Events ────────────────────────────────────────────────────────────
+if (typeof document !== 'undefined') {
 document.addEventListener('DOMContentLoaded', function () {
   document.addEventListener('input', function () { trackCalc('payoff', 'used'); }, { once: true, capture: true });
 
@@ -549,3 +550,8 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('printBtn')?.addEventListener('click', () => window.print());
 
 });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { DEFAULTS, state, monthlyPmt, amortize, calculate };
+}

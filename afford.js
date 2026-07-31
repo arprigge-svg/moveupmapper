@@ -375,6 +375,7 @@
     if (v.pmiMode) applyPmiMode(v.pmiMode);
   }
 
+  if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', function () {
     var rateInput  = document.getElementById('rate');
     var rateSlider = document.getElementById('rateSlider');
@@ -493,5 +494,10 @@
     setDefaults(vals);
     update();
   });
+  }
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { DEFAULTS, pmtFactor, solve };
+  }
 
 }());

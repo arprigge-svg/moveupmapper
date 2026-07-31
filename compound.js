@@ -1283,4 +1283,14 @@ function switchTab(tab) {
   if (tab === 'goal') recalcGoal();
 }
 
-document.addEventListener('DOMContentLoaded', init);
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', init);
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    DEFAULTS, GOAL_DEFAULTS,
+    simulate, simulateWithdrawal, compoundsLeadsAt, calculate,
+    simulateGoalPath, calculateGoal,
+  };
+}

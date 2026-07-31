@@ -555,6 +555,7 @@ function populateFields() {
 
 // ── Event wiring ─────────────────────────────────────────────────────────────
 
+if (typeof document !== 'undefined') {
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   populateFields();
@@ -727,3 +728,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   recalc();
 });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { DEFAULTS, monthlyPmt, pmiDropoffMonth, buildScenarios, simulate };
+}

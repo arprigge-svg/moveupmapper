@@ -624,6 +624,7 @@ function syncInputs() {
 }
 
 // ── Event wiring ────────────────────────────────────────────────────
+if (typeof document !== 'undefined') {
 document.addEventListener('DOMContentLoaded', function () {
   document.addEventListener('input', function () { trackCalc('refi', 'used'); }, { once: true, capture: true });
 
@@ -809,3 +810,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { DEFAULTS, state, monthlyPmt, calculate };
+}
