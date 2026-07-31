@@ -5,18 +5,18 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Housing Market in Context — Move Up Mapper</title>
-  <meta name="description" content="Six charts putting today's housing market in historical perspective — opportunity cost, affordability, rate spreads, price-to-rent, down payment burden, and the lock-in effect.">
+  <meta name="description" content="Eight charts putting today's housing market in historical perspective — opportunity cost, affordability, renter cost burden, rate spreads, price-to-rent, down payment burden, the lock-in effect, and transaction volume.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Move Up Mapper">
   <meta property="og:title" content="Housing Market in Context — Move Up Mapper">
-  <meta property="og:description" content="Six charts putting today's housing market in historical perspective — opportunity cost, affordability, rate spreads, price-to-rent, down payment burden, and the lock-in effect.">
+  <meta property="og:description" content="Eight charts putting today's housing market in historical perspective — opportunity cost, affordability, renter cost burden, rate spreads, price-to-rent, down payment burden, the lock-in effect, and transaction volume.">
   <meta property="og:url" content="https://www.moveupmapper.com/market">
   <meta property="og:image" content="https://www.moveupmapper.com/social-card.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Housing Market in Context — Move Up Mapper">
-  <meta name="twitter:description" content="Six charts putting today's housing market in historical perspective — opportunity cost, affordability, rate spreads, price-to-rent, down payment burden, and the lock-in effect.">
+  <meta name="twitter:description" content="Eight charts putting today's housing market in historical perspective — opportunity cost, affordability, renter cost burden, rate spreads, price-to-rent, down payment burden, the lock-in effect, and transaction volume.">
   <link rel="canonical" href="https://www.moveupmapper.com/market">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +28,7 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Housing Market in Context",
-    "description": "Six charts putting today's housing market in historical perspective.",
+    "description": "Eight charts putting today's housing market in historical perspective.",
     "url": "https://www.moveupmapper.com/market",
     "isPartOf": { "@type": "WebSite", "name": "Move Up Mapper", "url": "https://www.moveupmapper.com" }
   }
@@ -43,7 +43,6 @@
   <style>
     .market-hero {
       padding: 36px 0 28px;
-      max-width: 700px;
     }
     .market-eyebrow {
       font-size: 11px;
@@ -108,7 +107,6 @@
       font-size: 14px;
       color: var(--text-muted);
       line-height: 1.65;
-      max-width: 640px;
     }
     .market-chart-wrap {
       position: relative;
@@ -211,14 +209,16 @@
   <div class="market-hero">
     <div class="market-eyebrow">Data &amp; Context</div>
     <h1>The housing market in numbers.</h1>
-    <p>Six charts that put today's market in historical perspective — from opportunity cost and monthly affordability to rate dynamics, price-to-rent, the down payment barrier, and the lock-in effect keeping supply off the market. Data sourced from FRED and updated annually.</p>
+    <p>Eight charts that put today's market in historical perspective — from opportunity cost and monthly affordability to renter cost burden, rate dynamics, price-to-rent, the down payment barrier, the lock-in effect keeping supply off the market, and how few homes are actually changing hands. Data sourced from FRED, the Census Bureau, and NAR, updated annually.</p>
     <nav class="market-nav-pills" aria-label="Jump to chart">
-      <a href="#opportunity"  class="market-nav-pill">Opportunity Cost</a>
+      <a href="#opportunity"   class="market-nav-pill">Opportunity Cost</a>
       <a href="#affordability" class="market-nav-pill">Affordability</a>
+      <a href="#rentburden"    class="market-nav-pill">Renter Burden</a>
       <a href="#spread"        class="market-nav-pill">Rate Spread</a>
       <a href="#ptr"           class="market-nav-pill">Price-to-Rent</a>
       <a href="#downpayment"   class="market-nav-pill">Down Payment</a>
       <a href="#lockin"        class="market-nav-pill">Lock-In Effect</a>
+      <a href="#sales"         class="market-nav-pill">Sales Volume</a>
     </nav>
   </div>
 
@@ -256,10 +256,27 @@
     <a href="/rvb" class="market-section-footer">Model your full rent vs. buy comparison →</a>
   </div>
 
-  <!-- ── Chart 3: Rate Spread ── -->
+  <!-- ── Chart 3: Renter Cost Burden ── -->
+  <div class="card wide-card market-section" id="rentburden">
+    <div class="market-section-header">
+      <div class="market-section-label">Chart 03 — Renter Burden</div>
+      <h2>The renter side of the affordability story</h2>
+      <p class="market-section-sub">Median gross rent as a share of household income nationally — the direct renter-side counterpart to the owner-side burden shown above. Unlike the owner metrics, this one hasn't spiked recently; it's been chronically elevated for two decades.</p>
+    </div>
+    <div class="market-chart-wrap">
+      <canvas id="chartRentBurden" aria-label="Median gross rent as a percentage of household income, 2000–2024"></canvas>
+    </div>
+    <p class="chart-source">Sources: U.S. Census Bureau, American Community Survey 1-Year Estimates, Table B25071 (Median Gross Rent as a Percentage of Household Income). 2000 figure from the Census 2000 Housing Costs of Renters brief (decennial census, not ACS). ACS 1-year national estimates are unavailable for 2001–2004 (pre-dating the national 1-year survey), 2020 (data collection suspended during the pandemic), and 2025 (not yet published) — those years (dashed segments, hollow points) are straight-line interpolated or extrapolated between the nearest published figures, not independent estimates.</p>
+    <div class="market-callout market-callout--amber">
+      <p><strong>Chronic, not new:</strong> The median renter household has spent right around 30% of income on rent, essentially the classic HUD affordability threshold, in nearly every year on record — peaking at 31.9% in 2011 during the post-recession income squeeze and easing slightly to 29.3–30.3% between 2015 and 2019. Unlike the owner-side monthly payment chart above, there's no dramatic 2022 spike here: renters have been at or near this line for a generation.</p>
+    </div>
+    <a href="/rvb" class="market-section-footer">See how rent burden factors into your own rent vs. buy decision →</a>
+  </div>
+
+  <!-- ── Chart 4: Rate Spread ── -->
   <div class="card wide-card market-section" id="spread">
     <div class="market-section-header">
-      <div class="market-section-label">Chart 03 — Rate Dynamics</div>
+      <div class="market-section-label">Chart 04 — Rate Dynamics</div>
       <h2>Why rates stayed high after the Fed cut</h2>
       <p class="market-section-sub">30-year fixed mortgage rate vs. 10-year Treasury yield, and the spread between them. The spread is the mortgage market's embedded risk premium — and it widened sharply after 2022.</p>
     </div>
@@ -276,7 +293,7 @@
   <!-- ── Chart 4: Price-to-Rent ── -->
   <div class="card wide-card market-section" id="ptr">
     <div class="market-section-header">
-      <div class="market-section-label">Chart 04 — Rent vs. Buy Context</div>
+      <div class="market-section-label">Chart 05 — Rent vs. Buy Context</div>
       <h2>Price-to-rent ratio over time</h2>
       <p class="market-section-sub">Home prices relative to annual rents, expressed as a multiple (i.e., how many years of rent it would take to buy the median home). A higher ratio generally favors renting and investing the difference; a lower ratio favors buying.</p>
     </div>
@@ -293,7 +310,7 @@
   <!-- ── Chart 5: Down Payment Burden ── -->
   <div class="card wide-card market-section" id="downpayment">
     <div class="market-section-header">
-      <div class="market-section-label">Chart 05 — Access Barrier</div>
+      <div class="market-section-label">Chart 06 — Access Barrier</div>
       <h2>The 20% down payment as a share of income</h2>
       <p class="market-section-sub">A 20% down payment on the median U.S. home expressed as a percentage of median household income — how much of one year's gross income a typical household would need to save.</p>
     </div>
@@ -310,7 +327,7 @@
   <!-- ── Chart 6: Lock-In Effect ── -->
   <div class="card wide-card market-section" id="lockin">
     <div class="market-section-header">
-      <div class="market-section-label">Chart 06 — Supply Constraint</div>
+      <div class="market-section-label">Chart 07 — Supply Constraint</div>
       <h2>The golden handcuff: existing mortgage rates</h2>
       <p class="market-section-sub">Distribution of outstanding U.S. mortgage balances by interest rate bracket, as of early 2024. Most existing homeowners locked in rates far below today's market — and have little financial incentive to sell.</p>
     </div>
@@ -324,11 +341,29 @@
     <a href="/learn/mortgage-rate-lock-in" class="market-section-footer">The lock-in effect explained in depth →</a>
   </div>
 
+  <!-- ── Chart 8: Existing Home Sales ── -->
+  <div class="card wide-card market-section" id="sales">
+    <div class="market-section-header">
+      <div class="market-section-label">Chart 08 — Transaction Volume</div>
+      <h2>The frozen market, in one number</h2>
+      <p class="market-section-sub">Existing-home sales, annual totals, against the average 30-year fixed mortgage rate over the same period. This is the concrete outcome of the two preceding charts: with rates elevated and most owners rate-locked in place, far fewer homes are trading hands than at any point since the mid-1990s.</p>
+    </div>
+    <div class="market-chart-wrap">
+      <canvas id="chartSales" aria-label="Existing-home sales, annual totals in millions, 2000–2025"></canvas>
+    </div>
+    <p class="chart-source">Sources: National Association of Realtors (NAR), Existing-Home Sales, seasonally adjusted annual rate; figures shown are calendar-year totals. NAR discontinued providing this series to FRED for public redistribution in 2023, so recent-year figures are compiled directly from NAR's published releases rather than FRED. 2025 is the final published figure. Mortgage rate: Freddie Mac PMMS, 30-year fixed, annual average.</p>
+    <div class="market-callout market-callout--amber">
+      <p><strong>A generational low:</strong> Sales peaked at 7.07 million in 2005 and have been essentially cut in half since — 4.06 million in both 2024 and 2025, the two lowest annual totals on record since 1995. Notice the timing: sales cratered the same year rates spiked past 6% in 2022, then never recovered even as rates leveled off. This isn't a demand collapse so much as a supply freeze: the Lock-In Effect chart above and the Rate Spread chart earlier explain most of why so few owners are listing.</p>
+    </div>
+    <a href="/swap" class="market-section-footer">Thinking about moving anyway? Model your own home swap →</a>
+  </div>
+
   <!-- ── Methodology ── -->
   <div class="market-methodology">
     <h3>Data &amp; Methodology</h3>
-    <p>All data is sourced from publicly available federal datasets (FRED, FHFA, Freddie Mac PMMS) and updated annually. Home prices use the FRED MSPUS series (median sales price of houses sold). Mortgage rates are annual averages from Freddie Mac's Primary Mortgage Market Survey. Treasury yields are Federal Reserve H.15 constant-maturity rates. Household income uses FRED MEHOINUSA672N. Rent index uses BLS CPI Rent of Primary Residence (CUUR0000SEHA). 2025 figures reflect full-year estimates based on available data through early 2026.</p>
+    <p>All data is sourced from publicly available federal datasets (FRED, FHFA, Freddie Mac PMMS, U.S. Census Bureau, NAR) and updated annually. Home prices use the FRED MSPUS series (median sales price of houses sold). Mortgage rates are annual averages from Freddie Mac's Primary Mortgage Market Survey. Treasury yields are Federal Reserve H.15 constant-maturity rates. Household income uses FRED MEHOINUSA672N. Rent index uses BLS CPI Rent of Primary Residence (CUUR0000SEHA). 2025 figures reflect full-year estimates based on available data through early 2026.</p>
     <p>Equity return data in Chart 01 uses approximate annual total returns (price + dividends reinvested). Small-cap value returns are based on Fama-French US Small Cap Value factor data (publicly available via the Ken French Data Library). These are approximations intended for educational context, not investment advice. The opportunity cost chart excludes leverage, transaction costs, taxes, and the shelter value of homeownership — all of which materially affect the actual comparison. Use the <a href="/rvb">Rent vs. Buy calculator</a> for a model that accounts for these variables.</p>
+    <p>Renter cost burden (Chart 03) uses the Census Bureau's American Community Survey 1-Year Estimates, Table B25071, fetched directly from the Census API. National 1-year estimates aren't published for 2001–2004 (before the ACS 1-year survey began), 2020 (data collection was suspended during the pandemic), or 2025 (not yet released); those years are straight-line interpolated or extrapolated between the nearest real figures and shown as dashed segments with hollow points on the chart, rather than presented as independently measured. Existing-home sales (Chart 08) come from NAR's own published releases — FRED's public copy of this series (EXHOSLUSM495S) was restricted to NAR licensing terms in 2023 and no longer carries the full history.</p>
   </div>
 
 </div><!-- .app -->
@@ -358,6 +393,20 @@
   /* Approx total return indices, base $100 = Jan 2000 (year-end values) */
   var SP500_IDX = [90.9,80.1,62.4,80.3,89.1,93.4,108.1,114.0,71.8,90.8,104.5,106.7,123.8,163.9,186.4,189.0,211.7,257.8,246.5,324.1,383.7,493.8,404.5,510.9,638.6,690.0];
   var SCV_IDX   = [120.0,137.5,117.0,170.8,209.0,225.1,278.0,260.0,164.3,227.4,293.1,277.0,327.1,440.0,448.8,415.1,545.1,587.6,497.1,608.4,636.4,816.5,698.1,828.8,920.0,966.0];
+
+  /* Median gross rent as % of household income (Census ACS 1-Year, Table B25071).
+     2000 is the Census 2000 decennial brief (not ACS); 2001–2004 predate the ACS
+     1-year national series; 2020 was suspended during the pandemic; 2025 isn't yet
+     published. Those years are straight-line interpolated/extrapolated between the
+     real values on either side — RENT_BURDEN_REAL below marks which points are
+     actual published figures vs. interpolated, and the chart dashes those segments. */
+  var RENT_BURDEN      = [25.5,26.4,27.2,28.1,28.9,29.8,29.9,29.7,29.9,30.8,31.6,31.9,31.1,30.8,31.0,30.3,29.9,29.8,29.9,29.3,30.0,30.6,31.0,31.0,30.9,31.0];
+  var RENT_BURDEN_REAL = [true,false,false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,true,true,true,true,false];
+
+  /* Existing-home sales, annual totals in millions (National Association of Realtors).
+     FRED's public series (EXHOSLUSM495S) lost its pre-2025 history to a 2023 licensing
+     change, so this is compiled from NAR's own published releases. */
+  var SALES_VOL = [5.173,5.335,5.634,6.176,6.784,7.072,6.477,5.03,4.11,4.34,4.19,4.26,4.66,5.09,4.94,5.25,5.45,5.51,5.34,5.34,5.64,6.12,5.03,4.09,4.06,4.06];
 
   /* ── Derived series ── */
   function monthlyPI(price_k, annualRatePct) {
@@ -735,6 +784,124 @@
           max: 50
         },
         y: { ticks: { font: TFONT }, grid: { display: false } }
+      }
+    }
+  });
+
+  /* ── Chart 7: Renter Cost Burden ── */
+  new Chart(document.getElementById('chartRentBurden'), {
+    type: 'line',
+    data: {
+      labels: LABELS,
+      datasets: [{
+        label: 'Median gross rent as % of income',
+        data: RENT_BURDEN,
+        borderColor: '#0d9488',
+        backgroundColor: 'rgba(13,148,136,0.08)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: RENT_BURDEN_REAL.map(function (r) { return r ? 2 : 0; }),
+        pointHoverRadius: RENT_BURDEN_REAL.map(function (r) { return r ? 5 : 4; }),
+        borderWidth: 2.2,
+        segment: {
+          borderDash: function (ctx) {
+            var bothReal = RENT_BURDEN_REAL[ctx.p0DataIndex] && RENT_BURDEN_REAL[ctx.p1DataIndex];
+            return bothReal ? undefined : [5, 4];
+          }
+        }
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              var real = RENT_BURDEN_REAL[ctx.dataIndex];
+              var val  = ctx.parsed.y.toFixed(1) + '% of household income';
+              return real ? ' Median rent burden: ' + val : ' Interpolated (no published estimate): ~' + val;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          ticks: { callback: function (v) { return v + '%'; }, font: TFONT },
+          grid: { color: GRID },
+          suggestedMin: 20
+        },
+        x: { ticks: { font: TFONT, maxRotation: 0 }, grid: { color: GRID } }
+      }
+    }
+  });
+
+  /* ── Chart 8: Existing Home Sales ── */
+  new Chart(document.getElementById('chartSales'), {
+    type: 'line',
+    data: {
+      labels: LABELS,
+      datasets: [
+        {
+          label: 'Existing-home sales (millions)',
+          data: SALES_VOL,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37,99,235,0.08)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+          borderWidth: 2.2,
+          yAxisID: 'y'
+        },
+        {
+          label: '30-year fixed rate',
+          data: RATE_30,
+          borderColor: '#d97706',
+          backgroundColor: 'transparent',
+          borderDash: [5, 4],
+          tension: 0.3,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          borderWidth: 1.8,
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'start',
+          labels: { font: TFONT, boxWidth: 12, padding: 14 }
+        },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              if (ctx.datasetIndex === 1) return ' 30-year fixed rate: ' + ctx.parsed.y.toFixed(2) + '%';
+              return ' ' + ctx.parsed.y.toFixed(2) + ' million homes sold';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          position: 'left',
+          ticks: { callback: function (v) { return v + 'M'; }, font: TFONT },
+          grid: { color: GRID }
+        },
+        y1: {
+          position: 'right',
+          ticks: { callback: function (v) { return v.toFixed(0) + '%'; }, font: TFONT },
+          grid: { display: false }
+        },
+        x: { ticks: { font: TFONT, maxRotation: 0 }, grid: { color: GRID } }
       }
     }
   });
