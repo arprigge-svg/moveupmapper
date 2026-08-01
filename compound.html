@@ -83,15 +83,6 @@
     </div>
   </header>
 
-  <!-- About expand -->
-  <details class="about-expand no-print">
-    <summary>About this calculator</summary>
-    <div class="about-content">
-      <p>Enter an initial balance, a contribution amount at your preferred frequency, and a growth rate for both your contributions and your investments. The calculator models how a rising contribution schedule — like saving a fixed percentage of a salary that grows over time — produces a less linear, more compounding curve than flat contributions would suggest. The range band shows outcomes across your expected return variance, and all results include an inflation-adjusted purchasing power equivalent.</p>
-      <p class="about-disclaimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>Not financial advice.</strong> This tool is for informational purposes only and does not constitute financial, tax, or investment advice. Consult a qualified professional before making any financial decisions.</span></p>
-    </div>
-  </details>
-
   <!-- ── Calculator Tabs ── -->
   <div class="calc-tabs no-print">
     <button class="calc-tab active" data-tab="growth">Growth Projector</button>
@@ -361,38 +352,6 @@
     </details>
   </div>
 
-  <!-- ── Summary Stats ── -->
-  <div class="card wide-card">
-    <div id="scenario-active-label" style="display:none; padding:10px 20px 0; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;"></div>
-    <div class="rvb-stats-grid rvb-stats-grid--4">
-
-      <div class="bp-stat">
-        <div class="bp-stat-label">FINAL PORTFOLIO VALUE</div>
-        <div class="bp-stat-value" id="stat-final-value">—</div>
-        <div class="bp-stat-delta">nominal · <span class="dynamic-yr-label">20</span>-year projection <span id="stat-acct-badge"></span></div>
-      </div>
-
-      <div class="bp-stat">
-        <div class="bp-stat-label">IN TODAY'S DOLLARS</div>
-        <div class="bp-stat-value" id="stat-real-value">—</div>
-        <div class="bp-stat-delta">inflation-adjusted purchasing power</div>
-      </div>
-
-      <div class="bp-stat">
-        <div class="bp-stat-label">TOTAL INVESTED</div>
-        <div class="bp-stat-value" id="stat-total-invested">—</div>
-        <div class="bp-stat-delta">initial balance + all contributions</div>
-      </div>
-
-      <div class="bp-stat">
-        <div class="bp-stat-label">TOTAL GAIN (RETURNS)</div>
-        <div class="bp-stat-value green" id="stat-total-gain">—</div>
-        <div class="bp-stat-delta">growth from compound returns only</div>
-      </div>
-
-    </div>
-  </div>
-
   <!-- ── Purchasing Power Adjustment ── -->
   <div class="card wide-card">
     <div class="card-head">
@@ -406,18 +365,25 @@
         <div class="card-sub">What your future balance is worth in today's dollars</div>
       </div>
     </div>
+    <div id="scenario-active-label" style="display:none; padding:14px 20px 0; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;"></div>
     <div class="card-section">
       <div class="compound-infl-card">
         <div class="compound-infl-stat">
           <div class="compound-infl-label">Nominal final value</div>
           <div class="compound-infl-value" id="infl-final">—</div>
-          <div class="compound-infl-note">The raw dollar amount in your portfolio at year <span class="dynamic-yr-label">20</span></div>
+          <div class="compound-infl-note">The raw dollar amount in your portfolio at year <span class="dynamic-yr-label">20</span> <span id="stat-acct-badge"></span></div>
         </div>
         <div class="compound-infl-divider"></div>
         <div class="compound-infl-stat">
           <div class="compound-infl-label">In today's dollars</div>
           <div class="compound-infl-value" style="color:#6366f1" id="infl-real">—</div>
           <div class="compound-infl-note">Equivalent purchasing power in today's terms, at <span id="infl-rate">3%</span> inflation over <span id="infl-years">20</span> years</div>
+        </div>
+        <div class="compound-infl-divider"></div>
+        <div class="compound-infl-stat">
+          <div class="compound-infl-label">Total gain (returns)</div>
+          <div class="compound-infl-value" id="stat-total-gain">—</div>
+          <div class="compound-infl-note">Growth from compound returns only — nominal value minus total invested</div>
         </div>
         <div class="compound-infl-divider"></div>
         <div class="compound-infl-stat">
@@ -715,6 +681,7 @@ The erosion compounds in reverse, just as investment returns compound forward: e
         </div>
       </div>
 
+      <p class="about-disclaimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>Not financial advice.</strong> This tool is for informational purposes only and does not constitute financial, tax, or investment advice. Consult a qualified professional before making any financial decisions.</span></p>
     </div>
   </details>
 
@@ -1013,6 +980,7 @@ The erosion compounds in reverse, just as investment returns compound forward: e
           </div>
         </div>
 
+        <p class="about-disclaimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>Not financial advice.</strong> This tool is for informational purposes only and does not constitute financial, tax, or investment advice. Consult a qualified professional before making any financial decisions.</span></p>
       </div>
     </details>
 

@@ -189,38 +189,6 @@ canvas { display: block; width: 100% !important; }
   margin-bottom: 20px;
 }
 
-/* ── About Expand ── */
-.about-expand { margin-bottom: 20px; }
-.about-expand summary {
-  font-size: 12.5px;
-  color: var(--text-muted);
-  cursor: pointer;
-  list-style: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  user-select: none;
-  padding: 2px 0;
-}
-.about-expand summary::-webkit-details-marker { display: none; }
-.about-expand summary:hover { color: var(--text); }
-.about-expand summary::after {
-  content: '↓';
-  font-size: 11px;
-  display: inline-block;
-  transition: transform 0.2s;
-}
-.about-expand[open] summary::after { transform: rotate(180deg); }
-.about-content {
-  margin-top: 10px;
-  background: var(--indigo-light);
-  border-left: 3px solid var(--indigo);
-  border-radius: var(--radius);
-  padding: 14px 18px;
-  font-size: 13.5px;
-  color: var(--gray-700);
-  line-height: 1.65;
-}
 .about-disclaimer {
   display: flex;
   align-items: flex-start;
@@ -2127,7 +2095,6 @@ details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
   .refi-chart-area     { padding: 14px 14px 10px; }
   .refi-warning        { margin: 10px 14px; padding: 10px 12px; }
   .refi-detail-cell    { padding: 12px 14px; }
-  .payoff-glossary     { padding: 14px 14px 16px; }
   .payoff-market-note  { padding: 10px 14px; }
   .payoff-amort-body   { padding: 14px 14px 16px; }
 
@@ -2258,10 +2225,6 @@ details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
 }
 
 /* ── Payoff: section containers (replaces inline styles for mobile responsiveness) ── */
-.payoff-glossary {
-  border-top: 1px solid var(--border);
-  padding: 16px 20px 20px;
-}
 .payoff-market-note {
   display: flex;
   gap: 8px;

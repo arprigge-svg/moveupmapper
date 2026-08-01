@@ -478,13 +478,10 @@ function render(c, s) {
     }
   }
 
-  setText('stat-final-value',     fmt(m.finalValue));
-  setText('stat-real-value',      fmt(m.finalReal));
-  setText('stat-total-invested',  fmt(c.totalInvested));
-  setText('stat-total-gain',      fmt(m.totalGain));
+  setText('stat-total-gain', fmt(m.totalGain));
 
   const gainEl = document.getElementById('stat-total-gain');
-  if (gainEl) gainEl.className = 'bp-stat-value ' + (m.totalGain >= 0 ? 'green' : 'red');
+  if (gainEl) gainEl.style.color = m.totalGain >= 0 ? 'var(--green)' : 'var(--red)';
 
   const clEl = document.getElementById('stat-compounds-leads');
   if (clEl) {
@@ -664,8 +661,8 @@ function updateMobileBar() {
   } else {
     if (lbl1) lbl1.textContent = 'Final Value';
     if (lbl2) lbl2.textContent = "In Today's $";
-    v1.textContent = document.getElementById('stat-final-value')?.textContent || '—';
-    v2.textContent = document.getElementById('stat-real-value')?.textContent || '—';
+    v1.textContent = document.getElementById('infl-final')?.textContent || '—';
+    v2.textContent = document.getElementById('infl-real')?.textContent || '—';
   }
 }
 
