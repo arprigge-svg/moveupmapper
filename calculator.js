@@ -565,21 +565,17 @@ function render(c, s) {
     setText('taxHelper', '≈' + fmt(c.annualTax) + '/yr on this purchase price');
   }
 
-  // Equity toggle + loan detail fields visibility
-  const equityToggle = $('equityToggle');
-  const equityLabel  = $('equityLabel');
+  // Equity/loan balance toggle + loan detail fields visibility
   const equityHelper = $('equityHelper');
   const loanFields   = $('loanDetailsFields');
+  $('equityModeEquity')?.classList.toggle('active', s.equityMode === 'equity');
+  $('equityModeLoan')?.classList.toggle('active', s.equityMode === 'loanBalance');
   syncBuyerMode(s.buyerMode);
   const amortActive  = s.buyerMode !== 'firstTime' && s.equityMode === 'loanBalance' && s.termRemainder > 0 && s.currentMortgageRate > 0 && s.equityValue > 0;
   if (s.equityMode === 'equity') {
-    equityToggle.textContent = 'Switch to Loan Balance';
-    equityLabel.textContent  = 'EQUITY';
     equityHelper.textContent = 'How much of your home you own outright';
     if (loanFields) loanFields.style.display = 'none';
   } else {
-    equityToggle.textContent = 'Switch to Equity';
-    equityLabel.textContent  = 'LOAN BALANCE';
     equityHelper.textContent = 'Remaining mortgage balance owed';
     if (loanFields) loanFields.style.display = '';
   }
@@ -1018,14 +1014,16 @@ function init() {
     setState({ targetSliderPct: Math.min(50, getState().targetSliderPct + 1) });
   });
 
-  // Equity mode toggle (bound once to prevent even-count listener cancellation)
-  $('equityToggle').addEventListener('click', () => {
+  // Equity/loan balance mode toggle (bound once)
+  $('equityModeEquity').addEventListener('click', () => {
     const cur = getState();
-    if (cur.equityMode === 'equity') {
-      setState({ equityMode: 'loanBalance', equityValue: Math.max(0, cur.homeValuation - cur.equityValue) });
-    } else {
-      setState({ equityMode: 'equity', equityValue: Math.max(0, cur.homeValuation - cur.equityValue) });
-    }
+    if (cur.equityMode === 'equity') return;
+    setState({ equityMode: 'equity', equityValue: Math.max(0, cur.homeValuation - cur.equityValue) });
+  });
+  $('equityModeLoan').addEventListener('click', () => {
+    const cur = getState();
+    if (cur.equityMode === 'loanBalance') return;
+    setState({ equityMode: 'loanBalance', equityValue: Math.max(0, cur.homeValuation - cur.equityValue) });
   });
 
   // Tax mode toggle (bound once)

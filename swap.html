@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=50">
+  <link rel="stylesheet" href="styles.css?v=63">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -121,37 +121,37 @@
           <div class="card-title" id="currentHomeTitle">Your Current Home</div>
           <div class="card-sub" id="currentHomeSub">What you're working with today</div>
         </div>
-      </div>
-      <div class="buyer-mode-bar">
-        <span class="buyer-mode-label">Buyer type</span>
-        <div class="mode-toggle">
+        <div class="mode-toggle buyer-mode-inline">
           <button class="mode-btn active" id="buyerModeOwner">Owner</button>
           <button class="mode-btn" id="buyerModeFirst">First-Time Buyer</button>
         </div>
       </div>
-      <div class="card-body">
+      <div class="card-body swap-tile-body">
 
         <!-- Owner-only fields — hidden for first-time buyers -->
         <div id="homeOwnerFields">
-          <div class="field">
-            <label>HOME VALUATION</label>
-            <div class="input-wrap prefix">
-              <span class="affix">$</span>
-              <input type="number" id="homeValuation" min="0" step="1000">
+          <div class="two-col">
+            <div class="field">
+              <label>HOME VALUATION</label>
+              <div class="input-wrap prefix">
+                <span class="affix">$</span>
+                <input type="number" id="homeValuation" min="0" step="1000">
+              </div>
+              <div class="helper">Estimated market value of your current home</div>
             </div>
-            <div class="helper">Estimated market value of your current home</div>
-          </div>
 
-          <div class="field">
-            <div class="field-row-head">
-              <label id="equityLabel">EQUITY</label>
-              <button class="btn-toggle" id="equityToggle">Switch to Loan Balance</button>
+            <div class="field">
+              <div class="equity-toggle-label">
+                <button type="button" class="equity-toggle-word" id="equityModeLoan">Loan Balance</button>
+                <span class="equity-toggle-sep">/</span>
+                <button type="button" class="equity-toggle-word active" id="equityModeEquity">Equity</button>
+              </div>
+              <div class="input-wrap prefix">
+                <span class="affix">$</span>
+                <input type="number" id="equityValue" min="0" step="1000">
+              </div>
+              <div class="helper" id="equityHelper">How much of your home you own outright</div>
             </div>
-            <div class="input-wrap prefix">
-              <span class="affix">$</span>
-              <input type="number" id="equityValue" min="0" step="1000">
-            </div>
-            <div class="helper" id="equityHelper">How much of your home you own outright</div>
           </div>
 
           <!-- Loan detail fields — visible only in Loan Balance mode -->
@@ -192,22 +192,24 @@
           <span>No home to sell — your available savings and income growth are the foundation of your buying power. Use the Buying Power section below to model how your down payment builds over time.</span>
         </div>
 
-        <div class="field">
-          <label id="expendableCashLabel">EXPENDABLE CASH</label>
-          <div class="input-wrap prefix">
-            <span class="affix">$</span>
-            <input type="number" id="expendableCash" min="0" step="1000">
+        <div class="two-col">
+          <div class="field">
+            <label id="expendableCashLabel">EXPENDABLE CASH</label>
+            <div class="input-wrap prefix">
+              <span class="affix">$</span>
+              <input type="number" id="expendableCash" min="0" step="1000">
+            </div>
+            <div class="helper" id="expendableCashHelper">Savings you can put toward the purchase</div>
           </div>
-          <div class="helper" id="expendableCashHelper">Savings you can put toward the purchase</div>
-        </div>
 
-        <div class="field">
-          <label>MONTHLY TAKE-HOME PAY</label>
-          <div class="input-wrap prefix">
-            <span class="affix">$</span>
-            <input type="number" id="monthlyIncome" min="0" step="100">
+          <div class="field">
+            <label>MONTHLY TAKE-HOME PAY</label>
+            <div class="input-wrap prefix">
+              <span class="affix">$</span>
+              <input type="number" id="monthlyIncome" min="0" step="100">
+            </div>
+            <div class="helper">After-tax monthly income</div>
           </div>
-          <div class="helper">After-tax monthly income</div>
         </div>
 
         <div class="field" id="currentHOAField">
@@ -219,6 +221,7 @@
           <div class="helper">Monthly HOA on your current home</div>
         </div>
 
+        <div class="card-body-spacer"></div>
         <div id="sellCostsSection">
           <button type="button" class="section-collapse-hdr mt-sm" id="sellCostsToggle" aria-expanded="false">
             <div class="section-label">
@@ -294,7 +297,7 @@
           <div class="card-sub">The home you want to buy</div>
         </div>
       </div>
-      <div class="card-body card-body--prospect">
+      <div class="card-body card-body--prospect swap-tile-body">
 
         <div class="field">
           <label>PURCHASE PRICE</label>
@@ -1053,7 +1056,7 @@
 </div><!-- /app -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="calculator.js?v=14"></script>
+<script src="calculator.js?v=19"></script>
 <script>
   (function() {
     function makeCollapse(toggleId, bodyId) {

@@ -213,6 +213,7 @@ canvas { display: block; width: 100% !important; }
 .card-head {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 18px 20px 14px;
   border-bottom: 1px solid var(--border);
@@ -251,12 +252,6 @@ canvas { display: block; width: 100% !important; }
 @media (max-width: 900px) {
   .calc-grid { grid-template-columns: 1fr; }
   .calc-grid--2col { grid-template-columns: 1fr; }
-  .swap-calc-grid { grid-template-columns: 1fr; }
-  .swap-inputs-head { grid-template-columns: 1fr; }
-  .sih-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
-  .swap-inputs-body { grid-template-columns: 1fr; }
-  .swap-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
-  .buyer-mode-inline { gap: 6px; }
 }
 
 /* ── Form Fields ── */
@@ -461,6 +456,10 @@ label {
 .three-col > * {
   min-width: 0;
 }
+.two-col > .field,
+.three-col > .field {
+  margin-bottom: 0;
+}
 .three-col {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -474,8 +473,15 @@ label {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 5px;
+  position: relative;
 }
 .field-row-head label { margin-bottom: 0; }
+.field-row-head .btn-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
 .section-label {
   display: flex;
   align-items: center;
@@ -534,7 +540,28 @@ label {
   cursor: pointer;
 }
 .btn-toggle:hover { background: #e0e7ff; border-color: var(--indigo); }
-.mode-toggle { display: flex; border: 1.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.mode-toggle { display: inline-flex; border: 1.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.equity-toggle-label {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+.equity-toggle-word {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color .15s;
+}
+.equity-toggle-word:hover { color: var(--indigo-mid); }
+.equity-toggle-word.active { color: var(--indigo); }
+.equity-toggle-sep { font-size: 11px; color: var(--border); }
 .mode-btn {
   padding: 2px 9px;
   border: none;
@@ -543,67 +570,11 @@ label {
   font-weight: 500;
   color: var(--text-muted);
   transition: all .15s;
+  white-space: nowrap;
 }
 .mode-btn.active { background: var(--indigo); color: white; }
 
-.buyer-mode-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-}
-.buyer-mode-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-/* ── Swap Calculator: Dual-Column Input Layout ── */
-.swap-calc-grid {
-  grid-template-columns: 2fr 1fr;
-}
-
-.swap-inputs-head {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-bottom: 1px solid var(--border);
-}
-
-.sih-col {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 20px 14px;
-}
-
-.sih-col:first-child {
-  border-right: 1px solid var(--border);
-}
-
-.buyer-mode-inline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
-.swap-inputs-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.swap-col {
-  padding: 16px 20px;
-}
-
-.swap-col:first-child {
-  border-right: 1px solid var(--border);
-}
+.buyer-mode-inline { flex-shrink: 0; }
 
 /* ── Swap Results: wide card below inputs, two columns ── */
 /* ── Swap input card layout (balances card heights) ── */
@@ -616,14 +587,23 @@ label {
   display: flex;
   flex-direction: column;
 }
-/* Compensates for buyer-mode-bar height on the left card */
-.card-body--prospect { padding-top: 26px; }
-/* Pushes the Buying Costs toggle to the bottom of the right card */
+/* Pushes the Buying/Selling Costs toggle to the bottom of each card */
 .card-body-spacer { flex: 1; }
 @media (max-width: 900px) {
   .card-body-spacer { display: none; }
-  .card-body--prospect { padding-top: 16px; }
 }
+/* Roomier input spacing on the swap page's two top tiles */
+.swap-tile-body > .field,
+#loanDetailsFields > .field,
+#buyCostsBody > .field {
+  margin-bottom: 24px;
+}
+.swap-tile-body .two-col,
+.swap-tile-body .three-col {
+  margin-bottom: 24px;
+  align-items: stretch;
+}
+#loanDetailsFields { margin-bottom: 24px; }
 
 .swap-results-card {
   margin-top: 16px;
@@ -2058,10 +2038,7 @@ details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
   .card-body,
   .card-section      { padding: 14px 14px; }
   .results-section   { padding: 10px 12px; }
-  .buyer-mode-bar    { padding: 10px 14px; }
-  .sih-col           { padding: 12px 14px 10px; }
-  .swap-col          { padding: 14px 14px; }
-  .buyer-mode-inline { flex-wrap: wrap; justify-content: flex-end; }
+  .buyer-mode-inline { flex-basis: 100%; justify-content: flex-end; margin-top: 6px; }
   .horizon-inner     { padding: 12px 14px; gap: 12px; }
   .bp-controls .ctrl-section { padding: 12px; }
   .glossary-body     { padding: 4px 14px 16px; }
