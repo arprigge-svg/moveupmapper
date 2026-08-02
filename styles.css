@@ -1714,7 +1714,6 @@ details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
 .landing-hero-text { margin-bottom: 28px; }
 .landing-hero-text h1 { font-size: 30px; line-height: 1.2; color: var(--text); margin-bottom: 10px; }
 .landing-hero-text p { font-size: 15px; color: var(--text-muted); line-height: 1.65; margin: 0; }
-.landing-hero-privacy { font-size: 12.5px; color: var(--text-muted); margin: 10px 0 0; }
 
 .tool-carousel { display: flex; align-items: center; gap: 0; }
 .tool-carousel-viewport { overflow: hidden; flex: 1; min-width: 0; }
