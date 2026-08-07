@@ -172,32 +172,29 @@ function calcAffordablePrice(s, targetMonthly, dpPool, hoiMonthly, hoaMonthly) {
   const hoa = hoaMonthly !== undefined ? hoaMonthly : s.newHOA;
   // HOI and HOA are fixed monthly costs independent of price — deduct before solving
   const budget = Math.max(0, targetMonthly - hoi - hoa);
-  let price;
-  if (s.taxMode === 'percent') {
-    const taxMonthly = s.propertyTaxPercent / 100 / 12;
-    price = (budget + dp * K) / (K + taxMonthly);
-  } else {
-    const fixedTaxMonthly = s.propertyTaxDollar / 12;
-    const loanPayment = budget - fixedTaxMonthly;
-    if (loanPayment <= 0) return dp;
-    price = dp + loanPayment / K;
-  }
-  price = Math.max(0, price);
-  // If PMI would apply, subtract it and recalculate once
-  if (dp / price < 0.20) {
-    const effectiveTarget = budget - s.monthlyPMI;
-    if (effectiveTarget > 0) {
-      if (s.taxMode === 'percent') {
-        const taxMonthly = s.propertyTaxPercent / 100 / 12;
-        price = Math.max(0, (effectiveTarget + dp * K) / (K + taxMonthly));
-      } else {
-        const fixedTaxMonthly = s.propertyTaxDollar / 12;
-        const loanPayment = effectiveTarget - fixedTaxMonthly;
-        price = loanPayment > 0 ? Math.max(0, dp + loanPayment / K) : dp;
-      }
+
+  // Max price affordable at a given P&I+tax budget (PMI excluded)
+  const priceForBudget = (b) => {
+    if (s.taxMode === 'percent') {
+      const taxMonthly = s.propertyTaxPercent / 100 / 12;
+      return Math.max(0, (b + dp * K) / (K + taxMonthly));
     }
-  }
-  return price;
+    const fixedTaxMonthly = s.propertyTaxDollar / 12;
+    const loanPayment = b - fixedTaxMonthly;
+    return loanPayment > 0 ? dp + loanPayment / K : dp;
+  };
+
+  const priceNoPMI = priceForBudget(budget);
+  if (priceNoPMI <= 0 || dp / priceNoPMI >= 0.20) return priceNoPMI;
+
+  // Below 20% down, PMI applies, which caps price at the point where the down
+  // payment is exactly 20% — going higher would need PMI room the budget may
+  // not have. Using max() here (instead of always subtracting PMI) keeps the
+  // price continuous as it crosses the threshold, instead of jumping by a
+  // full monthlyPMI/K the instant a down payment dips under 20%.
+  const pmiBoundary = dp / 0.20;
+  const pricePMI = priceForBudget(budget - s.monthlyPMI);
+  return Math.max(pmiBoundary, pricePMI);
 }
 
 function calculate(s) {
