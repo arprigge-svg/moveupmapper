@@ -85,7 +85,7 @@
     </div>
     <div>
       <h1>Privacy Policy</h1>
-      <p class="header-sub">Effective date: May 2026</p>
+      <p class="header-sub">Effective date: August 2026</p>
     </div>
   </header>
 
@@ -96,11 +96,13 @@
       <section class="prose-section">
         <h2>Overview</h2>
         <p>
-          This website provides free financial calculators to help you think through housing and investment
-          decisions. We are committed to being straightforward about data: this site does not create user
-          accounts, does not require you to submit personal information, and does not store your calculator
-          inputs on any server. All values you enter are saved only in your own browser's local storage and
-          never leave your device.
+          This website provides free financial calculators and a mapping tool to help you think through
+          housing and investment decisions. We are committed to being straightforward about data: this site
+          does not create user accounts, does not require you to submit personal information, and does not
+          run a server that stores your calculator inputs. All values you enter into a calculator are saved
+          only in your own browser's local storage and never leave your device. The one exception is the
+          Commute Map tool, which by necessity sends the addresses and search area you enter to outside
+          mapping services — see "Commute Map &amp; Mapping Data" below for exactly what that involves.
         </p>
         <p>
           That said, like most websites, we use a standard third-party analytics service that collects
@@ -117,6 +119,12 @@
           <li>Financial account information of any kind</li>
           <li>Precise location data</li>
         </ul>
+        <p>
+          The one exception: the Commute Map tool sends the addresses you enter to Mapbox, and the
+          resulting search area to the U.S. Census Bureau, in order to calculate travel times and matching
+          ZIP codes. That data goes directly from your browser to those services — we don't receive, log,
+          or store any of it ourselves. See "Commute Map &amp; Mapping Data" below.
+        </p>
       </section>
 
       <section class="prose-section">
@@ -155,6 +163,27 @@
         <p>
           You can opt out of Google Analytics tracking across all websites by installing the
           <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics Opt-out Browser Add-on</a>.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>Commute Map &amp; Mapping Data</h2>
+        <p>
+          The Commute Map tool works differently from the calculators on this site. Finding coordinates for
+          an address, calculating a drive/walk-time area, and matching that area to ZIP codes all require
+          live mapping data that can't be computed in your browser alone, so that page sends data directly
+          to two outside services:
+        </p>
+        <ul>
+          <li><strong>Mapbox</strong> — receives the addresses you type or select, for geocoding, address
+          suggestions, and calculating drive/walk-time areas. See the
+          <a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener">Mapbox Privacy Policy</a>.</li>
+          <li><strong>U.S. Census Bureau (TIGERweb)</strong> — receives the shape of your computed search
+          area, used only to find which ZIP codes intersect it.</li>
+        </ul>
+        <p>
+          These requests go directly from your browser to Mapbox and the Census Bureau — we do not see,
+          log, or store this data ourselves, and neither service is used anywhere else on this site.
         </p>
       </section>
 

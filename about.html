@@ -110,7 +110,8 @@
         <p>
           It started with the Home Swap Calculator, the tool I personally needed most. From there I kept
           adding calculators to address other decisions I'd faced or saw others wrestling with. There are
-          now eight of them.
+          now eight of them, plus a mapping tool for a question the calculators don't answer: where should
+          you even be looking?
         </p>
         <p>
           No paywalls, no lead forms, no signup, no data collection. I don't appreciate when sites do this
@@ -136,8 +137,9 @@
       <section class="prose-section">
         <h2>The Tools</h2>
         <p>
-          Eight housing and financial calculators built to empower buyers, renters, and investors. Fully
-          customizable and tailored to your specific situation and needs.
+          Eight housing and financial calculators built to empower buyers, renters, and investors, plus a
+          mapping tool for narrowing down where to look. Fully customizable and tailored to your specific
+          situation and needs.
         </p>
 
         <div class="about-tool-block">
@@ -366,6 +368,29 @@
           </p>
           <a href="/proceeds" class="about-tool-link">Open Net Proceeds Calculator →</a>
         </div>
+
+        <div class="about-tool-block">
+          <div class="about-tool-header">
+            <div class="about-tool-icon" style="background:#db2777">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <span class="about-tool-name">Commute Map</span>
+          </div>
+          <p>
+            Every calculator above assumes you already know which home you're evaluating. This tool answers
+            the question that comes before that: where should you even be looking? Enter up to four places
+            that matter — work, a partner's work, school, family — with a comfortable drive or walk time to
+            each, and it plots the actual area within reach of all of them, plus the ZIP codes inside it so
+            you can take it straight to a listings search.
+          </p>
+          <p>
+            It's the one tool on this site that isn't a calculator, and it works differently under the hood
+            as a result — see <a href="#your-data">Your Data</a> below for what that means for your inputs.
+          </p>
+          <a href="/commute" class="about-tool-link">Open Commute Map →</a>
+        </div>
       </section>
 
       <section class="prose-section">
@@ -419,11 +444,19 @@
       </section>
 
       <section class="prose-section">
-        <h2>Your Data</h2>
+        <h2 id="your-data">Your Data</h2>
         <p>
-          All calculations happen entirely in your browser. Your inputs are saved in your browser's local
-          storage so your settings persist between visits, but that data is never transmitted to any server,
-          never stored in a database, and never shared with anyone.
+          Every calculator on this site runs entirely in your browser. Your inputs are saved in your
+          browser's local storage so your settings persist between visits, but that data is never
+          transmitted to any server, never stored in a database, and never shared with anyone.
+        </p>
+        <p>
+          Commute Map is the exception. Turning an address into coordinates, calculating drive/walk-time
+          areas, and matching them to ZIP codes all require live data no browser has on its own, so that
+          page sends the addresses you enter to Mapbox for geocoding and travel-time calculations, and
+          sends the resulting search-area shape to the U.S. Census Bureau's TIGERweb service to find
+          matching ZIP codes. Neither service receives anything beyond what's needed to answer that
+          specific request, and we don't store any of it ourselves.
         </p>
         <p>
           This site uses Google Analytics to understand how visitors interact with the tools and displays
