@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=65">
+  <link rel="stylesheet" href="styles.css?v=66">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -55,6 +55,7 @@
         <button type="button" class="page-nav-link nav-dropdown-btn" aria-haspopup="true">Calculators <svg class="nav-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
         <div class="nav-dropdown-menu">
           <a href="/afford" class="nav-dropdown-item">Affordability Calculator</a>
+          <a href="/commute" class="nav-dropdown-item">Commute Map</a>
           <a href="/compound" class="nav-dropdown-item">Compound Growth</a>
           <a href="/downpayment" class="nav-dropdown-item">Down Payment Optimizer</a>
           <a href="/swap" class="nav-dropdown-item">Home Swap Calculator</a>
@@ -172,6 +173,17 @@
             <div class="tool-card-cta">Open calculator <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><polyline points="12 5 19 12 12 19"/></svg></div>
           </a>
 
+          <a href="/commute" class="tool-card">
+            <div class="tool-card-icon" style="background:#db2777">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div class="tool-card-name">Commute Map</div>
+            <div class="tool-card-desc">Enter up to 4 places that matter — work, school, family — with a max drive or walk time for each, and see the area you should actually be searching.</div>
+            <div class="tool-card-cta">Open calculator <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          </a>
+
         </div>
       </div>
       <button class="carousel-btn carousel-btn--next" id="carouselNext" aria-label="Next calculators">
@@ -185,6 +197,7 @@
       <button class="carousel-dot" data-idx="3" aria-label="Show calculators 4–6"></button>
       <button class="carousel-dot" data-idx="4" aria-label="Show calculators 5–7"></button>
       <button class="carousel-dot" data-idx="5" aria-label="Show calculators 6–8"></button>
+      <button class="carousel-dot" data-idx="6" aria-label="Show calculators 7–9"></button>
     </div>
   </section>
 
@@ -312,6 +325,7 @@
   <footer class="site-footer no-print">
     <div class="footer-links">
       <a href="/afford">Affordability Calculator</a>
+      <a href="/commute">Commute Map</a>
       <a href="/swap">Home Swap Calculator</a>
       <a href="/rvb">Rent vs. Buy Analysis</a>
       <a href="/compound">Compound Growth</a>
@@ -331,7 +345,7 @@
 
 <script>
 (function () {
-  var SHOW = 3, TOTAL = 8, MAX = TOTAL - SHOW; // MAX = 5
+  var SHOW = 3, TOTAL = 9, MAX = TOTAL - SHOW; // MAX = 6
   var offset = 0;
   var track    = document.getElementById('toolTrack');
   var viewport = document.querySelector('.tool-carousel-viewport');

@@ -3,6 +3,11 @@
 
 # 301-redirect .html URLs to clean versions (preserves SEO from any indexed pages)
 [[redirects]]
+  from = "/commute.html"
+  to   = "/commute"
+  status = 301
+
+[[redirects]]
   from = "/swap.html"
   to   = "/swap"
   status = 301

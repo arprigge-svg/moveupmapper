@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commute Map — Move Up Mapper</title>
+  <meta name="description" content="Enter up to 4 places that matter — work, school, family — with a max drive or walk time for each, and see the area you should actually be searching for a home.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Move Up Mapper">
+  <meta property="og:title" content="Commute Map — Move Up Mapper">
+  <meta property="og:description" content="Enter up to 4 places that matter — work, school, family — with a max drive or walk time for each, and see the area you should actually be searching for a home.">
+  <meta property="og:url" content="https://www.moveupmapper.com/commute">
+  <meta property="og:image" content="https://www.moveupmapper.com/social-card.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Move Up Mapper — Free Housing &amp; Investment Calculators">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Commute Map — Move Up Mapper">
+  <meta name="twitter:description" content="Enter up to 4 places that matter and see the area you should actually be searching for a home.">
+  <link rel="canonical" href="https://www.moveupmapper.com/commute">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
+  <link rel="stylesheet" href="styles.css?v=66">
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Commute Map",
+    "url": "https://www.moveupmapper.com/commute",
+    "description": "Enter up to 4 places that matter — work, school, family — with a max drive or walk time for each, and see the area you should actually be searching for a home.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "provider": { "@type": "Organization", "name": "Move Up Mapper", "url": "https://www.moveupmapper.com" }
+  }
+  </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCEFCLSHX0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YCEFCLSHX0');
+  </script>
+  <style>
+    .commute-row-wrap { margin-bottom: 14px; }
+    .commute-row {
+      display: grid;
+      grid-template-columns: 28px 1fr 168px 100px 24px;
+      gap: 10px;
+      align-items: start;
+    }
+    .commute-row-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+    .commute-row-address input { font-size: 14px; }
+    .commute-row-mode { height: 38px; flex-shrink: 0; }
+    .commute-row-mode .mode-btn { padding: 0 12px; height: 100%; }
+    .commute-row-minutes { width: 100px; flex-shrink: 0; }
+    .commute-row-remove {
+      width: 24px;
+      height: 24px;
+      margin-top: 6px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 18px;
+      line-height: 1;
+      transition: all .15s;
+    }
+    .commute-row-remove:hover { background: var(--red-light); color: var(--red); }
+    .commute-row-error {
+      grid-column: 2 / -1;
+      margin: 4px 0 0 38px;
+      font-size: 12px;
+      color: var(--red);
+    }
+    .commute-add-row {
+      background: none;
+      border: none;
+      color: var(--indigo);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 0;
+      margin-bottom: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .commute-add-row:hover { text-decoration: underline; }
+    .commute-submit-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    #commuteResultAlert { margin-top: 14px; }
+    #map {
+      height: 520px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--gray-100);
+    }
+    .commute-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .commute-legend-item { display: flex; align-items: center; gap: 6px; }
+    .commute-legend-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    @media (max-width: 700px) {
+      .commute-row {
+        grid-template-columns: 28px 1fr 24px;
+        grid-template-areas: "badge address remove" "gap mode mode" "gap minutes minutes";
+        row-gap: 8px;
+      }
+      .commute-row-badge { grid-area: badge; }
+      .commute-row-address { grid-area: address; }
+      .commute-row-remove { grid-area: remove; }
+      .commute-row-mode { grid-area: mode; height: auto; }
+      .commute-row-minutes { grid-area: minutes; width: 100%; min-width: 0; }
+      .commute-row-minutes input { min-width: 0; }
+      .commute-row-error { margin-left: 0; grid-column: 1 / -1; }
+      #map { height: 380px; }
+    }
+  </style>
+</head>
+<body>
+<nav class="site-nav no-print">
+  <div class="site-nav-inner">
+    <a href="/" class="site-brand">
+      <img src="favicon.svg" width="28" height="28" alt="" style="border-radius:7px;flex-shrink:0;display:block">
+      <span class="brand-name">Move Up Mapper</span>
+    </a>
+    <div class="page-nav-links">
+      <div class="nav-dropdown">
+        <button type="button" class="page-nav-link nav-dropdown-btn active" aria-haspopup="true">Calculators <svg class="nav-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="nav-dropdown-menu">
+          <a href="/afford" class="nav-dropdown-item">Affordability Calculator</a>
+          <a href="/commute" class="nav-dropdown-item active">Commute Map</a>
+          <a href="/compound" class="nav-dropdown-item">Compound Growth</a>
+          <a href="/downpayment" class="nav-dropdown-item">Down Payment Optimizer</a>
+          <a href="/swap" class="nav-dropdown-item">Home Swap Calculator</a>
+          <a href="/proceeds" class="nav-dropdown-item">Net Proceeds</a>
+          <a href="/payoff" class="nav-dropdown-item">Payoff Calculator</a>
+          <a href="/refi" class="nav-dropdown-item">Refi Calculator</a>
+          <a href="/rvb" class="nav-dropdown-item">Rent vs. Buy Analysis</a>
+        </div>
+      </div>
+      <a href="/faq"    class="page-nav-link">FAQ</a>
+      <a href="/learn"  class="page-nav-link">Learn</a>
+      <a href="/market" class="page-nav-link">Market</a>
+      <a href="/about"  class="page-nav-link">About</a>
+    </div>
+  </div>
+</nav>
+<div class="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-icon" style="background:#db2777">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Where Should You Live?</h1>
+      <p class="header-sub">Find the area that keeps you within reach of the places that matter — not the other way around.</p>
+    </div>
+  </header>
+
+  <!-- Inputs -->
+  <div class="card wide-card" style="margin-top:8px">
+    <div class="card-head">
+      <div class="card-icon" style="background:#db2777">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">Your Key Locations</div>
+        <div class="card-sub">Work, a partner's work, school, family — add up to 4 places with a max travel time for each</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div id="commuteRows"></div>
+
+      <button type="button" class="commute-add-row" id="commuteAddRow">+ Add another location</button>
+
+      <div class="commute-submit-row">
+        <button type="button" class="btn-primary" id="commuteSubmit">Find My Search Area</button>
+      </div>
+
+      <div class="alert" id="commuteResultAlert" style="display:none"></div>
+
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div class="card wide-card" style="margin-top:24px">
+    <div class="card-head">
+      <div class="card-icon" style="background:#4f46e5">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">Your Search Area</div>
+        <div class="card-sub">The highlighted region is within your specified travel time of every location above</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="map"></div>
+      <div class="commute-legend" id="commuteLegend"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer no-print">
+    <div class="footer-links">
+      <a href="/afford">Affordability Calculator</a>
+      <a href="/commute">Commute Map</a>
+      <a href="/swap">Home Swap Calculator</a>
+      <a href="/rvb">Rent vs. Buy Analysis</a>
+      <a href="/compound">Compound Growth</a>
+      <a href="/downpayment">Down Payment Optimizer</a>
+      <a href="/refi">Refinance Calculator</a>
+      <a href="/payoff">Payoff Calculator</a>
+      <a href="/proceeds">Net Proceeds</a>
+      <a href="/faq">FAQ</a>
+      <a href="/learn">Learn</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+    </div>
+    <div class="footer-note">For informational purposes only. Not financial advice. &copy; 2026</div>
+  </footer>
+
+</div><!-- /app -->
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.4.0/turf.min.js"></script>
+<script src="commute.js?v=6"></script>
+<script src="/nav.js"></script>
+</body>
+</html>

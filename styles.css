@@ -109,6 +109,18 @@ canvas { display: block; width: 100% !important; }
   transition: all .15s;
 }
 .btn-print:hover { background: var(--indigo-light); }
+.btn-primary {
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--indigo);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background .15s;
+}
+.btn-primary:hover { background: #4338ca; }
+.btn-primary:disabled { background: var(--gray-300); cursor: default; }
 
 /* ── Header ── */
 .app-header {
