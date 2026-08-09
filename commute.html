@@ -68,7 +68,82 @@
       margin-top: 4px;
       flex-shrink: 0;
     }
-    .commute-row-address input { font-size: 14px; }
+    .commute-row-address { position: relative; }
+    .commute-row-address .input-wrap input {
+      flex: 1;
+      padding: 8px 10px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: var(--text);
+      background: transparent;
+      min-width: 0;
+    }
+    .commute-suggestions {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 6px 20px rgba(0,0,0,.1);
+      z-index: 30;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .commute-suggestions.open { display: block; }
+    .commute-suggestion {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .commute-suggestion:last-child { border-bottom: none; }
+    .commute-suggestion:hover,
+    .commute-suggestion.active { background: var(--gray-50); }
+    .commute-suggestion-main { font-size: 13px; font-weight: 500; color: var(--text); }
+    .commute-suggestion-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .commute-pick-btn {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      margin-right: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .commute-pick-btn:hover { background: var(--gray-100); color: var(--text); }
+    .commute-pick-btn.active { background: var(--indigo); color: white; }
+    .commute-pick-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      margin-bottom: 12px;
+      background: var(--indigo-light);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--text);
+    }
+    .commute-pick-hint-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .commute-pick-cancel {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--indigo);
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 0;
+    }
+    .commute-pick-cancel:hover { text-decoration: underline; }
     .commute-row-mode { height: 38px; flex-shrink: 0; }
     .commute-row-mode .mode-btn { padding: 0 12px; height: 100%; }
     .commute-row-minutes { width: 100px; flex-shrink: 0; }
@@ -193,7 +268,7 @@
       </div>
       <div>
         <div class="card-title">Your Key Locations</div>
-        <div class="card-sub">Work, a partner's work, school, family — add up to 4 places with a max travel time for each</div>
+        <div class="card-sub">Work, a partner's work, school, family — add up to 4 places with a max travel time for each (up to 60 minutes, the limit of our travel-time data provider)</div>
       </div>
     </div>
     <div class="card-body">
@@ -223,8 +298,18 @@
         <div class="card-title">Your Search Area</div>
         <div class="card-sub">The highlighted region is within your specified travel time of every location above</div>
       </div>
+      <div class="mode-toggle" id="commuteStyleToggle" style="margin-left:auto">
+        <button type="button" class="mode-btn active" data-style="light-v11">Light</button>
+        <button type="button" class="mode-btn" data-style="streets-v12">Streets</button>
+        <button type="button" class="mode-btn" data-style="outdoors-v12">Outdoors</button>
+      </div>
     </div>
     <div class="card-body">
+      <div class="commute-pick-hint" id="commutePickHint" style="display:none">
+        <span class="commute-pick-hint-dot"></span>
+        <span id="commutePickHintText"></span>
+        <button type="button" class="commute-pick-cancel" id="commutePickCancel">Cancel</button>
+      </div>
       <div id="map"></div>
       <div class="commute-legend" id="commuteLegend"></div>
     </div>
@@ -254,7 +339,7 @@
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.4.0/turf.min.js"></script>
-<script src="commute.js?v=6"></script>
+<script src="commute.js?v=12"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

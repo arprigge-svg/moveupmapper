@@ -4,6 +4,8 @@
   var MAPBOX_TOKEN = 'pk.eyJ1IjoibW92ZXVwbWFwcGVyIiwiYSI6ImNtc2t3Nmg4YzB2azIyeHB5NDVxem54c3AifQ.0zwYjQyoPmoD6oC9B002LQ';
   var MIN_LOCATIONS = 1;
   var MAX_LOCATIONS = 4;
+  var SUGGEST_DEBOUNCE_MS = 300;
+  var SUGGEST_MIN_CHARS = 3;
   var ROW_COLORS = ['#4f46e5', '#0d9488', '#d97706', '#db2777'];
   var RESULT_COLOR = '#16a34a';
 
@@ -11,7 +13,10 @@
   var mapReady = false;
   var markers = [];
   var sourceIds = [];
-  var rowsContainer, addBtn, submitBtn, resultAlert, legend;
+  var pickRow = null;
+  var pickBtn = null;
+  var lastRender = null;
+  var rowsContainer, addBtn, submitBtn, resultAlert, legend, pickHint, pickHintDot, pickHintText, styleToggle;
 
   function $(id) { return document.getElementById(id); }
 
@@ -22,12 +27,20 @@
     wrap.innerHTML =
       '<div class="commute-row">' +
         '<div class="commute-row-badge"></div>' +
-        '<div class="input-wrap commute-row-address"><input type="text" class="commute-address" placeholder="Address, city, or landmark"></div>' +
+        '<div class="commute-row-address">' +
+          '<div class="input-wrap">' +
+            '<input type="text" class="commute-address" placeholder="Address, city, or landmark" autocomplete="off">' +
+            '<button type="button" class="commute-pick-btn" aria-label="Pick this location on the map" title="Pick this location on the map">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>' +
+            '</button>' +
+          '</div>' +
+          '<div class="commute-suggestions"></div>' +
+        '</div>' +
         '<div class="mode-toggle commute-row-mode">' +
           '<button type="button" class="mode-btn active" data-mode="driving">Driving</button>' +
           '<button type="button" class="mode-btn" data-mode="walking">Walking</button>' +
         '</div>' +
-        '<div class="input-wrap suffix commute-row-minutes"><input type="number" class="commute-minutes" min="5" max="60" step="5" value="15"><span class="affix">min</span></div>' +
+        '<div class="input-wrap suffix commute-row-minutes"><input type="number" class="commute-minutes" min="5" max="60" step="5" value="15" title="Maximum 60 minutes — the limit of our travel-time data provider"><span class="affix">min</span></div>' +
         '<button type="button" class="commute-row-remove" aria-label="Remove this location">&times;</button>' +
       '</div>' +
       '<div class="commute-row-error" style="display:none"></div>';
@@ -41,11 +54,187 @@
     });
 
     wrap.querySelector('.commute-row-remove').addEventListener('click', function () {
+      if (pickRow === wrap) exitPickMode();
+      if (wrap._previewMarker) wrap._previewMarker.remove();
       wrap.remove();
       renumberRows();
     });
 
+    wrap.querySelector('.commute-pick-btn').addEventListener('click', function (e) {
+      if (pickRow === wrap) exitPickMode();
+      else enterPickMode(wrap, e.currentTarget);
+    });
+
+    wireAddressAutocomplete(
+      wrap,
+      wrap.querySelector('.commute-address'),
+      wrap.querySelector('.commute-suggestions')
+    );
+
     return wrap;
+  }
+
+  function rowColor(wrap) {
+    var rows = Array.prototype.slice.call(rowsContainer.querySelectorAll('.commute-row-wrap'));
+    return ROW_COLORS[rows.indexOf(wrap) % ROW_COLORS.length];
+  }
+
+  /* ── Pick-on-map mode ── */
+  function enterPickMode(wrap, btn) {
+    exitPickMode();
+    pickRow = wrap;
+    pickBtn = btn;
+    btn.classList.add('active');
+    if (map) map.getCanvas().style.cursor = 'crosshair';
+
+    var rows = Array.prototype.slice.call(rowsContainer.querySelectorAll('.commute-row-wrap'));
+    var idx = rows.indexOf(wrap) + 1;
+    pickHintDot.style.background = rowColor(wrap);
+    pickHintText.textContent = 'Click the map to set location ' + idx + '.';
+    pickHint.style.display = 'flex';
+  }
+
+  function exitPickMode() {
+    if (pickBtn) pickBtn.classList.remove('active');
+    pickRow = null;
+    pickBtn = null;
+    if (map) map.getCanvas().style.cursor = '';
+    pickHint.style.display = 'none';
+  }
+
+  function formatCoord(lng, lat) {
+    return lat.toFixed(5) + ', ' + lng.toFixed(5);
+  }
+
+  function placePreviewMarker(wrap, lng, lat, color) {
+    if (wrap._previewMarker) wrap._previewMarker.remove();
+    var marker = new mapboxgl.Marker({ color: color, draggable: true }).setLngLat([lng, lat]).addTo(map);
+    marker.on('dragend', function () {
+      var pos = marker.getLngLat();
+      applyPickedLocation(wrap, pos.lng, pos.lat);
+    });
+    wrap._previewMarker = marker;
+    return marker;
+  }
+
+  function applyPickedLocation(wrap, lng, lat) {
+    var input = wrap.querySelector('.commute-address');
+    var box = wrap.querySelector('.commute-suggestions');
+    box.classList.remove('open');
+    box.innerHTML = '';
+    input.blur();
+    input.value = 'Locating…';
+    wrap._verified = null;
+
+    reverseGeocode(lng, lat).then(function (label) {
+      input.value = label;
+      wrap._verified = { lng: lng, lat: lat, label: label };
+    }).catch(function () {
+      var fallback = formatCoord(lng, lat);
+      input.value = fallback;
+      wrap._verified = { lng: lng, lat: lat, label: fallback };
+    });
+  }
+
+  function handleMapPick(e) {
+    if (!pickRow) return;
+    var wrap = pickRow;
+    var lng = e.lngLat.lng, lat = e.lngLat.lat;
+    exitPickMode();
+    placePreviewMarker(wrap, lng, lat, rowColor(wrap));
+    applyPickedLocation(wrap, lng, lat);
+  }
+
+  /* ── Address autocomplete ── */
+  function wireAddressAutocomplete(wrap, input, box) {
+    var debounceTimer = null;
+    var requestSeq = 0;
+    var activeIndex = -1;
+    var currentResults = [];
+
+    function closeBox() {
+      box.classList.remove('open');
+      box.innerHTML = '';
+      currentResults = [];
+      activeIndex = -1;
+    }
+
+    function selectResult(result) {
+      input.value = result.label;
+      wrap._verified = { lng: result.lng, lat: result.lat, label: result.label };
+      closeBox();
+    }
+
+    function highlight(index) {
+      var items = box.querySelectorAll('.commute-suggestion');
+      items.forEach(function (el, i) { el.classList.toggle('active', i === index); });
+      activeIndex = index;
+    }
+
+    function renderResults(results) {
+      currentResults = results;
+      activeIndex = -1;
+      if (!results.length) { closeBox(); return; }
+      box.innerHTML = '';
+      results.forEach(function (r) {
+        var item = document.createElement('div');
+        item.className = 'commute-suggestion';
+        var main = document.createElement('div');
+        main.className = 'commute-suggestion-main';
+        main.textContent = r.mainText;
+        var sub = document.createElement('div');
+        sub.className = 'commute-suggestion-sub';
+        sub.textContent = r.subText;
+        item.appendChild(main);
+        item.appendChild(sub);
+        // mousedown (not click) fires before the input's blur handler closes the box
+        item.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+          selectResult(r);
+        });
+        box.appendChild(item);
+      });
+      box.classList.add('open');
+    }
+
+    input.addEventListener('input', function () {
+      wrap._verified = null;
+      var q = input.value.trim();
+      clearTimeout(debounceTimer);
+      if (q.length < SUGGEST_MIN_CHARS) { closeBox(); return; }
+      var seq = ++requestSeq;
+      debounceTimer = setTimeout(function () {
+        suggest(q).then(function (results) {
+          if (seq !== requestSeq) return; // a newer keystroke has since fired
+          renderResults(results);
+        }).catch(function () {
+          if (seq !== requestSeq) return;
+          closeBox();
+        });
+      }, SUGGEST_DEBOUNCE_MS);
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (!box.classList.contains('open')) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        highlight(Math.min(activeIndex + 1, currentResults.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        highlight(Math.max(activeIndex - 1, 0));
+      } else if (e.key === 'Enter') {
+        if (activeIndex >= 0) {
+          e.preventDefault();
+          selectResult(currentResults[activeIndex]);
+        }
+      } else if (e.key === 'Escape') {
+        closeBox();
+      }
+    });
+
+    input.addEventListener('blur', function () {
+      setTimeout(closeBox, 150);
+    });
   }
 
   function renumberRows() {
@@ -76,7 +265,8 @@
         address: wrap.querySelector('.commute-address').value.trim(),
         mode: wrap.querySelector('.commute-row-mode .mode-btn.active').dataset.mode,
         minutes: parseInt(wrap.querySelector('.commute-minutes').value, 10) || 15,
-        color: ROW_COLORS[i % ROW_COLORS.length]
+        color: ROW_COLORS[i % ROW_COLORS.length],
+        verified: wrap._verified || null
       });
     });
     return data;
@@ -122,6 +312,42 @@
     });
   }
 
+  function suggest(query) {
+    var url = 'https://api.mapbox.com/search/geocode/v6/forward?q=' + encodeURIComponent(query) +
+      '&limit=5&autocomplete=true&access_token=' + MAPBOX_TOKEN;
+    return fetch(url).then(function (res) {
+      if (!res.ok) throw new Error('suggest-failed');
+      return res.json();
+    }).then(function (json) {
+      var feats = json.features || [];
+      return feats.map(function (feat) {
+        var props = feat.properties || {};
+        var full = props.full_address || props.name || query;
+        return {
+          lng: feat.geometry.coordinates[0],
+          lat: feat.geometry.coordinates[1],
+          label: full,
+          mainText: props.name || full,
+          subText: props.place_formatted || ''
+        };
+      });
+    });
+  }
+
+  function reverseGeocode(lng, lat) {
+    var url = 'https://api.mapbox.com/search/geocode/v6/reverse?longitude=' + lng + '&latitude=' + lat +
+      '&access_token=' + MAPBOX_TOKEN;
+    return fetch(url).then(function (res) {
+      if (!res.ok) throw new Error('reverse-failed');
+      return res.json();
+    }).then(function (json) {
+      var feat = json.features && json.features[0];
+      if (!feat) throw new Error('reverse-not-found');
+      var props = feat.properties || {};
+      return props.full_address || props.name || formatCoord(lng, lat);
+    });
+  }
+
   function isochrone(lng, lat, mode, minutes) {
     var profile = mode === 'walking' ? 'walking' : 'driving';
     var url = 'https://api.mapbox.com/isochrone/v1/mapbox/' + profile + '/' + lng + ',' + lat +
@@ -139,6 +365,9 @@
   function clearMapLayers() {
     markers.forEach(function (m) { m.remove(); });
     markers = [];
+    rowsContainer.querySelectorAll('.commute-row-wrap').forEach(function (wrap) {
+      if (wrap._previewMarker) { wrap._previewMarker.remove(); wrap._previewMarker = null; }
+    });
     sourceIds.forEach(function (id) {
       if (map.getLayer(id + '-fill')) map.removeLayer(id + '-fill');
       if (map.getLayer(id + '-line')) map.removeLayer(id + '-line');
@@ -182,10 +411,23 @@
       return;
     }
 
+    // Mapbox's Isochrone API caps contours_minutes at 60 (driving/walking) —
+    // the field's max="60" only limits the spinner, not free typing, so a
+    // typed value like 90 would otherwise reach the API and fail there.
+    var hadRangeError = false;
+    validRows.forEach(function (r) {
+      if (r.minutes < 5 || r.minutes > 60) {
+        hadRangeError = true;
+        setRowError(r.wrap, 'Enter a travel time between 5 and 60 minutes — 60 is the max our travel-time data provider supports.');
+      }
+    });
+    if (hadRangeError) return;
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Finding…';
 
     Promise.all(validRows.map(function (r) {
+      if (r.verified) return Promise.resolve(r.verified);
       return geocode(r.address).catch(function () { return { error: true }; });
     })).then(function (geocoded) {
       var hadError = false;
@@ -227,6 +469,7 @@
   }
 
   function renderResults(validRows, geocoded, isochrones) {
+    lastRender = { validRows: validRows, geocoded: geocoded, isochrones: isochrones };
     clearMapLayers();
 
     var bounds = new mapboxgl.LngLatBounds();
@@ -270,6 +513,31 @@
     map.fitBounds(bounds, { padding: 60, maxZoom: 13, duration: 600 });
   }
 
+  // setStyle() replaces the whole style, wiping any sources/layers we added
+  // (markers are separate DOM overlays and survive it automatically) — so
+  // the last rendered result needs to be redrawn once the new style is ready.
+  function redrawAfterStyleChange() {
+    if (!lastRender) return;
+    sourceIds = [];
+    legend.innerHTML = '';
+
+    var validRows = lastRender.validRows, geocoded = lastRender.geocoded, isochrones = lastRender.isochrones;
+    validRows.forEach(function (r, i) {
+      addPolygonLayer('iso-' + i, isochrones[i].geometry, r.color, 0.10, 1.5);
+      addLegendItem(r.color, (i + 1) + '. ' + geocoded[i].label);
+    });
+
+    var intersection = isochrones[0];
+    for (var i = 1; i < isochrones.length; i++) {
+      if (!intersection) break;
+      intersection = turf.intersect(turf.featureCollection([intersection, isochrones[i]]));
+    }
+    if (validRows.length > 1 && intersection) {
+      addPolygonLayer('result', intersection.geometry, RESULT_COLOR, 0.4, 2.5);
+      addLegendItem(RESULT_COLOR, 'Your search area');
+    }
+  }
+
   /* ── Init ── */
   function init() {
     rowsContainer = $('commuteRows');
@@ -277,12 +545,30 @@
     submitBtn = $('commuteSubmit');
     resultAlert = $('commuteResultAlert');
     legend = $('commuteLegend');
+    pickHint = $('commutePickHint');
+    pickHintDot = pickHint.querySelector('.commute-pick-hint-dot');
+    pickHintText = $('commutePickHintText');
+    styleToggle = $('commuteStyleToggle');
 
     addRow();
     addRow();
 
     addBtn.addEventListener('click', addRow);
     submitBtn.addEventListener('click', handleSubmit);
+    $('commutePickCancel').addEventListener('click', exitPickMode);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && pickRow) exitPickMode();
+    });
+
+    var styleBtns = styleToggle.querySelectorAll('.mode-btn');
+    styleBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('active') || !map) return;
+        styleBtns.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        map.setStyle('mapbox://styles/mapbox/' + btn.dataset.style);
+      });
+    });
 
     // Sources/layers can't be added until the style has finished loading —
     // block submission until then so an early click can't silently no-op.
@@ -297,10 +583,12 @@
       zoom: 3.2
     });
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.on('click', handleMapPick);
     map.on('load', function () {
       mapReady = true;
       resetSubmitButton();
     });
+    map.on('style.load', redrawAfterStyleChange);
 
     // If the map hasn't finished loading after a while (slow connection,
     // network hiccup), stop leaving the button stuck on "Loading map…"
