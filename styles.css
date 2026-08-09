@@ -1299,6 +1299,19 @@ details[open] > .faq-q::after {
 }
 .nav-dropdown-item:hover { background: var(--gray-50); color: var(--text); }
 .nav-dropdown-item.active { color: var(--indigo); font-weight: 600; }
+.nav-dropdown-label {
+  padding: 6px 16px 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--gray-700);
+}
+.nav-dropdown-label:not(:first-child) {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gray-300);
+}
 
 /* ── Horizon Slider ── */
 .horizon-card { overflow: visible; margin-bottom: 28px; }
@@ -1731,6 +1744,7 @@ details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
 .tool-carousel-viewport { overflow: hidden; flex: 1; min-width: 0; }
 .tool-grid { display: flex; gap: 16px; transition: transform .35s cubic-bezier(.25,.46,.45,.94); }
 .tool-card {
+  position: relative;
   background: var(--card-bg);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
@@ -1742,6 +1756,19 @@ details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
   flex-shrink: 0;
 }
 .tool-card:hover { border-color: var(--indigo-mid); box-shadow: var(--shadow-md); }
+.tool-card-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  background: var(--gray-100);
+  padding: 3px 8px;
+  border-radius: 20px;
+}
 .tool-card-icon {
   width: 40px; height: 40px; border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
