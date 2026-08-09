@@ -297,6 +297,10 @@
     var res = solve(inp);
     lastResult = res;
     render(res);
+    // Advanced panel content (e.g. the discount-points helper text) can change
+    // height on every render, not just on $/% mode toggles — keep it in sync
+    // so the frozen max-height never clips the last row of fields.
+    refreshAdvPanel();
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(inp)); } catch(e) {}
   }
 
@@ -316,7 +320,6 @@
     if (helper) helper.textContent = mode === 'dollar'
       ? 'Annual property tax in dollars (÷ 12 for monthly escrow)'
       : 'Annual rate as % of home value; varies widely by location';
-    refreshAdvPanel();
   }
 
   function applyInsMode(mode) {
@@ -335,7 +338,6 @@
     if (helper) helper.textContent = mode === 'dollar'
       ? 'Annual insurance premium in dollars (÷ 12 for monthly escrow)'
       : 'Annual insurance premium as % of home value';
-    refreshAdvPanel();
   }
 
   function applyPmiMode(mode) {
@@ -354,7 +356,6 @@
     if (helper) helper.textContent = mode === 'dollar'
       ? 'Monthly PMI in dollars; applies only if down payment < 20%'
       : 'Annual PMI as % of loan; applies only if down payment < 20%';
-    refreshAdvPanel();
   }
 
   function setDefaults(v) {
@@ -448,6 +449,12 @@
         this.setAttribute('aria-expanded', String(!open));
         advBody.style.maxHeight = open ? '0' : advBody.scrollHeight + 'px';
       });
+      // Focusing a field reveals its .helper text (see .field:focus-within
+      // in styles.css), which grows that field's height after the panel's
+      // max-height was already frozen — re-measure once the reveal/hide
+      // transition (200ms) finishes so the last row never gets clipped.
+      advBody.addEventListener('focusin', function () { setTimeout(refreshAdvPanel, 220); });
+      advBody.addEventListener('focusout', function () { setTimeout(refreshAdvPanel, 220); });
     }
 
     document.getElementById('resetBtn').addEventListener('click', function () {
