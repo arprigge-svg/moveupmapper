@@ -8,6 +8,7 @@
   var SUGGEST_MIN_CHARS = 3;
   var ROW_COLORS = ['#4f46e5', '#0d9488', '#d97706', '#db2777'];
   var RESULT_COLOR = '#16a34a';
+  var ZCTA_QUERY_URL = 'https://tigerweb.geo.census.gov/arcgis/rest/services/Generalized_TAB2020/PUMA_TAD_TAZ_UGA_ZCTA/MapServer/3/query';
 
   var map = null;
   var mapReady = false;
@@ -16,7 +17,8 @@
   var pickRow = null;
   var pickBtn = null;
   var lastRender = null;
-  var rowsContainer, addBtn, submitBtn, resultAlert, legend, pickHint, pickHintDot, pickHintText, styleToggle, styleBtns;
+  var lastZcta = null;
+  var rowsContainer, addBtn, submitBtn, resultAlert, legend, pickHint, pickHintDot, pickHintText, styleToggle, styleBtns, zipSection, zipList;
 
   function $(id) { return document.getElementById(id); }
 
@@ -366,6 +368,93 @@
     });
   }
 
+  // The US Census Bureau's TIGERweb service (free, public, CORS-enabled) lets
+  // us query ZCTA (ZIP code) polygons that genuinely intersect our exact
+  // search-area geometry — no bundled dataset, no precision loss from
+  // approximating the shape.
+  function toEsriRings(geometry) {
+    if (geometry.type === 'Polygon') return geometry.coordinates;
+    var rings = [];
+    geometry.coordinates.forEach(function (poly) {
+      poly.forEach(function (ring) { rings.push(ring); });
+    });
+    return rings;
+  }
+
+  function queryZctas(geometry) {
+    var body = new URLSearchParams({
+      geometry: JSON.stringify({ rings: toEsriRings(geometry), spatialReference: { wkid: 4326 } }),
+      geometryType: 'esriGeometryPolygon',
+      inSR: '4326',
+      spatialRel: 'esriSpatialRelIntersects',
+      outFields: 'ZCTA5',
+      returnGeometry: 'true',
+      outSR: '4326',
+      f: 'geojson'
+    });
+    return fetch(ZCTA_QUERY_URL, { method: 'POST', body: body }).then(function (res) {
+      if (!res.ok) throw new Error('zcta-query-failed');
+      return res.json();
+    }).then(function (geojson) {
+      if (!geojson.features) throw new Error('zcta-query-bad-response');
+      var zips = geojson.features.map(function (f) { return f.properties.ZCTA5; }).filter(Boolean);
+      zips.sort();
+      return { zips: zips, geojson: geojson };
+    });
+  }
+
+  function addZctaLayer(geojson) {
+    map.addSource('zcta', { type: 'geojson', data: geojson });
+    map.addLayer({
+      id: 'zcta-line', type: 'line', source: 'zcta',
+      paint: { 'line-color': '#6b7280', 'line-width': 1.25, 'line-dasharray': [2, 2], 'line-opacity': 0.8 }
+    });
+  }
+
+  function removeZctaLayer() {
+    if (map.getLayer('zcta-line')) map.removeLayer('zcta-line');
+    if (map.getSource('zcta')) map.removeSource('zcta');
+  }
+
+  function clearZipList() {
+    lastZcta = null;
+    zipList.innerHTML = '';
+    zipSection.style.display = 'none';
+  }
+
+  function renderZipList(zips) {
+    zipList.innerHTML = '';
+    zips.forEach(function (zip) {
+      var a = document.createElement('a');
+      a.className = 'commute-zip-pill';
+      a.href = 'https://www.zillow.com/homes/' + encodeURIComponent(zip) + '_rb/';
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = zip;
+      zipList.appendChild(a);
+    });
+    zipSection.style.display = zips.length ? '' : 'none';
+  }
+
+  // Fetches and renders in the background — this is supplementary context on
+  // top of an already-successful search, so a slow or failed lookup here
+  // shouldn't disrupt the map result that already rendered. The submit
+  // button re-enables as soon as renderResults() returns, before this fetch
+  // resolves, so a fast resubmit can start a second lookup before the first
+  // one lands — guard with a sequence number the same way suggest() does,
+  // so a stale response can't overwrite a newer search's results.
+  var zctaRequestSeq = 0;
+  function fetchAndShowZctas(geometry) {
+    var seq = ++zctaRequestSeq;
+    queryZctas(geometry).then(function (result) {
+      if (seq !== zctaRequestSeq) return;
+      lastZcta = result;
+      if (!result.zips.length) return;
+      addZctaLayer(result.geojson);
+      renderZipList(result.zips);
+    }).catch(function () {});
+  }
+
   /* ── Map rendering ── */
   function clearMapLayers() {
     markers.forEach(function (m) { m.remove(); });
@@ -379,7 +468,9 @@
       if (map.getSource(id)) map.removeSource(id);
     });
     sourceIds = [];
+    removeZctaLayer();
     legend.innerHTML = '';
+    clearZipList();
   }
 
   function addPolygonLayer(id, geometry, color, fillOpacity, lineWidth) {
@@ -516,12 +607,14 @@
       addLegendItem(RESULT_COLOR, 'Your search area');
       showResultAlert('green', 'Search area found',
         'The highlighted region on the map is within your specified travel time of every location you entered.');
+      fetchAndShowZctas(intersection.geometry);
     } else if (validRows.length > 1) {
       showResultAlert('amber', 'No overlapping area found',
         'These locations don’t share a common area within the times you set. Try increasing a travel time or double-checking an address.');
     } else {
       showResultAlert('green', 'Search area found',
         'The highlighted region is within your specified travel time of this location.');
+      fetchAndShowZctas(isochrones[0].geometry);
     }
 
     map.fitBounds(bounds, { padding: 60, maxZoom: 13, duration: 600 });
@@ -550,6 +643,8 @@
       addPolygonLayer('result', intersection.geometry, RESULT_COLOR, 0.4, 2.5);
       addLegendItem(RESULT_COLOR, 'Your search area');
     }
+
+    if (lastZcta && lastZcta.zips.length) addZctaLayer(lastZcta.geojson);
   }
 
   function resetAll() {
@@ -560,6 +655,7 @@
     if (map && mapReady) clearMapLayers();
     lastRender = null;
     clearResultAlert();
+    clearZipList();
 
     rowsContainer.innerHTML = '';
     addRow();
@@ -587,6 +683,8 @@
     pickHintDot = pickHint.querySelector('.commute-pick-hint-dot');
     pickHintText = $('commutePickHintText');
     styleToggle = $('commuteStyleToggle');
+    zipSection = $('commuteZipSection');
+    zipList = $('commuteZipList');
 
     addRow();
     addRow();
