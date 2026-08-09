@@ -144,6 +144,7 @@
       padding: 0;
     }
     .commute-pick-cancel:hover { text-decoration: underline; }
+    #commuteStyleToggle .mode-btn:disabled { opacity: .5; cursor: default; }
     .commute-row-mode { height: 38px; flex-shrink: 0; }
     .commute-row-mode .mode-btn { padding: 0 12px; height: 100%; }
     .commute-row-minutes { width: 100px; flex-shrink: 0; }
@@ -254,21 +255,20 @@
     </div>
     <div>
       <h1>Where Should You Live?</h1>
-      <p class="header-sub">Find the area that keeps you within reach of the places that matter — not the other way around.</p>
+      <p class="header-sub">Find the area that keeps you within reach of the places that matter.</p>
+    </div>
+    <div class="header-actions" style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-shrink:0">
+      <button class="btn-text" id="commuteReset">Reset</button>
     </div>
   </header>
 
   <!-- Inputs -->
   <div class="card wide-card" style="margin-top:8px">
     <div class="card-head">
-      <div class="card-icon" style="background:#db2777">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-      </div>
       <div>
         <div class="card-title">Your Key Locations</div>
-        <div class="card-sub">Work, a partner's work, school, family — add up to 4 places with a max travel time for each (up to 60 minutes, the limit of our travel-time data provider)</div>
+        <div class="card-sub" style="margin-top:5px;font-size:13px">Enter up to 4 locations — work, school, family, and more — with a preferred max travel time to each. We'll plot the area within reach of all of them to kick off your home search.</div>
+        <div class="card-sub" style="margin-top:3px;font-size:12px">Note: 60 minutes is the limit of our travel-time data provider.</div>
       </div>
     </div>
     <div class="card-body">
@@ -301,7 +301,7 @@
       <div class="mode-toggle" id="commuteStyleToggle" style="margin-left:auto">
         <button type="button" class="mode-btn active" data-style="light-v11">Light</button>
         <button type="button" class="mode-btn" data-style="streets-v12">Streets</button>
-        <button type="button" class="mode-btn" data-style="outdoors-v12">Outdoors</button>
+        <button type="button" class="mode-btn" data-style="dark-v11">Dark</button>
       </div>
     </div>
     <div class="card-body">
@@ -339,7 +339,7 @@
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.28.1/mapbox-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.4.0/turf.min.js"></script>
-<script src="commute.js?v=12"></script>
+<script src="commute.js?v=14"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

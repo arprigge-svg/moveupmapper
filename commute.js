@@ -16,7 +16,7 @@
   var pickRow = null;
   var pickBtn = null;
   var lastRender = null;
-  var rowsContainer, addBtn, submitBtn, resultAlert, legend, pickHint, pickHintDot, pickHintText, styleToggle;
+  var rowsContainer, addBtn, submitBtn, resultAlert, legend, pickHint, pickHintDot, pickHintText, styleToggle, styleBtns;
 
   function $(id) { return document.getElementById(id); }
 
@@ -260,11 +260,16 @@
     var rows = rowsContainer.querySelectorAll('.commute-row-wrap');
     var data = [];
     rows.forEach(function (wrap, i) {
+      // parseInt(...) || 15 would silently turn a literal "0" into 15 (0 is
+      // falsy) and skip the 5-60 range check entirely — check NaN explicitly
+      // so an out-of-range value like 0 surfaces the same inline error a
+      // value like 90 already does, instead of being coerced with no feedback.
+      var minutesVal = parseInt(wrap.querySelector('.commute-minutes').value, 10);
       data.push({
         wrap: wrap,
         address: wrap.querySelector('.commute-address').value.trim(),
         mode: wrap.querySelector('.commute-row-mode .mode-btn.active').dataset.mode,
-        minutes: parseInt(wrap.querySelector('.commute-minutes').value, 10) || 15,
+        minutes: isNaN(minutesVal) ? 15 : minutesVal,
         color: ROW_COLORS[i % ROW_COLORS.length],
         verified: wrap._verified || null
       });
@@ -393,7 +398,11 @@
   function addLegendItem(color, label) {
     var item = document.createElement('div');
     item.className = 'commute-legend-item';
-    item.innerHTML = '<span class="commute-legend-swatch" style="background:' + color + '"></span>' + label;
+    var swatch = document.createElement('span');
+    swatch.className = 'commute-legend-swatch';
+    swatch.style.background = color;
+    item.appendChild(swatch);
+    item.appendChild(document.createTextNode(label));
     legend.appendChild(item);
   }
 
@@ -425,6 +434,10 @@
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Finding…';
+    // setStyle() wipes sources/layers until the new style finishes loading,
+    // so switching mid-search could throw inside renderResults right as a
+    // successful fetch resolves — block it while a search is in flight.
+    styleBtns.forEach(function (b) { b.disabled = true; });
 
     Promise.all(validRows.map(function (r) {
       if (r.verified) return Promise.resolve(r.verified);
@@ -466,6 +479,7 @@
   function resetSubmitButton() {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Find My Search Area';
+    styleBtns.forEach(function (b) { b.disabled = false; });
   }
 
   function renderResults(validRows, geocoded, isochrones) {
@@ -538,6 +552,30 @@
     }
   }
 
+  function resetAll() {
+    exitPickMode();
+    rowsContainer.querySelectorAll('.commute-row-wrap').forEach(function (wrap) {
+      if (wrap._previewMarker) wrap._previewMarker.remove();
+    });
+    if (map && mapReady) clearMapLayers();
+    lastRender = null;
+    clearResultAlert();
+
+    rowsContainer.innerHTML = '';
+    addRow();
+    addRow();
+
+    if (map) {
+      var lightBtn = styleToggle.querySelector('.mode-btn[data-style="light-v11"]');
+      if (!lightBtn.classList.contains('active')) {
+        styleBtns.forEach(function (b) { b.classList.remove('active'); });
+        lightBtn.classList.add('active');
+        map.setStyle('mapbox://styles/mapbox/light-v11');
+      }
+      map.flyTo({ center: [-98.5795, 39.8283], zoom: 3.2, duration: 600 });
+    }
+  }
+
   /* ── Init ── */
   function init() {
     rowsContainer = $('commuteRows');
@@ -555,12 +593,13 @@
 
     addBtn.addEventListener('click', addRow);
     submitBtn.addEventListener('click', handleSubmit);
+    $('commuteReset').addEventListener('click', resetAll);
     $('commutePickCancel').addEventListener('click', exitPickMode);
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && pickRow) exitPickMode();
     });
 
-    var styleBtns = styleToggle.querySelectorAll('.mode-btn');
+    styleBtns = styleToggle.querySelectorAll('.mode-btn');
     styleBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (btn.classList.contains('active') || !map) return;
