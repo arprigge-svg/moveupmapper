@@ -46,7 +46,7 @@
 <body>
 <nav class="site-nav no-print">
   <div class="site-nav-inner">
-    <a href="/" class="site-brand">
+    <a href="/" class="site-brand" aria-label="Move Up Mapper">
       <img src="favicon.svg" width="28" height="28" alt="" style="border-radius:7px;flex-shrink:0;display:block">
       <span class="brand-name">Move Up Mapper</span>
     </a>
@@ -74,7 +74,7 @@
     </div>
   </div>
 </nav>
-<div class="app">
+<main class="app">
 
   <!-- Hero -->
   <section class="landing-hero">
@@ -220,7 +220,7 @@
   </section>
 
   <!-- Market Context -->
-  <section class="landing-section">
+  <section class="landing-section" id="marketContext">
     <div class="landing-section-head">
       <div class="landing-section-head-row">
         <h2>Market Context</h2>
@@ -352,7 +352,7 @@
     <div class="footer-note">For informational purposes only. Not financial advice. &copy; 2026</div>
   </footer>
 
-</div>
+</main>
 
 <script>
 (function () {
@@ -404,9 +404,11 @@
   window.requestAnimationFrame(function () { goTo(0); });
 }());
 </script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-(function () {
+// Chart.js (~70 KiB) and its init are only needed once the below-the-fold
+// Market Context section is about to scroll into view, so load it lazily
+// instead of blocking the initial render for content nobody may reach.
+function initHomeCharts() {
   'use strict';
 
   // ── Affordability data (1990–2025) ─────────────────────────────────────────
@@ -648,7 +650,28 @@
       }
     }
   });
+}
 
+(function () {
+  var section = document.getElementById('marketContext');
+  if (!section) return;
+
+  function loadChartsWhenNear() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+    script.onload = initHomeCharts;
+    document.body.appendChild(script);
+  }
+
+  if (!window.IntersectionObserver) { loadChartsWhenNear(); return; }
+
+  var observer = new IntersectionObserver(function (entries) {
+    if (entries[0].isIntersecting) {
+      observer.disconnect();
+      loadChartsWhenNear();
+    }
+  }, { rootMargin: '150px 0px' });
+  observer.observe(section);
 }());
 </script>
 <script src="/nav.js"></script>
