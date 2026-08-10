@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=68">
+  <link rel="stylesheet" href="styles.css?v=69">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -450,6 +450,11 @@
     </div><!-- /glossary-body -->
   </details>
 
+  <div class="rate-hint no-print" data-mortgage-rate-widget style="display:none;margin:0 0 8px 2px" title="Freddie Mac PMMS, via FRED">
+    Today's average new-loan rate: <span class="rate-hint-value" data-mortgage-rate="30">—</span> 30-yr
+    · <span class="rate-hint-value" data-mortgage-rate="15">—</span> 15-yr — worth a look below if that's meaningfully under your current rate.
+  </div>
+
   <a href="/refi" class="tool-crosslink no-print">
     <div class="tool-crosslink-icon" style="background:#0d9488">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -487,6 +492,7 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="mortgage-rates.js?v=1"></script>
 <script src="payoff.js?v=9"></script>
 <script>
 /* ── Field tip tooltips ── */

@@ -352,6 +352,29 @@ label {
   opacity: 1;
   margin-top: 4px;
 }
+.rate-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.rate-hint-value {
+  display: inline-flex;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: var(--indigo-light);
+  color: var(--indigo);
+  font-weight: 700;
+  border: none;
+  font-size: 12px;
+  font-family: inherit;
+}
+.rate-hint-value[data-fill-target] { cursor: pointer; transition: background .15s, color .15s; }
+.rate-hint-value[data-fill-target]:hover { background: var(--indigo); color: white; }
+.rate-hint-date { color: var(--gray-500); margin-left: 2px; }
 .field-lookup-link {
   display: block;
   margin-top: 3px;

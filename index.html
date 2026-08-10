@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=68">
+  <link rel="stylesheet" href="styles.css?v=69">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -272,6 +272,11 @@
         </div>
       </div>
       <div class="card-body">
+        <div class="rate-hint" data-mortgage-rate-widget style="display:none;margin-top:0;margin-bottom:14px" title="Freddie Mac PMMS, via FRED">
+          Today's average: <span class="rate-hint-value" data-mortgage-rate="30">—</span> 30-yr fixed
+          · <span class="rate-hint-value" data-mortgage-rate="15">—</span> 15-yr fixed
+          <span class="rate-hint-date">as of <span data-mortgage-rate-date></span></span>
+        </div>
         <div class="context-chart-wrap">
           <canvas id="rateChart"></canvas>
         </div>
@@ -674,6 +679,7 @@ function initHomeCharts() {
   observer.observe(section);
 }());
 </script>
+<script src="mortgage-rates.js?v=1"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

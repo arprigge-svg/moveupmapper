@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=68">
+  <link rel="stylesheet" href="styles.css?v=69">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -213,6 +213,10 @@
             </div>
             <div class="helper">Use the interest rate, not APR</div>
             <div class="helper" id="effectiveRateNote" style="display:none;color:var(--green);font-weight:500">Effective rate after points: <span id="effectiveRateVal"></span></div>
+            <div class="rate-hint" data-mortgage-rate-widget style="display:none" title="Freddie Mac PMMS, via FRED">
+              Today's avg: <button type="button" class="rate-hint-value" data-mortgage-rate="30" data-fill-target="newRate">—</button> 30-yr
+              · <button type="button" class="rate-hint-value" data-mortgage-rate="15" data-fill-target="newRate">—</button> 15-yr
+            </div>
           </div>
           <div class="field">
             <label>NEW LOAN TERM</label>
@@ -572,6 +576,7 @@
 </main><!-- /app -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="mortgage-rates.js?v=1"></script>
 <script src="refi.js?v=11"></script>
 <script>
 /* ── Field tip tooltips ── */

@@ -905,33 +905,32 @@ function switchScenario(to) {
 }
 
 /* ── Live mortgage rate ── */
+// FRED's own endpoints don't send CORS headers, so this used to fetch
+// fredgraph.csv directly and fail silently on every load (caught by the
+// catch block below, with no visible symptom). mortgage-rates.json is a
+// same-origin static file refreshed on a schedule from that same FRED data
+// (see .github/workflows/update-mortgage-rates.yml) — using it here actually
+// works.
 async function fetchMortgageRate() {
   try {
-    const res = await fetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=MORTGAGE30US');
-    if (!res.ok) return;
-    const text = await res.text();
-    const lines = text.trim().split('\n');
-    // Last non-empty line with a valid number
-    for (let i = lines.length - 1; i >= 1; i--) {
-      const parts = lines[i].split(',');
-      const val = parseFloat(parts[1]);
-      if (!isNaN(val) && val > 0) {
-        DEFAULTS.interestRate = val;
-        // Update any scenario still using the placeholder default
-        for (const key of ['a', 'b']) {
-          if (scenarios[key] && scenarios[key]._rateIsDefault) {
-            scenarios[key].interestRate = val;
-          }
-        }
-        // Reflect in the active input if user hasn't touched it
-        const el = document.getElementById('interestRate');
-        if (el && el.dataset.rateIsDefault === 'true') {
-          el.value = val;
-          el.removeAttribute('data-rate-is-default');
-          recalcAndRender();
-        }
-        return;
+    const data = await fetchCurrentMortgageRates();
+    const term = (scenarios[activeScenario] && scenarios[activeScenario].prospectiveTerm) || 30;
+    const val = term === 15 ? data.fifteenYear : data.thirtyYear;
+    if (isNaN(val) || val <= 0) return;
+
+    DEFAULTS.interestRate = val;
+    // Update any scenario still using the placeholder default
+    for (const key of ['a', 'b']) {
+      if (scenarios[key] && scenarios[key]._rateIsDefault) {
+        scenarios[key].interestRate = val;
       }
+    }
+    // Reflect in the active input if user hasn't touched it
+    const el = document.getElementById('interestRate');
+    if (el && el.dataset.rateIsDefault === 'true') {
+      el.value = val;
+      el.removeAttribute('data-rate-is-default');
+      recalcAndRender();
     }
   } catch (_) { /* keep fallback */ }
 }
