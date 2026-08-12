@@ -1,0 +1,30 @@
+name: Update State Home Prices
+
+on:
+  schedule:
+    # Zillow typically publishes the new ZHVI cut in mid-month. Run on the
+    # 20th as a safety net after their usual release.
+    - cron: '0 17 20 * *'
+  workflow_dispatch: {}
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: node scripts/update-state-home-prices.js
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add state-home-prices.json
+          git diff --staged --quiet || git commit -m "Update state home prices [skip ci]"
+          git push

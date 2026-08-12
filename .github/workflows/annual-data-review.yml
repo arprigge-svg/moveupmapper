@@ -1,0 +1,35 @@
+name: Annual Market Map Data Review
+
+# The four hand-maintained fields in market-map-data.js (property tax,
+# insurance, transfer tax, closing type) have no scrapeable source — see
+# the file's own header comment. This doesn't attempt to fetch anything;
+# it just files a yearly reminder so the data doesn't silently go stale.
+on:
+  schedule:
+    - cron: '0 15 1 9 *' # Sept 1 — matches Tax Foundation's usual annual release
+  workflow_dispatch: {}
+
+jobs:
+  file-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Annual review: market-map-data.js static fields',
+              body: [
+                'Check each source for updates and revise market-map-data.js accordingly (values and the matching `meta` source/sourceUrl/asOfYear block):',
+                '',
+                '- [ ] Property tax — Tax Foundation, https://taxfoundation.org/data/all/state/property-taxes-by-state-county-2025/',
+                '- [ ] Insurance — III, https://www.iii.org/fact-statistic/facts-statistics-homeowners-and-renters-insurance',
+                '- [ ] Transfer tax — Old Republic Title / PropertyShark state guides',
+                '- [ ] Closing type (attorney/title/mixed) — rarely changes, spot-check only',
+                '',
+                'Home price is automated separately (see update-state-home-prices.yml) and needs no manual action.'
+              ].join('\n')
+            });
