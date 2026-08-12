@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=69">
+  <link rel="stylesheet" href="styles.css?v=71">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -54,7 +54,6 @@
       <div class="nav-dropdown">
         <button type="button" class="page-nav-link nav-dropdown-btn" aria-haspopup="true">Calculators <svg class="nav-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
         <div class="nav-dropdown-menu">
-          <div class="nav-dropdown-label">Calculators</div>
           <a href="/afford" class="nav-dropdown-item">Affordability Calculator</a>
           <a href="/compound" class="nav-dropdown-item">Compound Growth</a>
           <a href="/downpayment" class="nav-dropdown-item">Down Payment Optimizer</a>
@@ -63,8 +62,13 @@
           <a href="/payoff" class="nav-dropdown-item">Payoff Calculator</a>
           <a href="/refi" class="nav-dropdown-item">Refi Calculator</a>
           <a href="/rvb" class="nav-dropdown-item">Rent vs. Buy Analysis</a>
-          <div class="nav-dropdown-label">Tools</div>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <button type="button" class="page-nav-link nav-dropdown-btn" aria-haspopup="true">Tools <svg class="nav-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="nav-dropdown-menu">
           <a href="/commute" class="nav-dropdown-item">Commute Map</a>
+          <a href="/ratefactors" class="nav-dropdown-item">Rate Factors</a>
         </div>
       </div>
       <a href="/faq"      class="page-nav-link">FAQ</a>
@@ -80,7 +84,7 @@
   <section class="landing-hero">
     <div class="landing-hero-text">
       <h1>Housing decisions start with better math.</h1>
-      <p>Nine free housing tools and calculators. No account required, no personal data stored.</p>
+      <p>Ten free housing tools and calculators. No account required, no personal data stored.</p>
     </div>
     <div class="tool-carousel">
       <button class="carousel-btn carousel-btn--prev" id="carouselPrev" aria-label="Previous calculators" disabled>
@@ -195,6 +199,18 @@
             <div class="tool-card-cta">Open tool <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><polyline points="12 5 19 12 12 19"/></svg></div>
           </a>
 
+          <a href="/ratefactors" class="tool-card">
+            <div class="tool-card-icon" style="background:#475569">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+              </svg>
+            </div>
+            <div class="tool-card-badge">Tool</div>
+            <div class="tool-card-name">Rate Factors</div>
+            <div class="tool-card-desc">See exactly how credit score, down payment, occupancy, property type, and loan purpose stack up to change the rate a lender quotes — using their own published pricing grid.</div>
+            <div class="tool-card-cta">Open tool <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          </a>
+
         </div>
       </div>
       <button class="carousel-btn carousel-btn--next" id="carouselNext" aria-label="Next calculators">
@@ -209,6 +225,7 @@
       <button class="carousel-dot" data-idx="4" aria-label="Show calculators 5–7"></button>
       <button class="carousel-dot" data-idx="5" aria-label="Show calculators 6–8"></button>
       <button class="carousel-dot" data-idx="6" aria-label="Show calculators 7–9"></button>
+      <button class="carousel-dot" data-idx="7" aria-label="Show calculators 8–10"></button>
     </div>
   </section>
 
@@ -342,6 +359,7 @@
     <div class="footer-links">
       <a href="/afford">Affordability Calculator</a>
       <a href="/commute">Commute Map</a>
+      <a href="/ratefactors">Rate Factors</a>
       <a href="/swap">Home Swap Calculator</a>
       <a href="/rvb">Rent vs. Buy Analysis</a>
       <a href="/compound">Compound Growth</a>
@@ -361,7 +379,7 @@
 
 <script>
 (function () {
-  var SHOW = 3, TOTAL = 9, MAX = TOTAL - SHOW; // MAX = 6
+  var SHOW = 3, TOTAL = 10, MAX = TOTAL - SHOW; // MAX = 7
   var offset = 0;
   var track    = document.getElementById('toolTrack');
   var viewport = document.querySelector('.tool-carousel-viewport');

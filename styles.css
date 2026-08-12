@@ -352,6 +352,11 @@ label {
   opacity: 1;
   margin-top: 4px;
 }
+.field-note {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
 .rate-hint {
   margin-top: 6px;
   font-size: 12px;
@@ -1275,6 +1280,12 @@ details[open] > .faq-q::after {
   .page-nav-links { overflow: visible; }
   .page-nav-link { padding: 0 10px; font-size: 12px; }
   .brand-name { display: none; }
+}
+@media (max-width: 480px) {
+  .site-nav-inner { padding: 0 8px; gap: 2px; }
+  .page-nav-link { padding: 0 5px; font-size: 10.5px; }
+  .nav-dropdown-btn { gap: 0; }
+  .nav-chevron { display: none; }
 }
 
 /* ── Nav: Calculators dropdown ── */

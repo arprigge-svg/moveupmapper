@@ -72,6 +72,11 @@
   to   = "/proceeds"
   status = 301
 
+[[redirects]]
+  from = "/ratefactors.html"
+  to   = "/ratefactors"
+  status = 301
+
 # Security headers for all pages
 [[headers]]
   for = "/*"

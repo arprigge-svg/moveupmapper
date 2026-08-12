@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rate Factors — What Moves Your Mortgage Rate — Move Up Mapper</title>
+  <meta name="description" content="See exactly how credit score, down payment, occupancy, property type, and loan purpose stack up to change the mortgage rate a lender quotes you — built on Freddie Mac's published pricing grid.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Move Up Mapper">
+  <meta property="og:title" content="Rate Factors — What Moves Your Mortgage Rate — Move Up Mapper">
+  <meta property="og:description" content="An interactive breakdown of how credit score, LTV, occupancy, property type, and loan purpose combine to set your mortgage rate — using Freddie Mac's actual published pricing grid.">
+  <meta property="og:url" content="https://www.moveupmapper.com/ratefactors">
+  <meta property="og:image" content="https://www.moveupmapper.com/social-card.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Move Up Mapper — Free Housing &amp; Investment Calculators">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Rate Factors — What Moves Your Mortgage Rate — Move Up Mapper">
+  <meta name="twitter:description" content="See how credit score, down payment, occupancy, property type, and loan purpose combine to set your mortgage rate, using real published pricing data.">
+  <link rel="canonical" href="https://www.moveupmapper.com/ratefactors">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
+  <link rel="stylesheet" href="styles.css?v=71">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Rate Factors",
+    "url": "https://www.moveupmapper.com/ratefactors",
+    "description": "Interactive breakdown of how credit score, down payment, occupancy, property type, and loan purpose combine to determine a mortgage rate quote, based on Freddie Mac's published Loan-Level Price Adjustment grid.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "provider": { "@type": "Organization", "name": "Move Up Mapper", "url": "https://www.moveupmapper.com" }
+  }
+  </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCEFCLSHX0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YCEFCLSHX0');
+  </script>
+</head>
+<body>
+<nav class="site-nav no-print">
+  <div class="site-nav-inner">
+    <a href="/" class="site-brand" aria-label="Move Up Mapper">
+      <img src="favicon.svg" width="28" height="28" alt="" style="border-radius:7px;flex-shrink:0;display:block">
+      <span class="brand-name">Move Up Mapper</span>
+    </a>
+    <div class="page-nav-links">
+      <div class="nav-dropdown">
+        <button type="button" class="page-nav-link nav-dropdown-btn" aria-haspopup="true">Calculators <svg class="nav-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="nav-dropdown-menu">
+          <a href="/afford" class="nav-dropdown-item">Affordability Calculator</a>
+          <a href="/compound" class="nav-dropdown-item">Compound Growth</a>
+          <a href="/downpayment" class="nav-dropdown-item">Down Payment Optimizer</a>
+          <a href="/swap" class="nav-dropdown-item">Home Swap Calculator</a>
+          <a href="/proceeds" class="nav-dropdown-item">Net Proceeds</a>
+          <a href="/payoff" class="nav-dropdown-item">Payoff Calculator</a>
+          <a href="/refi" class="nav-dropdown-item">Refi Calculator</a>
+          <a href="/rvb" class="nav-dropdown-item">Rent vs. Buy Analysis</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <button type="button" class="page-nav-link nav-dropdown-btn active" aria-haspopup="true">Tools <svg class="nav-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <div class="nav-dropdown-menu">
+          <a href="/commute" class="nav-dropdown-item">Commute Map</a>
+          <a href="/ratefactors" class="nav-dropdown-item active">Rate Factors</a>
+        </div>
+      </div>
+      <a href="/faq"    class="page-nav-link">FAQ</a>
+      <a href="/learn"  class="page-nav-link">Learn</a>
+      <a href="/market" class="page-nav-link">Market</a>
+      <a href="/about"  class="page-nav-link">About</a>
+    </div>
+  </div>
+</nav>
+<main class="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-icon" style="background:#475569">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Rate Factors</h1>
+      <p class="header-sub">Why would two borrowers get different rates on the same day? See exactly how credit score, down payment, and loan details stack up — using lenders' own published pricing grid.</p>
+    </div>
+    <div class="header-actions" style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-shrink:0">
+      <button class="btn-text" id="resetBtn">Reset</button>
+    </div>
+  </header>
+
+  <!-- Inputs -->
+  <div class="card wide-card" style="margin-top:8px">
+    <div class="card-head">
+      <div class="card-icon" style="background:#475569">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
+          <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
+          <line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">Your Profile</div>
+        <div class="card-sub">Adjust these to see how each factor changes the price</div>
+      </div>
+      <button class="tip-btn" aria-label="Learn more" style="margin-left:auto" data-tip="These are pricing factors — the things that change the rate you're quoted once you already qualify. Income, existing debts, and DTI aren't part of this pricing grid at all; they determine whether you qualify and how much you can borrow, which is a different question. See the Affordability Calculator for that side of it.">?</button>
+    </div>
+    <div class="card-body">
+
+      <div class="field" style="margin-bottom:28px">
+        <div class="label-tip-row">
+          <label style="font-size:12px">CREDIT SCORE</label>
+          <button class="tip-btn" aria-label="Learn more" data-tip="Lenders price loans in credit-score bands, not by exact score — a 719 and a 700 are priced identically, but a 720 gets a meaningfully better price. This is the single biggest driver of the adjustment below.">?</button>
+        </div>
+        <div class="rate-slider-row">
+          <span class="horizon-edge-label">300</span>
+          <input type="range" id="ficoScore" min="300" max="850" step="1" value="720" style="accent-color:#475569">
+          <span class="horizon-edge-label">850</span>
+        </div>
+        <div class="field-note">Score: <strong id="ficoScoreVal">720</strong></div>
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <div class="label-tip-row">
+          <label style="font-size:12px">DOWN PAYMENT</label>
+          <button class="tip-btn" aria-label="Learn more" data-tip="Expressed here as a percentage of the purchase price. A larger down payment means a lower loan-to-value (LTV) ratio, which is the second major pricing input — less of the home's value is at risk for the lender.">?</button>
+        </div>
+        <div class="rate-slider-row">
+          <span class="horizon-edge-label">3%</span>
+          <input type="range" id="downPayment" min="3" max="97" step="1" value="20" style="accent-color:#475569">
+          <span class="horizon-edge-label">97%</span>
+        </div>
+        <div class="field-note">Down: <strong id="downPctVal">20%</strong> · Loan-to-value: <strong id="ltvVal">80%</strong></div>
+      </div>
+
+      <div class="two-col" style="margin-top:28px;margin-bottom:28px">
+        <div class="field">
+          <div class="label-tip-row">
+            <label style="font-size:12px">LOAN PURPOSE</label>
+            <button class="tip-btn" aria-label="Learn more" data-tip="Purchases get the best pricing. Refinancing where you take no cash out prices a bit worse, since the lender has less data on why you're refinancing. Cash-out refinancing prices worse still — you're increasing the loan balance against the same collateral, which is more risk to the lender.">?</button>
+          </div>
+          <div class="filing-toggle">
+            <button type="button" class="mode-btn active" data-loan-purpose="purchase">Purchase</button>
+            <button type="button" class="mode-btn" data-loan-purpose="noCashoutRefi">Refinance</button>
+            <button type="button" class="mode-btn" data-loan-purpose="cashoutRefi">Cash-out</button>
+          </div>
+        </div>
+        <div class="field">
+          <div class="label-tip-row">
+            <label style="font-size:12px">OCCUPANCY</label>
+            <button class="tip-btn" aria-label="Learn more" data-tip="You're far less likely to walk away from the home you actually live in than a property you rent out or use occasionally. Second homes and investment properties carry a substantial price adjustment — often the largest single line item on the breakdown below.">?</button>
+          </div>
+          <div class="filing-toggle">
+            <button type="button" class="mode-btn active" data-occupancy="primary">Primary</button>
+            <button type="button" class="mode-btn" data-occupancy="secondHome">2nd Home</button>
+            <button type="button" class="mode-btn" data-occupancy="investment">Investment</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <div class="label-tip-row">
+            <label style="font-size:12px">PROPERTY TYPE</label>
+            <button class="tip-btn" aria-label="Learn more" data-tip="Condos and 2-4 unit properties price slightly worse than a standalone single-family home — they're harder to resell in a foreclosure and, for multi-unit, income can be less predictable. Manufactured homes carry a flat adjustment reflecting their different resale/appraisal dynamics.">?</button>
+          </div>
+          <div class="input-wrap" style="padding:0">
+            <select id="propertyType" class="input-select" style="height:36px;padding:0 10px;width:100%">
+              <option value="singleFamily" selected>Single-family home</option>
+              <option value="condo">Condominium</option>
+              <option value="multiUnit">2-4 unit property</option>
+              <option value="manufactured">Manufactured home</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <div class="label-tip-row">
+            <label style="font-size:12px">RATE TYPE</label>
+            <button class="tip-btn" aria-label="Learn more" data-tip="In this grid, ARMs only carry a price adjustment above 90% loan-to-value (the lender is taking on payment-shock risk on top of a loan that's already a larger share of the home's value). At 90% LTV or below, Freddie Mac doesn't price an ARM any differently from a fixed-rate loan — so toggling this won't move your rate unless your down payment is under 10%.">?</button>
+          </div>
+          <div class="mode-toggle">
+            <button type="button" class="mode-btn active" data-rate-type="fixed">Fixed</button>
+            <button type="button" class="mode-btn" data-rate-type="arm">ARM</button>
+          </div>
+          <div class="field-note" id="armHint"></div>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-bottom:0">
+        <div class="field" style="margin-bottom:0">
+          <div class="label-tip-row">
+            <label>SECONDARY FINANCING</label>
+            <button class="tip-btn" aria-label="Learn more" data-tip="A HELOC (home equity line of credit) or second mortgage taken out alongside this loan, sitting behind it. Combined leverage against the home is higher than the first mortgage's LTV (loan-to-value) alone suggests, so it carries its own adjustment on top of everything else.">?</button>
+          </div>
+          <div class="mode-toggle">
+            <button type="button" class="mode-btn active" data-secondary-financing="no">No</button>
+            <button type="button" class="mode-btn" data-secondary-financing="yes">Yes</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="card wide-card" style="margin-top:8px">
+
+    <div class="card-head">
+      <div class="card-icon" style="background:#475569">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">Your Rate</div>
+        <div class="card-sub" id="rfBandSummary">Results update instantly as you adjust inputs</div>
+      </div>
+      <button class="tip-btn" aria-label="Learn more" style="margin-left:auto" data-tip="Your estimated rate = today's baseline average + a rate impact derived from your total point adjustment below. The baseline itself is a survey average across many borrowers, not a zero-adjustment starting point — so treat this as illustrative and directionally accurate, not a quote.">?</button>
+    </div>
+
+    <div id="rfIneligible" class="alert alert-amber card-verdict-inset" style="display:none">
+      <span class="alert-icon">⚠</span>
+      <div class="alert-body">
+        <div class="alert-title">Not eligible at this loan-to-value</div>
+        <div class="alert-sub">Cash-out refinances above 80% LTV aren't priced in this grid. Lower the cash-out amount (raise the down payment slider) or switch loan purpose to see a price.</div>
+      </div>
+    </div>
+
+    <div id="rfResultBody">
+
+      <div style="display:flex;border-bottom:1px solid var(--border)">
+        <div class="bp-stat" style="flex:1;padding-top:20px;padding-bottom:20px">
+          <div class="bp-stat-label">TODAY'S BASELINE</div>
+          <div id="rfBaselineRate" style="font-size:40px;font-weight:800;line-height:1.15;margin-top:2px">—</div>
+          <div class="bp-stat-delta" style="font-size:11px;color:var(--text-muted);margin-top:4px">30-yr avg, all borrowers</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div class="bp-stat" style="flex:1.2;padding-top:20px;padding-bottom:20px">
+          <div class="bp-stat-label">YOUR ESTIMATED RATE</div>
+          <div id="rfYourRate" style="font-size:40px;font-weight:800;color:#475569;line-height:1.15;margin-top:2px">—</div>
+          <div class="bp-stat-delta" id="rfRateDeltaSmall" style="font-size:11px;color:var(--text-muted);margin-top:4px">—</div>
+        </div>
+      </div>
+
+      <div class="card-inner-section" style="padding-top:16px">
+        <div class="field" style="margin-bottom:0;max-width:240px">
+          <div class="label-tip-row">
+            <label>ASSUMED RATE IMPACT PER POINT</label>
+            <button class="tip-btn" aria-label="Learn more" data-tip="A commonly-cited industry rule of thumb for converting a price adjustment (in points, i.e. % of loan amount) into an interest-rate change. The actual conversion varies by lender, day, and market conditions — this is an adjustable assumption, not a precise formula. Ask a lender for their rate sheet to see the real trade-off.">?</button>
+          </div>
+          <div class="input-wrap suffix">
+            <input type="number" id="ptsPerPoint" min="0.1" max="0.5" step="0.01" value="0.25">
+            <span class="affix">%/pt</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-inner-section">
+        <div class="label-tip-row" style="margin-bottom:12px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted)">WHERE THE ADJUSTMENT COMES FROM</div>
+          <button class="tip-btn" aria-label="Learn more" data-tip="Every loan starts with a base charge from a credit-score-by-LTV grid — that's the first row below. Each additional factor you've selected (occupancy, property type, ARM, secondary financing) adds its own separate charge on top, published in its own table. They stack additively — nothing multiplies or offsets — so the total below is just the sum of every applicable row.">?</button>
+        </div>
+        <div id="rfBreakdown"></div>
+      </div>
+
+    </div>
+
+  </div><!-- /results card -->
+
+  <!-- Sensitivity tables -->
+  <details class="card wide-card glossary-card">
+    <summary class="card-head">
+      <div class="card-icon" style="background:#475569">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">See How Your Rate Changes</div>
+        <div class="card-sub">Every credit-score and down-payment tier, holding everything else constant</div>
+      </div>
+      <svg class="adv-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+    </summary>
+    <div class="glossary-body">
+      <div class="gloss-group" style="margin-top:0">
+        <div class="gloss-group-title">By Credit Score — at your current down payment</div>
+        <div style="overflow-x:auto">
+          <table class="afford-sens-table">
+            <thead><tr><th>Credit Score</th><th>Adjustment</th><th>Est. Rate</th></tr></thead>
+            <tbody id="rfFicoSensRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="gloss-group">
+        <div class="gloss-group-title">By Down Payment — at your current credit score</div>
+        <div style="overflow-x:auto">
+          <table class="afford-sens-table">
+            <thead><tr><th>Loan-to-Value</th><th>Adjustment</th><th>Est. Rate</th></tr></thead>
+            <tbody id="rfLtvSensRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Key Concepts -->
+  <details class="card wide-card glossary-card">
+    <summary class="card-head">
+      <div class="card-icon" style="background:#475569">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">How It Works &amp; Key Concepts</div>
+        <div class="card-sub">The pricing grid, what it means, and what this tool doesn't model</div>
+      </div>
+      <svg class="adv-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+    </summary>
+    <div class="glossary-body">
+      <div class="gloss-group">
+        <div class="gloss-group-title">The Pricing Grid</div>
+        <div class="gloss-grid">
+
+          <div class="gloss-item">
+            <div class="gloss-term">Loan-Level Price Adjustments (LLPAs)</div>
+            <div class="gloss-def">When a lender sells your loan to Freddie Mac or Fannie Mae, the price they get depends on the loan's risk profile. Freddie Mac publishes a grid of price adjustments — in points, where 1 point equals 1% of the loan amount — based on credit score, loan-to-value ratio, and other risk factors. Lenders pass these adjustments through to your rate, which is why two borrowers closing the same day on the same loan amount can get different rates.</div>
+          </div>
+
+          <div class="gloss-item">
+            <div class="gloss-term">Credit Score × LTV: The Base Grid</div>
+            <div class="gloss-def">The largest adjustment comes from a two-dimensional table: your credit score band (nine bands, from below 640 to 780+) crossed with your loan-to-value band (nine bands, from 30% or less to above 95%). Lower score and higher LTV both push the adjustment up — the worst-priced combination in this data set is over 1.7 points on a purchase, versus zero for the best-qualified combination.</div>
+          </div>
+
+          <div class="gloss-item">
+            <div class="gloss-term">Special Attributes Stack on Top</div>
+            <div class="gloss-def">Beyond the base grid, specific loan features each add their own published adjustment: investment properties and second homes carry the largest additions (over 4 points at some LTVs), followed by condos, 2-4 unit properties, manufactured homes, and adjustable-rate loans. These stack additively with the base grid — the breakdown above shows each one that applies to your selections.</div>
+          </div>
+
+          <div class="gloss-item">
+            <div class="gloss-term">From Points to Rate</div>
+            <div class="gloss-def">Points are a price, not a rate. Converting a price adjustment into a rate change is itself an approximation — lenders use it to decide between charging it upfront (points/fees) or building it into a higher rate over the loan's life. This tool uses an adjustable rule-of-thumb ratio (default 0.25 rate-percentage-points per price point) so the conversion is an explicit, visible assumption rather than a hidden one.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="gloss-group">
+        <div class="gloss-group-title">Terms to Know</div>
+        <div class="gloss-grid">
+
+          <div class="gloss-item">
+            <div class="gloss-term">Loan-to-Value (LTV)</div>
+            <div class="gloss-def">Your loan amount as a percentage of the home's value — equivalently, 100% minus your down payment percentage. A 20% down payment means an 80% LTV: the lender is financing 80% of the purchase price, and your equity covers the other 20%. Lower LTV means more of your own money in the deal, which lowers the lender's risk and, as the base grid above shows, your price adjustment.</div>
+          </div>
+
+          <div class="gloss-item">
+            <div class="gloss-term">HELOC / Secondary Financing</div>
+            <div class="gloss-def">A Home Equity Line of Credit (HELOC) is a revolving credit line secured by your home, much like a second mortgage. Taking one out alongside your primary loan is called secondary financing — it raises your combined leverage against the home beyond what the first mortgage's LTV alone shows, which is why it carries its own separate price adjustment in the grid.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="gloss-group">
+        <div class="gloss-group-title">What This Tool Doesn't Model</div>
+        <div class="gloss-grid">
+
+          <div class="gloss-item">
+            <div class="gloss-term">Lender Overlays &amp; Margin</div>
+            <div class="gloss-def">This tool shows Freddie Mac's published baseline adjustments — the floor lenders build from. Individual lenders add their own margin, operational costs, and sometimes stricter "overlays" (e.g., a higher minimum credit score than Freddie requires). Two lenders quoting the same borrower can still land on different rates. Always compare actual quotes.</div>
+          </div>
+
+          <div class="gloss-item">
+            <div class="gloss-term">Super Conforming &amp; Custom MI</div>
+            <div class="gloss-def">Loans above the standard conforming limit but within the higher county-specific "super conforming" limit carry additional adjustments not modeled here, since that depends on the property's specific county. Freddie Mac's separate Custom Mortgage Insurance Options table — an alternative way to structure PMI pricing — also isn't modeled; this tool assumes standard, lender-paid-at-closing pricing.</div>
+          </div>
+
+          <div class="gloss-item">
+            <div class="gloss-term">Alternative Credit Scoring</div>
+            <div class="gloss-def">Freddie's grid publishes a separate adjustment for loans underwritten using an alternative credit-score calculation method (rather than a standard FICO score) — a narrow case that isn't surfaced as an input here to keep the tool focused on the factors that affect most borrowers. Ask your lender if it applies to your situation.</div>
+          </div>
+
+          <div class="gloss-item">
+            <div class="gloss-term">The Baseline Rate Itself</div>
+            <div class="gloss-def">The "today's baseline rate" above is Freddie Mac's weekly Primary Mortgage Market Survey average — a blend across many borrower profiles, not a zero-adjustment starting point. Adding your points-based adjustment to that average is an illustrative approximation, not a precise stack. It's most useful for comparing scenarios against each other, less so as an exact quote.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <p class="about-disclaimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>Not financial advice.</strong> This tool illustrates published pricing mechanics using Freddie Mac's Exhibit 19, effective 07/01/2026. It is not a quote, pre-approval, or guarantee of any rate. Actual pricing depends on your lender, the day's market, and factors not modeled here. Consult a licensed mortgage professional for an actual quote.</span></p>
+    </div>
+  </details>
+
+  <a href="/afford" class="tool-crosslink no-print">
+    <div class="tool-crosslink-icon" style="background:#7c3aed">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <line x1="12" y1="22" x2="12" y2="12"/><line x1="9" y1="12" x2="15" y2="12"/>
+      </svg>
+    </div>
+    <div class="tool-crosslink-text">
+      <strong>Home Affordability Calculator</strong>
+      <span>Curious what your rate means for buying power? Plug it into the affordability calculator to see your maximum purchase price and full monthly payment.</span>
+    </div>
+    <span class="tool-crosslink-arrow">→</span>
+  </a>
+
+  <!-- Footer -->
+  <footer class="site-footer no-print">
+    <div class="footer-links">
+      <a href="/afford">Affordability Calculator</a>
+      <a href="/commute">Commute Map</a>
+      <a href="/swap">Home Swap Calculator</a>
+      <a href="/rvb">Rent vs. Buy Analysis</a>
+      <a href="/compound">Compound Growth</a>
+      <a href="/downpayment">Down Payment Optimizer</a>
+      <a href="/refi">Refinance Calculator</a>
+      <a href="/payoff">Payoff Calculator</a>
+      <a href="/proceeds">Net Proceeds</a>
+      <a href="/ratefactors">Rate Factors</a>
+      <a href="/faq">FAQ</a>
+      <a href="/learn">Learn</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+    </div>
+    <div class="footer-note">For informational purposes only. Not financial advice. &copy; 2026</div>
+  </footer>
+
+</main><!-- /app -->
+
+<script src="mortgage-rates.js?v=1"></script>
+<script src="ratefactors-data.js?v=1"></script>
+<script src="ratefactors.js?v=6"></script>
+<script>
+/* ── Field tip tooltips ── */
+(function () {
+  var popup = document.createElement('div');
+  popup.className = 'tip-popup';
+  document.body.appendChild(popup);
+  var active = null;
+  function show(btn) {
+    active = btn; btn.classList.add('tip-active');
+    popup.textContent = btn.getAttribute('data-tip');
+    popup.style.display = 'block';
+    var r = btn.getBoundingClientRect();
+    var pw = popup.offsetWidth, ph = popup.offsetHeight, m = 10;
+    var left = r.left + r.width / 2 - pw / 2;
+    var top = r.top - ph - 8;
+    if (left < m) left = m;
+    if (left + pw > window.innerWidth - m) left = window.innerWidth - pw - m;
+    if (top < m) top = r.bottom + 8;
+    popup.style.left = left + 'px'; popup.style.top = top + 'px';
+  }
+  function hide() {
+    if (active) active.classList.remove('tip-active');
+    active = null; popup.style.display = 'none';
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('.tip-btn');
+    if (btn) { e.stopPropagation(); if (active === btn) { hide(); return; } hide(); show(btn); }
+    else { hide(); }
+  });
+  window.addEventListener('scroll', hide, { passive: true });
+  window.addEventListener('resize', function () { if (active) show(active); });
+}());
+</script>
+<div class="mobile-sticky-bar no-print">
+  <div class="msb-item">
+    <div class="msb-label">Total Adjustment</div>
+    <div class="msb-value" id="mbar-v1">—</div>
+  </div>
+  <div class="msb-divider"></div>
+  <div class="msb-item">
+    <div class="msb-label">Illustrative Rate</div>
+    <div class="msb-value" id="mbar-v2">—</div>
+  </div>
+</div>
+<script src="/nav.js"></script>
+</body>
+</html>
