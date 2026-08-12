@@ -2982,6 +2982,48 @@ details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
 .afford-sens-current td { background: var(--gray-50); font-weight: 600; }
 .afford-sens-badge { font-size: 10px; font-weight: 700; background: #7c3aed; color: white; padding: 1px 5px; border-radius: 3px; margin-left: 5px; letter-spacing: .02em; }
 
+/* ── Closing Timeline: vertical step list ── */
+.mum-timeline { position: relative; padding-left: 28px; }
+.mum-timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px; top: 10px; bottom: 10px;
+  width: 2px;
+  background: var(--border);
+}
+.mum-timeline-step { position: relative; padding-bottom: 22px; }
+.mum-timeline-step:last-child { padding-bottom: 0; }
+.mum-timeline-dot {
+  position: absolute; left: -28px; top: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--dot-color, var(--border));
+}
+.mum-timeline-date { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+.mum-timeline-label { font-size: 14px; font-weight: 600; margin-top: 2px; }
+.mum-timeline-note { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+.mum-timeline-tag {
+  display: inline-block;
+  font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 4px; margin-left: 6px; vertical-align: 1px;
+  color: #fff; background: var(--dot-color, var(--text-muted));
+}
+
+/* ── Closing Timeline: strategy comparison cards ── */
+.tl-strategy-card {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.tl-strategy-card:hover { border-color: #94a3b8; }
+.tl-strategy-card.active { border-color: #1d4ed8; background: #eff6ff; }
+.tl-strategy-card-title { font-weight: 700; font-size: 13px; margin-bottom: 8px; }
+.tl-strategy-card-row { font-size: 12px; line-height: 1.6; }
+.tl-strategy-card-row + .tl-strategy-card-row.tl-con { margin-top: 3px; }
+
 /* ── Shared card interior layout ── */
 .card-inner-section { padding: 0 20px 20px; }
 .card-verdict-inset { margin: 0 20px 20px; }

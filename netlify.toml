@@ -77,6 +77,11 @@
   to   = "/ratefactors"
   status = 301
 
+[[redirects]]
+  from = "/timeline.html"
+  to   = "/timeline"
+  status = 301
+
 # Security headers for all pages
 [[headers]]
   for = "/*"
