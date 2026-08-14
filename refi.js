@@ -192,6 +192,11 @@ function renderChart(r) {
     options: {
       responsive: true,
       aspectRatio: window.innerWidth <= 480 ? 2.0 : 3.5,
+      // This chart is destroy()'d and recreated on every input change — without
+      // this, Chart.js's default entrance animation replays in full on every
+      // keystroke (a first-paint truncation race has also hit this exact
+      // destroy+recreate pattern elsewhere on this site).
+      animation: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: false },
@@ -313,11 +318,19 @@ function render() {
   if (verdict) {
     let cls, icon, heading, body;
 
-    if (r.monthlySavings < 0 && r.termShortened) {
+    if (r.monthlySavings < 0 && r.termShortened && r.interestSaved > 0) {
       cls = 'refi-verdict--info';
       icon = 'ℹ';
       heading = 'Term-reduction refinance';
       body = `Your monthly payment increases by ${fmt(Math.abs(r.monthlySavings))}/mo, but you'll pay off your home ${state.remainingYears - state.newTermYears} years sooner and save ${fmt(r.interestSaved)} in total interest. This makes sense if your budget can absorb the higher payment.`;
+    } else if (r.monthlySavings < 0 && r.termShortened) {
+      // Shorter term, but the rate hike outweighs it — total interest goes
+      // up too, not just the monthly payment. The "budget can absorb it"
+      // framing above only holds when interestSaved is actually positive.
+      cls = 'refi-verdict--red';
+      icon = '✕';
+      heading = 'Higher payment and more total interest';
+      body = `Your monthly payment increases by ${fmt(Math.abs(r.monthlySavings))}/mo, and despite the shorter term, the higher rate means you'd pay ${fmt(Math.abs(r.interestSaved))} more in total interest over the life of the loan — not less. This refinance doesn't make sense at these rates.`;
     } else if (!isFinite(r.breakEvenMonths)) {
       cls = 'refi-verdict--red';
       icon = '✕';

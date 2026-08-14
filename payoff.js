@@ -266,6 +266,11 @@ function renderChart(r) {
     options: {
       responsive: true,
       aspectRatio: window.innerWidth <= 480 ? 2.0 : 3.5,
+      // This chart is destroy()'d and recreated on every input change — without
+      // this, Chart.js's default entrance animation replays in full on every
+      // keystroke (a first-paint truncation race has also hit this exact
+      // destroy+recreate pattern elsewhere on this site).
+      animation: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: false },

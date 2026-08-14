@@ -71,6 +71,13 @@ const DEFAULTS = {
 /* ── State ── */
 const scenarios = { a: null, b: null };
 let activeScenario = 'a';
+// bindInputs() re-runs on every scenario-tab switch to resync field values
+// with the newly active scenario, but Scenario A/B share the same physical
+// <input> elements — without this guard, every switch stacked another
+// 'input' listener on top of the old ones (never removed), so a single
+// keystroke after a few tab switches fired setState()/recalcAndRender()
+// once per accumulated listener.
+let listenersBound = false;
 
 function getState() { return scenarios[activeScenario]; }
 
@@ -226,7 +233,11 @@ function calculate(s) {
   const buyingCosts = s.lenderFees + s.buyerTitleFees + s.repairCosts + effectiveEscrow + s.movingExpenses + buyerTransferTax + effectivePrepaids;
   const dpPool = Math.max(0, totalCash - buyingCosts);
   const downPayment = Math.min(dpPool, s.purchasePrice);
-  const cashRemaining = Math.max(0, totalCash - downPayment - buyingCosts);
+  // Not clamped to 0 like dpPool/saleProceeds above: when total cash can't
+  // even cover buying costs (downPayment has already floored at 0 in that
+  // case), this is a genuine shortfall the buyer would need to cover from
+  // an undisclosed source, not "$0 left over" — clamping it would hide that.
+  const cashRemaining = totalCash - downPayment - buyingCosts;
   const dpPct = s.purchasePrice > 0 ? downPayment / s.purchasePrice : 0;
   const loan = Math.max(0, s.purchasePrice - downPayment);
   const mortgagePI = loan * K;
@@ -243,7 +254,6 @@ function calculate(s) {
 
   // Property tax helper text
   const taxPctOfPrice = s.purchasePrice > 0 ? annualTax / s.purchasePrice * 100 : 0;
-  const taxDollarEquiv = annualTax;
 
   // Buying power over 10 years
   // Amortization-based equity: active when loan balance mode + rate + term are filled
@@ -303,15 +313,18 @@ function calculate(s) {
     return result;
   });
 
-  // Net growth vs headwinds
-  const avgGrowth = (s.wageGrowth + effHomeValGrowth + s.savingsRate + s.investmentGrowth) / 4;
+  // Net growth vs headwinds. savingsRate is deliberately excluded: it's a
+  // savings-allocation rate ("% of monthly pay saved annually"), not a
+  // growth rate of anything, so averaging it in with wage/home-value/
+  // investment growth produced a number with no real-world meaning.
+  const avgGrowth = (s.wageGrowth + effHomeValGrowth + s.investmentGrowth) / 3;
   const avgHeadwind = (effPropTaxGrowth + s.inflationRate + effMaintenanceGrowth) / 3;
   const netRate = avgGrowth - avgHeadwind;
 
   return {
     equity, realtorFees, transferTax, sellingCosts, saleProceeds, totalCash, buyingCosts, downPayment, cashRemaining,
     dpPct, loan, mortgagePI, annualTax, taxMonthly, pmi, hoiMonthly, totalMonthly, ratio, monthlyRemaining,
-    K, dpPool, taxPctOfPrice, taxDollarEquiv,
+    K, dpPool, taxPctOfPrice,
     targetMonthly, ceilingMonthly, targetPrice, ceilingPrice,
     bpData, avgGrowth, avgHeadwind, netRate,
     autoEscrow, effectiveEscrow,
@@ -329,6 +342,12 @@ function initCharts() {
     data: { labels: [], datasets: [] },
     options: {
       responsive: true,
+      // This chart is re-drawn via updateBpChart()'s default-animated
+      // .update() on every input change (not just initial load) — disabling
+      // animation avoids both a first-paint entrance-animation race (seen
+      // elsewhere on this site with charts created via `new Chart()`) and a
+      // distracting re-animate-from-scratch feel on every keystroke.
+      animation: false,
       interaction: { mode: 'index', intersect: false },
       plugins: { legend: { display: false } },
       scales: {
@@ -337,6 +356,19 @@ function initCharts() {
           grid: { color: '#f3f4f6' },
           ticks: {
             font: { size: 11 },
+            callback: v => v >= 1000 ? '$' + Math.round(v / 1000) + 'k' : '$' + v,
+          },
+        },
+        // Annual cost burden (~$15-20k) is an order of magnitude smaller
+        // than the other three series (~$400-800k) — on a shared axis it
+        // renders as a flat line indistinguishable from zero. Its own
+        // right-side axis keeps it readable.
+        y1: {
+          position: 'right',
+          grid: { display: false },
+          ticks: {
+            font: { size: 11 },
+            color: '#dc2626',
             callback: v => v >= 1000 ? '$' + Math.round(v / 1000) + 'k' : '$' + v,
           },
         },
@@ -387,6 +419,7 @@ function updateBpChart(c, s) {
       tension: .35,
       pointRadius: 3,
       fill: false,
+      yAxisID: 'y1',
     },
     {
       label: tpLabel,
@@ -473,7 +506,7 @@ function render(c, s) {
   }
   const crEl = $('r-cashRemaining');
   crEl.textContent = fmt(c.cashRemaining);
-  crEl.className = c.cashRemaining > 0 ? 'green' : '';
+  crEl.className = c.cashRemaining > 0 ? 'green' : c.cashRemaining < 0 ? 'red' : '';
 
   // Section cost hints
   setText('sellCostsSummary', s.buyerMode === 'firstTime' ? '' : '≈ ' + fmt(c.sellingCosts));
@@ -568,7 +601,6 @@ function render(c, s) {
   $('equityModeEquity')?.classList.toggle('active', s.equityMode === 'equity');
   $('equityModeLoan')?.classList.toggle('active', s.equityMode === 'loanBalance');
   syncBuyerMode(s.buyerMode);
-  const amortActive  = s.buyerMode !== 'firstTime' && s.equityMode === 'loanBalance' && s.termRemainder > 0 && s.currentMortgageRate > 0 && s.equityValue > 0;
   if (s.equityMode === 'equity') {
     equityHelper.textContent = 'How much of your home you own outright';
     if (loanFields) loanFields.style.display = 'none';
@@ -612,12 +644,12 @@ function render(c, s) {
   const bp0 = c.bpData[0];
   const bp10 = c.bpData[10];
   setText('bp-comfortPrice', fmt(bp10.comfort_t));
-  setText('bp-comfortDelta', '+' + fmt(bp10.comfort_t - bp0.comfort_t) + ' vs today');
+  setText('bp-comfortDelta', fmt(bp10.comfort_t - bp0.comfort_t, { showPlus: true }) + ' vs today');
   setText('bp-ceilingPrice', fmt(bp10.ceiling_t));
-  setText('bp-ceilingDelta', '+' + fmt(bp10.ceiling_t - bp0.ceiling_t) + ' vs today');
+  setText('bp-ceilingDelta', fmt(bp10.ceiling_t - bp0.ceiling_t, { showPlus: true }) + ' vs today');
   setText('bp-costBurden', fmt(bp10.costBurden_t));
   const costDelta = bp10.costBurden_t - bp0.costBurden_t;
-  setText('bp-costDelta', '+' + fmt(costDelta) + ' vs today');
+  setText('bp-costDelta', fmt(costDelta, { showPlus: true }) + ' vs today');
 
   setText('bp-avgGrowth',   fmtPct(c.avgGrowth));
   setText('bp-avgHeadwind', fmtPct(c.avgHeadwind));
@@ -747,7 +779,9 @@ function syncTargetPriceMode(mode) {
 
 /* ── Bind Inputs ── */
 function bindInputs() {
-  document.addEventListener('input', function () { trackCalc('swap', 'used'); }, { once: true, capture: true });
+  if (!listenersBound) {
+    document.addEventListener('input', function () { trackCalc('swap', 'used'); }, { once: true, capture: true });
+  }
 
   const s = getState();
 
@@ -755,6 +789,7 @@ function bindInputs() {
     const el = $(id);
     if (!el) return;
     el.value = s[id] !== undefined ? s[id] : DEFAULTS[id] || 0;
+    if (listenersBound) return;
     el.addEventListener('input', () => {
       const v = parseFloat(el.value) || 0;
       setState({ [id]: v });
@@ -771,7 +806,7 @@ function bindInputs() {
 
   const evEl = $('equityValue');
   evEl.value = s.equityValue;
-  evEl.addEventListener('input', () => setState({ equityValue: parseFloat(evEl.value) || 0 }));
+  if (!listenersBound) evEl.addEventListener('input', () => setState({ equityValue: parseFloat(evEl.value) || 0 }));
 
   // Prospective home
   num('purchasePrice');
@@ -780,7 +815,7 @@ function bindInputs() {
   const ptermSel = $('prospectiveTerm');
   if (ptermSel) {
     ptermSel.value = s.prospectiveTerm || 30;
-    ptermSel.addEventListener('change', () => setState({ prospectiveTerm: parseInt(ptermSel.value) }));
+    if (!listenersBound) ptermSel.addEventListener('change', () => setState({ prospectiveTerm: parseInt(ptermSel.value) }));
   }
   num('monthlyPMI');
   num('currentHOA');
@@ -788,7 +823,7 @@ function bindInputs() {
   const hoiEl = $('homeownersInsurance');
   if (hoiEl) {
     hoiEl.value = s.hoiMode === 'percent' ? s.hoiPct : s.homeownersInsurance;
-    hoiEl.addEventListener('input', () => {
+    if (!listenersBound) hoiEl.addEventListener('input', () => {
       const v = parseFloat(hoiEl.value) || 0;
       if (getState().hoiMode === 'percent') {
         setState({ hoiPct: v });
@@ -808,14 +843,14 @@ function bindInputs() {
   const prepaidsEl = $('prepaidsAtClosing');
   if (prepaidsEl) {
     if (s.prepaidsManual) prepaidsEl.value = s.prepaidsAtClosing;
-    prepaidsEl.addEventListener('input', () => {
+    if (!listenersBound) prepaidsEl.addEventListener('input', () => {
       setState({ prepaidsAtClosing: parseFloat(prepaidsEl.value) || 0, prepaidsManual: true });
     });
   }
   const escrowEl = $('prePaidEscrow');
   if (escrowEl) {
     if (s.prePaidEscrowManual) escrowEl.value = s.prePaidEscrow;
-    escrowEl.addEventListener('input', () => {
+    if (!listenersBound) escrowEl.addEventListener('input', () => {
       setState({ prePaidEscrow: parseFloat(escrowEl.value) || 0, prePaidEscrowManual: true });
     });
   }
@@ -823,7 +858,7 @@ function bindInputs() {
 
   const ptEl = $('propertyTax');
   ptEl.value = s.taxMode === 'dollar' ? s.propertyTaxDollar : s.propertyTaxPercent;
-  ptEl.addEventListener('input', () => {
+  if (!listenersBound) ptEl.addEventListener('input', () => {
     const v = parseFloat(ptEl.value) || 0;
     if (getState().taxMode === 'dollar') setState({ propertyTaxDollar: v });
     else setState({ propertyTaxPercent: v });
@@ -834,6 +869,7 @@ function bindInputs() {
     const el = $(id);
     if (!el) return;
     el.value = s[key];
+    if (listenersBound) return;
     el.addEventListener('input', () => setState({ [key]: parseFloat(el.value) || 0 }));
   }
   numCtrl('wageGrowth',       'wageGrowth');
@@ -848,10 +884,12 @@ function bindInputs() {
 
   // Slider (input only — click handlers bound once in init)
   const slider = $('targetSlider');
-  slider.addEventListener('input', () => {
+  if (!listenersBound) slider.addEventListener('input', () => {
     const pct = 10 + (slider.value / 100) * 40;
     setState({ targetSliderPct: pct });
   });
+
+  listenersBound = true;
 }
 
 function syncTaxInput(mode) {

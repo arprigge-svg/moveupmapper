@@ -742,8 +742,8 @@
             <div class="gloss-def">Each year's buying cost sums six components: mortgage P&amp;I (fixed for the life of the loan), property tax (grows annually), PMI (drops once the loan reaches 80% LTV), home maintenance (grows with home value), HOA (flat), and homeowners insurance (grows with inflation). Renting cost adds rent (grows annually) and renters insurance (grows with inflation). The chart plots both over your horizon so you can see when — and by how much — one becomes cheaper than the other.</div>
           </div>
           <div class="gloss-item">
-            <div class="gloss-term">Break-Even Year</div>
-            <div class="gloss-def">The first year in which the cumulative cost of buying (including closing costs) falls below the cumulative cost of renting. Before that year, renting has cost less in total; after it, buying has. Closing costs push the break-even out — a higher closing cost means more years needed to recover the purchase expense. The break-even year is shown in the Summary Stats panel.</div>
+            <div class="gloss-term">Equity Break-Even Year</div>
+            <div class="gloss-def">The first year in which your home equity built (down payment + principal paid + appreciation) meets or exceeds what your down payment and closing costs would have grown to if invested instead. Before that year, the renter-investor path holds more wealth; after it, the buyer's equity pulls ahead. This is a wealth comparison, not a cash-flow one — see "Monthly Cost Comparison" above for the separate month-to-month crossover between rent and your buying costs. The equity break-even year is shown in the Summary Stats panel.</div>
           </div>
           <div class="gloss-item">
             <div class="gloss-term">Equity (Chart 2)</div>
@@ -763,7 +763,7 @@
           </div>
           <div class="gloss-item">
             <div class="gloss-term">Tax Savings Calculation (Optional)</div>
-            <div class="gloss-def">When Tax Benefits are enabled, the calculator estimates the annual income tax savings from itemizing deductions and subtracts them from the buy cost each year. The math runs in two parts. Federal savings: (mortgage interest that year + property tax that year, capped at $10,000 under the SALT limit) × your federal marginal rate. State savings: (mortgage interest + property tax, no SALT cap applied) × your state marginal rate. Mortgage interest is computed year-by-year using proper amortization — interest is front-loaded and declines each year as the principal balance falls, so the tax benefit is largest early in the loan and diminishes over time. The resulting annual savings are divided by 12 and subtracted from each year's monthly buy cost, which flows into Chart 1, the cost crossover calculation, and Chart 2's savings pool (since lower buy costs leave the renter less of a gap to reinvest). Totals shown in the Tax Benefits panel accumulate these year-by-year estimates across your full horizon.</div>
+            <div class="gloss-def">When Tax Benefits are enabled, the calculator estimates the annual income tax savings from itemizing deductions and subtracts them from the buy cost each year. The math runs in two parts. Federal savings: (mortgage interest that year + property tax that year, capped at $10,000 under the SALT limit) minus your standard deduction, floored at zero, × your federal marginal rate — only the amount your itemized deductions exceed the standard deduction produces an incremental benefit. State savings: (mortgage interest + property tax, no SALT cap or standard-deduction offset applied) × your state marginal rate. Mortgage interest is computed year-by-year using proper amortization — interest is front-loaded and declines each year as the principal balance falls, so the tax benefit is largest early in the loan and diminishes over time. The resulting annual savings are divided by 12 and subtracted from each year's monthly buy cost, which flows into Chart 1, the cost crossover calculation, and Chart 2's savings pool (since lower buy costs leave the renter less of a gap to reinvest). Totals shown in the Tax Benefits panel accumulate these year-by-year estimates across your full horizon.</div>
           </div>
         </div>
       </div>
@@ -887,6 +887,12 @@
       });
     }
     mirrors.forEach(([src]) => document.getElementById(src)?.addEventListener('input', syncMirrors));
+
+    // Exposed for rvb.js's populateFields(), which sets source field values
+    // programmatically (e.g. on Reset) without dispatching an 'input' event —
+    // without this hook, these read-only mirrors would keep showing their
+    // pre-reset values after Reset even though every real field updated.
+    window.syncMirrors = syncMirrors;
 
     syncMirrors();
   });

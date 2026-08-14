@@ -201,7 +201,12 @@ function calculate(s) {
     // Maintenance grows with home value — % of current home value each year.
     const maintenanceMonthly = homeVal * (s.maintenancePct / 100) / 12;
     const hoiMonthly        = s.monthlyHOI * Math.pow(1 + s.inflation / 100, t);
-    const buyMonthly        = pi + propTaxMonthly + pmiThisYear + maintenanceMonthly + s.monthlyHOA + hoiMonthly;
+    // Loan term and analysis horizon are independent inputs — once the loan
+    // is paid off (t >= mortgageTerm), the P&I payment stops, but other
+    // ownership costs (tax, maintenance, HOA, insurance) continue.
+    const mortgageActive    = t < s.mortgageTerm;
+    const piThisYear        = mortgageActive ? pi : 0;
+    const buyMonthly        = piThisYear + propTaxMonthly + pmiThisYear + maintenanceMonthly + s.monthlyHOA + hoiMonthly;
     buyMonthlyCosts.push(buyMonthly);
 
     // Equity = down payment + principal paid to date + home appreciation above purchase price.
@@ -249,7 +254,7 @@ function calculate(s) {
     if (t < YEARS) {
       totalTaxSavings  += yearTaxSavings;
       totalRentPaid    += rentMonthly * 12;
-      totalPIPaid      += pi * 12;
+      totalPIPaid      += piThisYear * 12;
       totalPropTaxPaid += propTaxMonthly * 12;
     }
   }
@@ -279,7 +284,8 @@ function calculate(s) {
 
 function fmt(n) {
   if (n == null || !isFinite(n)) return '—';
-  return '$' + Math.round(n).toLocaleString('en-US');
+  const rounded = Math.round(n);
+  return (rounded < 0 ? '-$' : '$') + Math.abs(rounded).toLocaleString('en-US');
 }
 
 function setText(id, val) {
@@ -428,6 +434,12 @@ function initCharts() {
   const sharedOpts = {
     responsive: true,
     maintainAspectRatio: false,
+    // Both charts are created here with empty data, then filled in by a
+    // separate updateXChart() call right after — the entrance animation on
+    // the initial empty render can race against that immediate data swap,
+    // leaving the canvas painted mid-transition (truncated/empty) on first
+    // load. Same bug and fix as elsewhere on this site.
+    animation: false,
     plugins: {
       legend: { position: 'top', labels: { font: { size: 12 }, boxWidth: 14, padding: 14 } },
       tooltip: {
@@ -590,19 +602,10 @@ function load() {
 
 function encodeShareState() {
   try {
-    const c = calculate(state);
     const delta = {};
     for (const key of Object.keys(DEFAULTS)) {
       if (state[key] !== DEFAULTS[key]) delta[key] = state[key];
     }
-    delta._s = {
-      purchasePrice:    state.purchasePrice,
-      rent:             state.rent,
-      buyMonthlyYr1:    Math.round(c.buyMonthlyYr1),
-      rentMonthlyYr1:   Math.round(c.rentMonthlyCosts[0]),
-      costCrossoverYear: c.costCrossoverYear ?? null,
-      horizonYears:     state.horizonYears,
-    };
     return btoa(JSON.stringify(delta));
   } catch (_) { return null; }
 }
@@ -642,6 +645,7 @@ function populateFields() {
 
   syncDpInput(state.dpMode ?? 'dollar');
   syncHoiInput(state.hoiMode ?? 'dollar');
+  window.syncMirrors?.();
 }
 
 function bindInputs() {
@@ -660,6 +664,13 @@ function bindInputs() {
 
   // Auto-clear PMI when down payment reaches ≥ 20% of home price.
   function pmiAutoReset() {
+    // In percent mode, state.downPayment only tracks state.downPaymentPct via
+    // recomputeFromPct(), which normally runs later inside recalc() — too
+    // late for this check to see the just-updated purchasePrice. Without
+    // this, a lower home price could evaluate against the stale dollar
+    // figure, wrongly conclude the down payment ratio cleared 20%, and
+    // silently wipe a real PMI entry the user still needs.
+    recomputeFromPct();
     if (state.purchasePrice > 0 && state.downPayment / state.purchasePrice >= 0.20 && state.monthlyPMI > 0) {
       state.monthlyPMI = 0;
       const el = document.getElementById('monthlyPMI');

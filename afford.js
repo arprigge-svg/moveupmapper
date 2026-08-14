@@ -226,20 +226,29 @@
       backFill.className = 'afford-dti-fill ' + dtiColor(res.backDTI, BACK_LIMIT);
     }
 
+    var frontLimitEl = document.getElementById('dti-front-limit');
+    var backLimitEl  = document.getElementById('dti-back-limit');
+    var bindingBadge = ' <span class="afford-sens-badge">binding</span>';
+    if (frontLimitEl) frontLimitEl.innerHTML = '28% conventional guideline' + (res.binding === 'front' ? bindingBadge : '');
+    if (backLimitEl)  backLimitEl.innerHTML  = '43% conventional guideline' + (res.binding === 'back'  ? bindingBadge : '');
+
     // Verdict
     var verdict = document.getElementById('affordVerdict');
     if (verdict) {
       var nearFront = res.frontDTI > FRONT_LIMIT - 0.04;
       var nearBack  = res.backDTI  > BACK_LIMIT  - 0.05;
       var cls, icon, title, body;
+      var bindingNote = res.binding === 'front'
+        ? ' Your front-end (housing) ratio is the binding constraint here — a larger down payment or lower rate would raise your buying power more than paying down other debts.'
+        : ' Your back-end (all-debts) ratio is the binding constraint here — paying down other debts would raise your buying power more than a larger down payment.';
       if (nearFront || nearBack) {
         cls = 'refi-verdict--amber'; icon = '~';
         title = 'Near the limit: tight but typically approvable';
-        body = 'Your DTI ratios are within conventional guidelines but close to the boundary. Some lenders may require compensating factors (a strong credit score, solid cash reserves, or stable employment) to approve at this level.';
+        body = 'Your DTI ratios are within conventional guidelines but close to the boundary. Some lenders may require compensating factors (a strong credit score, solid cash reserves, or stable employment) to approve at this level.' + bindingNote;
       } else {
         cls = 'refi-verdict--green'; icon = '✓';
         title = 'Well within conventional lending guidelines';
-        body = 'Both DTI ratios are comfortably below typical lender thresholds. Prices up to this level are generally approvable, subject to your credit score, employment history, and specific lender requirements.';
+        body = 'Both DTI ratios are comfortably below typical lender thresholds. Prices up to this level are generally approvable, subject to your credit score, employment history, and specific lender requirements.' + bindingNote;
       }
       verdict.className = 'refi-verdict ' + cls;
       var iconEl  = verdict.querySelector('.refi-verdict-icon');
@@ -273,7 +282,6 @@
       html += '<tr' + (cur ? ' class="afford-sens-current"' : '') + '>' +
         '<td>' + rateLabel + (cur ? ' <span class="afford-sens-badge">current</span>' : '') + '</td>' +
         '<td>' + fmtDollar(r.P) + '</td>' +
-        '<td>' + fmtDollar(r.mTotal) + '/mo</td>' +
         '</tr>';
     });
     tbody.innerHTML = html;

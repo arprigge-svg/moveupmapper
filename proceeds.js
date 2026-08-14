@@ -22,6 +22,16 @@
     if (n === 0) return '$0';
     return '−' + fmt(n);
   }
+  // Unlike fmtSigned (always shows "−", used for waterfall line items that
+  // are always being subtracted regardless of their own sign), this reflects
+  // the value's actual sign — needed for net proceeds, which fmt()'s
+  // Math.abs() would otherwise silently turn into a plain-looking positive
+  // number when the seller is underwater, indistinguishable from a real gain
+  // except by a subtle color change (lost entirely in black & white print).
+  function fmtNet(n) {
+    if (!isFinite(n)) return '—';
+    return (n < 0 ? '−' : '') + fmt(n);
+  }
   function fmtPct(p) { return p.toFixed(2) + '%'; }
 
   function calc(sp, mort, lComm, bComm, other, credits, mode) {
@@ -56,8 +66,10 @@
 
   function render(r) {
     // Stat tiles
-    setEl('stat-net',         fmt(r.net));
-    setEl('stat-gross-equity', fmt(r.grossEquity));
+    setEl('stat-net',         fmtNet(r.net));
+    setEl('stat-gross-equity', fmtNet(r.grossEquity));
+    var geStatEl = document.getElementById('stat-gross-equity');
+    if (geStatEl) geStatEl.style.color = r.grossEquity < 0 ? 'var(--red)' : '';
     setEl('stat-total-costs', fmt(r.totalCosts));
     setEl('stat-cost-pct',    fmtPct(r.costPct));
 
@@ -72,7 +84,7 @@
     setEl('wf-credits',     r.credits > 0 ? fmtSigned(r.credits) : '—');
     setEl('wf-after-costs', fmt(r.sp - r.totalCosts));
     setEl('wf-mortgage',    fmtSigned(r.mort));
-    setEl('wf-net',         fmt(r.net));
+    setEl('wf-net',         fmtNet(r.net));
 
     var creditsRow = document.getElementById('wf-credits-row');
     if (creditsRow) creditsRow.style.opacity = r.credits > 0 ? '1' : '0.4';
@@ -109,7 +121,7 @@
     }
 
     // Mobile bar
-    setEl('mbar-v1', fmt(r.net));
+    setEl('mbar-v1', fmtNet(r.net));
     setEl('mbar-v2', fmtPct(r.costPct) + ' costs');
   }
 

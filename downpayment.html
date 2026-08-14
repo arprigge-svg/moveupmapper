@@ -323,7 +323,7 @@
     <!-- Empty state -->
     <div id="dpEmptyState" class="dp-empty-state" style="display:none">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--border);margin-bottom:10px"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      <p>Enter a home price and savings amount to see your scenarios.</p>
+      <p id="dpEmptyStateMsg">Enter a home price and savings amount to see your scenarios.</p>
     </div>
 
   </div>
@@ -359,7 +359,7 @@
 
           <div class="gloss-item">
             <div class="gloss-term">Monthly Savings Logic</div>
-            <div class="gloss-def">The minimum-down scenario sets the reference monthly burden (highest payment + PMI). Every other scenario has a lower monthly burden. That monthly difference is invested each month at your investment return rate. This means the "no PMI" or "max down" scenarios are credited for every dollar saved on mortgage payments — the question is whether those savings outweigh starting with less invested capital.</div>
+            <div class="gloss-def">Whichever scenario has the highest monthly burden (payment + PMI) sets the reference — normally the minimum-down scenario, unless a custom down payment smaller than the calculated minimum takes over that role. Every other scenario has a lower monthly burden, and that monthly difference is invested each month at your investment return rate. This means the "no PMI" or "max down" scenarios are credited for every dollar saved on mortgage payments — the question is whether those savings outweigh starting with less invested capital.</div>
           </div>
 
           <div class="gloss-item">

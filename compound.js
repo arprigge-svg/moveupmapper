@@ -208,7 +208,8 @@ function calculate(s) {
 
 function fmt(n) {
   if (n == null || !isFinite(n)) return '—';
-  return '$' + Math.round(n).toLocaleString('en-US');
+  const rounded = Math.round(n);
+  return (rounded < 0 ? '-$' : '$') + Math.abs(rounded).toLocaleString('en-US');
 }
 
 function setText(id, val) {
@@ -262,6 +263,13 @@ function initChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      // Disabled: the initial entrance animation and the container's
+      // async webfont-driven reflow (see <link rel="preload"> in <head>)
+      // can race, leaving the canvas painted mid-transition — a truncated
+      // or empty-looking chart on first load. This chart's data is set
+      // synchronously right after creation, so there's nothing worth
+      // animating into anyway.
+      animation: false,
       plugins: {
         legend: {
           position: 'top',
@@ -351,6 +359,7 @@ function initWithdrawalChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false, // see growthChart's animation:false comment above
       plugins: {
         legend: {
           position: 'top',
@@ -569,7 +578,7 @@ function render(c, s) {
         const inflRate = s.inflationRate ?? 3;
         const maxWdYr  = depYear != null ? depYear : 50;
         const finalWdAmt = wr.wdAmount * Math.pow(1 + inflRate / 100, maxWdYr - 1);
-        annualSubEl.textContent = `grows to ${fmt(finalWdAmt)}/yr by Year ${maxWdYr} at ${inflRate}% inflation`;
+        annualSubEl.textContent = `grows to ${fmt(finalWdAmt)}/yr by year ${maxWdYr} of retirement at ${inflRate}% inflation`;
       } else {
         annualSubEl.textContent = 'from portfolio each year';
       }
@@ -691,10 +700,14 @@ function updateWithdrawalHints(c, s) {
   if (inflAdj) {
     const wdAmt   = s.withdrawalAmount ?? 0;
     const infl    = s.inflationRate    ?? 3;
+    // Illustrative horizon: years *into retirement*, not the accumulation
+    // duration — reuses the same number as the horizon slider only as a
+    // stand-in length, so the label must say "years of retirement" to
+    // avoid colliding with the accumulation chart's absolute "Yr N" axis.
     const years   = c?.years           ?? 20;
     if (wdAmt > 0 && infl > 0) {
       const futureAmt = Math.round(wdAmt * Math.pow(1 + infl / 100, years));
-      inflAdj.textContent = `Grows your withdrawal each year at ${infl}% inflation — ${fmt(wdAmt)}/yr becomes ${fmt(futureAmt)}/yr by Year ${years}, which shortens runway compared to a fixed amount`;
+      inflAdj.textContent = `Grows your withdrawal each year at ${infl}% inflation — ${fmt(wdAmt)}/yr becomes ${fmt(futureAmt)}/yr after ${years} years of retirement, which shortens runway compared to a fixed amount`;
     } else {
       inflAdj.textContent = 'Grows your withdrawal each year by the inflation rate to maintain the same purchasing power — shortens runway compared to a fixed amount';
     }
@@ -722,19 +735,10 @@ function load() {
 
 function encodeShareState() {
   try {
-    const c = calculate(state);
     const delta = {};
     for (const key of Object.keys(DEFAULTS)) {
       if (state[key] !== DEFAULTS[key]) delta[key] = state[key];
     }
-    delta._s = {
-      initialBalance: state.initialBalance,
-      contribution:   state.contribution,
-      annualReturn:   state.annualReturn,
-      duration:       state.duration,
-      finalBalance:   Math.round(c.base.finalValue),
-      totalContrib:   Math.round(c.totalContrib),
-    };
     return btoa(JSON.stringify(delta));
   } catch (_) { return null; }
 }
@@ -1128,6 +1132,7 @@ function initGoalChart() {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      animation: false, // see growthChart's animation:false comment
       plugins: {
         legend: { position: 'top', labels: { font: { size: 12 }, boxWidth: 14, padding: 14 } },
         tooltip: {
@@ -1196,14 +1201,18 @@ function renderGoal(g) {
   const flatSub = document.getElementById('g-flat-sub');
   if (flatSub) flatSub.textContent = `fixed · ${fmt(g.flatAnnual / 12)}/month`;
   setText('g-flat-total-contrib', fmt(g.flatTotalContrib));
-  setText('g-flat-returns', fmt(Math.max(0, g.flatReturns)));
+  setText('g-flat-returns', fmt(g.flatReturns));
+  const flatReturnsEl = document.getElementById('g-flat-returns');
+  if (flatReturnsEl) flatReturnsEl.style.color = g.flatReturns >= 0 ? '#16a34a' : 'var(--red)';
 
   setText('g-growing-annual', fmt(g.growingAnnualYr1) + '/yr');
   const growSub = document.getElementById('g-growing-sub');
   if (growSub) growSub.textContent = `in year 1 · ${fmt(g.growingAnnualYr1 / 12)}/month`;
   setText('g-growing-yrN',           fmt(g.growingYrN) + '/yr');
   setText('g-growing-total-contrib', fmt(g.growingTotalContrib));
-  setText('g-growing-returns', fmt(Math.max(0, g.growingReturns)));
+  setText('g-growing-returns', fmt(g.growingReturns));
+  const growingReturnsEl = document.getElementById('g-growing-returns');
+  if (growingReturnsEl) growingReturnsEl.style.color = g.growingReturns >= 0 ? '#16a34a' : 'var(--red)';
 
   setText('g-ctx-today-wd',  fmt(g.W) + '/yr');
   setText('g-ctx-nominal-wd', fmt(g.W_nom) + '/yr');

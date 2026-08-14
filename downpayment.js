@@ -181,10 +181,14 @@ function simulate(scenarios, s) {
       return m.pmt + pmi;
     });
 
-    // Min-down scenario (index 0) is the reference — highest burden.
-    // Other scenarios invest the difference each month.
-    const refBurden = burdens[0];
-    for (let i = 1; i < meta.length; i++) {
+    // The highest-burden scenario each month is the reference; every other
+    // scenario invests the difference. This is computed as the actual max
+    // (not assumed to be index 0/min-down) so the comparison stays correct
+    // even when a custom down payment is set below the computed minimum
+    // scenario, which would otherwise make 'custom' carry the highest
+    // burden while never being charged for exceeding the old fixed reference.
+    const refBurden = Math.max(...burdens);
+    for (let i = 0; i < meta.length; i++) {
       const saved = refBurden - burdens[i];
       if (saved > 0) portfolios[i] += saved;
     }
@@ -372,6 +376,13 @@ function renderChart(c) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      // Disabled: this chart is destroyed and recreated from scratch on
+      // every input change (see renderChart's `wealthChart.destroy()`
+      // above), and the initial entrance animation can race against the
+      // very first synchronous data render, leaving the canvas painted
+      // mid-transition — truncated or empty on first load. Same fix as
+      // compound.js's growthChart.
+      animation: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: false },
@@ -492,6 +503,12 @@ function recalc() {
   } else {
     wrap.style.display  = 'none';
     empty.style.display = '';
+    const msgEl = document.getElementById('dpEmptyStateMsg');
+    if (msgEl) {
+      msgEl.textContent = (state.homePrice && state.savings)
+        ? 'Increase your available savings (or lower the home price) — at least 3% of the price plus some cash reserve is needed to see scenarios.'
+        : 'Enter a home price and savings amount to see your scenarios.';
+    }
     updateMobileBar(null, -1);
     updateEffectiveRateNote(null);
   }
