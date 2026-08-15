@@ -1053,11 +1053,15 @@ function init() {
     const cur = getState();
     if (cur.equityMode === 'equity') return;
     setState({ equityMode: 'equity', equityValue: Math.max(0, cur.homeValuation - cur.equityValue) });
+    const evEl = $('equityValue');
+    if (evEl) evEl.value = getState().equityValue;
   });
   $('equityModeLoan').addEventListener('click', () => {
     const cur = getState();
     if (cur.equityMode === 'loanBalance') return;
     setState({ equityMode: 'loanBalance', equityValue: Math.max(0, cur.homeValuation - cur.equityValue) });
+    const evEl = $('equityValue');
+    if (evEl) evEl.value = getState().equityValue;
   });
 
   // Tax mode toggle (bound once)

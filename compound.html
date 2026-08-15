@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=73">
+  <link rel="stylesheet" href="styles.css?v=77">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCEFCLSHX0"></script>
   <script>
@@ -169,19 +169,19 @@
       </div>
 
       <div class="field">
-        <div class="field-row-head">
-          <label>CONTRIBUTION AMOUNT</label>
-          <div class="mode-toggle" style="gap:0">
+        <label>CONTRIBUTION AMOUNT</label>
+        <div class="compound-contrib-row">
+          <div class="input-wrap prefix compound-contrib-input">
+            <span class="affix">$</span>
+            <input type="number" id="contribution" min="0" step="50">
+          </div>
+          <div class="mode-toggle compound-contrib-freq" style="gap:0">
             <button class="mode-btn" data-freq="52">Weekly</button>
             <button class="mode-btn" data-freq="26">Biweekly</button>
             <button class="mode-btn active" data-freq="12">Monthly</button>
             <button class="mode-btn" data-freq="4">Quarterly</button>
             <button class="mode-btn" data-freq="1">Annually</button>
           </div>
-        </div>
-        <div class="input-wrap prefix">
-          <span class="affix">$</span>
-          <input type="number" id="contribution" min="0" step="50">
         </div>
         <div class="helper" id="contrib-helper">= $6,000/yr · grows 3% annually</div>
       </div>
@@ -276,29 +276,21 @@
 
     <!-- ── Withdrawal Phase ── -->
     <details class="adv-section" id="withdrawalSection">
-      <summary class="adv-toggle">
+      <summary class="adv-toggle" id="withdrawalSummary">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2v20M2 12l10 10 10-10"/>
         </svg>
         Withdrawal Phase
-        <span id="withdrawal-enabled-badge" style="display:none; font-size:10px; font-weight:700; letter-spacing:.05em; color:#f59e0b; margin-left:6px">ENABLED</span>
-        <svg class="adv-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="adv-chevron" style="margin-left:0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 12 15 18 9"/>
         </svg>
+        <div class="mode-toggle" style="gap:0; margin-left:auto" onclick="event.preventDefault()">
+          <button class="mode-btn active" data-wd-enable="false">Off</button>
+          <button class="mode-btn" data-wd-enable="true">On</button>
+        </div>
       </summary>
 
       <div class="card-section">
-        <div class="field" style="margin-bottom:16px">
-          <div class="field-row-head">
-            <label>WITHDRAWAL PHASE</label>
-            <div class="mode-toggle" style="gap:0">
-              <button class="mode-btn active" data-wd-enable="false">Off</button>
-              <button class="mode-btn" data-wd-enable="true">On</button>
-            </div>
-          </div>
-          <div class="helper">When enabled, a second chart appears showing how long your portfolio lasts under your withdrawal scenario. Withdrawals begin at the end of your accumulation period.</div>
-        </div>
-
         <div id="withdrawalFields" style="display:none">
           <div class="field" style="margin-bottom:16px">
             <label>ANNUAL WITHDRAWAL</label>
@@ -1037,7 +1029,7 @@ The erosion compounds in reverse, just as investment returns compound forward: e
 </main><!-- end .app -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="compound.js?v=19"></script>
+<script src="compound.js?v=23"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const slider = document.getElementById('durationSlider');

@@ -1673,6 +1673,23 @@ details[open] > .faq-q::after {
   background: var(--border);
   flex-shrink: 0;
 }
+.compound-contrib-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.compound-contrib-input {
+  flex: 0 0 calc((100% - 10px) / 2);
+  max-width: calc((100% - 10px) / 2);
+}
+.compound-contrib-freq {
+  flex: 1 1 auto;
+  display: flex;
+}
+.compound-contrib-freq .mode-btn {
+  flex: 1;
+}
 
 /* Advanced collapsible section (compound page) */
 .adv-section { border-top: 1px solid var(--border); }
@@ -1693,7 +1710,9 @@ details[open] > .faq-q::after {
 .adv-toggle::-webkit-details-marker { display: none; }
 .adv-toggle:hover { color: var(--text); }
 .adv-chevron { margin-left: auto; transition: transform 0.2s; flex-shrink: 0; }
-details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
+.adv-toggle.wd-disabled { cursor: default; }
+.adv-toggle.wd-disabled .adv-chevron { opacity: .35; }
+details.adv-section[open] > summary .adv-chevron { transform: rotate(180deg); }
 
 /* Scenario visibility toggles (chart) */
 .scenario-toggle {
@@ -1740,9 +1759,13 @@ details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 7px;
+  margin-top: 6px;
+  padding: 5px 8px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--indigo-mid);
+  background: var(--indigo-light);
+  border-left: 2px solid var(--indigo-mid);
+  border-radius: 0 4px 4px 0;
 }
 .wd-use-four-pct-btn {
   font-size: 11px;
@@ -2130,6 +2153,9 @@ details.adv-section[open] .adv-chevron { transform: rotate(180deg); }
 
   /* Toggle buttons — slightly taller touch target */
   .mode-btn { padding: 5px 10px; }
+
+  /* Compound contribution frequency toggle — 5 buttons is tight at this width */
+  .compound-contrib-freq .mode-btn { padding: 5px 7px; font-size: 11px; }
 
   /* Larger slider thumb for touch accuracy */
   input[type=range]::-webkit-slider-thumb { width: 26px; height: 26px; margin-top: -10px; }

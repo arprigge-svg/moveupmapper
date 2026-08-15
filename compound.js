@@ -590,7 +590,7 @@ function render(c, s) {
     if (sustainableSubEl) {
       sustainableSubEl.textContent = wr.wdInflAdj
         ? 'inflation-adjusted — maintains purchasing power indefinitely'
-        : 'portfolio return covers this indefinitely';
+        : 'portfolio return covers this indefinitely — Inflation Adjusted is off, so this fixed amount buys less each year';
     }
     setText('wd-start-balance', fmt(wr.startBalance));
 
@@ -617,11 +617,7 @@ function render(c, s) {
       const realAmt = wdAmt / Math.pow(1 + inflRate / 100, years);
       if (s.withdrawalInflationAdj) {
         const annualInc = wdAmt * (inflRate / 100);
-        wdInflHint.innerHTML = '';
-        wdInflHint.appendChild(document.createTextNode(`At ${inflRate}% inflation, this has the purchasing power of ${fmt(realAmt)}/yr in today's dollars by Year ${years}.`));
-        wdInflHint.appendChild(document.createElement('br'));
-        var wdSpan = document.createElement('span'); wdSpan.style.opacity = '0.85'; wdSpan.textContent = `${fmt(annualInc)} increase per year at ${inflRate}% inflation`;
-        wdInflHint.appendChild(wdSpan);
+        wdInflHint.textContent = `At ${inflRate}% inflation, this has the purchasing power of ${fmt(realAmt)}/yr in today's dollars by Year ${years} — increasing ${fmt(annualInc)}/yr each year.`;
       } else {
         wdInflHint.textContent = `At ${inflRate}% inflation, this has the purchasing power of ${fmt(realAmt)}/yr in today's dollars by Year ${years}`;
       }
@@ -787,6 +783,11 @@ function populateFields() {
 
   document.querySelectorAll('[data-wd-enable]').forEach(btn =>
     btn.classList.toggle('active', (btn.dataset.wdEnable === 'true') === wdEnabled));
+  document.getElementById('withdrawalSummary')?.classList.toggle('wd-disabled', !wdEnabled);
+  if (!wdEnabled) {
+    const section = document.getElementById('withdrawalSection');
+    if (section) section.open = false;
+  }
   document.querySelectorAll('[data-wd-type]').forEach(btn =>
     btn.classList.toggle('active', btn.dataset.wdType === wdType));
   document.querySelectorAll('[data-wd-contribs]').forEach(btn =>
@@ -804,8 +805,6 @@ function populateFields() {
   if (wdAmtInput) wdAmtInput.style.display = wdType === 'fixed' ? '' : 'none';
   if (wdPctInput) wdPctInput.style.display = wdType === 'percent' ? '' : 'none';
   if (wdDollarPrefix) wdDollarPrefix.style.display = wdType === 'fixed' ? '' : 'none';
-  const wdBadge = document.getElementById('withdrawal-enabled-badge');
-  if (wdBadge) wdBadge.style.display = wdEnabled ? '' : 'none';
 }
 
 function bindInputs() {
@@ -885,14 +884,15 @@ function bindInputs() {
         b.classList.toggle('active', (b.dataset.wdEnable === 'true') === enabled));
       const wdFieldsEl = document.getElementById('withdrawalFields');
       if (wdFieldsEl) wdFieldsEl.style.display = enabled ? '' : 'none';
-      const wdBadge = document.getElementById('withdrawal-enabled-badge');
-      if (wdBadge) wdBadge.style.display = enabled ? '' : 'none';
-      if (enabled) {
-        const section = document.getElementById('withdrawalSection');
-        if (section) section.open = true;
-      }
+      document.getElementById('withdrawalSummary')?.classList.toggle('wd-disabled', !enabled);
+      const section = document.getElementById('withdrawalSection');
+      if (section) section.open = enabled;
       recalc();
     });
+  });
+
+  document.getElementById('withdrawalSummary')?.addEventListener('click', (e) => {
+    if (!state.withdrawalEnabled) e.preventDefault();
   });
 
   document.getElementById('wd-use-four-pct')?.addEventListener('click', () => {

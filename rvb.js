@@ -26,6 +26,8 @@ const DEFAULTS = {
   mortgageTerm: 30,
   homeGrowth: 3,
   propTaxRate: 1.0,
+  propTaxMode: 'percent',
+  annualPropTax: 4500,
   propTaxGrowth: 2,
   monthlyPMI: 0,
   monthlyHOA: 0,
@@ -34,6 +36,8 @@ const DEFAULTS = {
   hoiPct: 0.4,
   closingCosts: 9000,
   maintenancePct: 1,
+  maintenanceMode: 'percent',
+  annualMaintenance: 4500,
   horizonYears: 10,
   itemizeDeductions: false,
   taxBracket: 22,
@@ -354,6 +358,22 @@ function render(c, s) {
       : 'Monthly premium — inflates with general inflation rate';
   }
 
+  // Property tax helper
+  const propTaxHelperEl = document.getElementById('propTaxHelperRvb');
+  if (propTaxHelperEl) {
+    propTaxHelperEl.textContent = s.propTaxMode === 'dollar'
+      ? '= ' + s.propTaxRate.toFixed(2) + '% of home price/yr'
+      : '= ' + fmt(s.purchasePrice * s.propTaxRate / 100) + '/yr';
+  }
+
+  // Maintenance helper
+  const maintenanceHelperEl = document.getElementById('maintenanceHelperRvb');
+  if (maintenanceHelperEl) {
+    maintenanceHelperEl.textContent = s.maintenanceMode === 'dollar'
+      ? '= ' + s.maintenancePct.toFixed(2) + '% of home value/yr'
+      : '= ' + fmt(s.purchasePrice * s.maintenancePct / 100) + '/yr';
+  }
+
   // Chart 1 side panel
   setText('side-pi',               fmt(c.pi));
   setText('side-proptax',          fmt(c.propTaxMonthlyYr1));
@@ -547,6 +567,12 @@ function recomputeFromPct() {
   if (state.hoiMode === 'percent') {
     state.monthlyHOI = state.purchasePrice * (state.hoiPct / 100) / 12;
   }
+  if (state.propTaxMode === 'dollar') {
+    state.propTaxRate = state.purchasePrice > 0 ? (state.annualPropTax / state.purchasePrice * 100) : 0;
+  }
+  if (state.maintenanceMode === 'dollar') {
+    state.maintenancePct = state.purchasePrice > 0 ? (state.annualMaintenance / state.purchasePrice * 100) : 0;
+  }
 }
 
 function syncDpInput(mode) {
@@ -581,6 +607,44 @@ function syncHoiInput(mode) {
   }
   document.getElementById('hoiModeDollarRvb')?.classList.toggle('active', mode === 'dollar');
   document.getElementById('hoiModePctRvb')?.classList.toggle('active', mode === 'percent');
+}
+
+function syncPropTaxInput(mode) {
+  const el = document.getElementById('propTaxRate');
+  const prefix = document.getElementById('propTaxPrefix');
+  if (!el) return;
+  if (mode === 'dollar') {
+    if (prefix) prefix.style.display = '';
+    el.step = '100';
+    el.max = '';
+    el.value = state.annualPropTax;
+  } else {
+    if (prefix) prefix.style.display = 'none';
+    el.step = '0.05';
+    el.max = '5';
+    el.value = Math.round(state.propTaxRate * 100) / 100;
+  }
+  document.getElementById('propTaxModeDollarRvb')?.classList.toggle('active', mode === 'dollar');
+  document.getElementById('propTaxModePctRvb')?.classList.toggle('active', mode === 'percent');
+}
+
+function syncMaintenanceInput(mode) {
+  const el = document.getElementById('maintenancePct');
+  const prefix = document.getElementById('maintenancePrefix');
+  if (!el) return;
+  if (mode === 'dollar') {
+    if (prefix) prefix.style.display = '';
+    el.step = '100';
+    el.max = '';
+    el.value = state.annualMaintenance;
+  } else {
+    if (prefix) prefix.style.display = 'none';
+    el.step = '0.1';
+    el.max = '10';
+    el.value = Math.round(state.maintenancePct * 100) / 100;
+  }
+  document.getElementById('maintenanceModeDollarRvb')?.classList.toggle('active', mode === 'dollar');
+  document.getElementById('maintenanceModePctRvb')?.classList.toggle('active', mode === 'percent');
 }
 
 function recalc() {
@@ -623,7 +687,7 @@ function populateFields() {
     'opportunityCost',
     'rent', 'rentersInsurance', 'rentIncrease', 'inflation',
     'purchasePrice', 'mortgageRate', 'mortgageTerm', 'homeGrowth',
-    'propTaxRate', 'propTaxGrowth', 'monthlyPMI', 'monthlyHOA', 'closingCosts', 'maintenancePct',
+    'propTaxGrowth', 'monthlyPMI', 'monthlyHOA', 'closingCosts',
     'stateTaxRate',
   ];
   fields.forEach(key => {
@@ -645,6 +709,8 @@ function populateFields() {
 
   syncDpInput(state.dpMode ?? 'dollar');
   syncHoiInput(state.hoiMode ?? 'dollar');
+  syncPropTaxInput(state.propTaxMode ?? 'percent');
+  syncMaintenanceInput(state.maintenanceMode ?? 'percent');
   window.syncMirrors?.();
 }
 
@@ -681,7 +747,7 @@ function bindInputs() {
   ['opportunityCost',
    'rent', 'rentersInsurance', 'rentIncrease', 'inflation',
    'mortgageRate', 'mortgageTerm', 'homeGrowth',
-   'propTaxRate', 'propTaxGrowth', 'monthlyPMI', 'monthlyHOA', 'closingCosts', 'maintenancePct',
+   'propTaxGrowth', 'monthlyPMI', 'monthlyHOA', 'closingCosts',
    'stateTaxRate',
   ].forEach(key => num(key));
 
@@ -745,6 +811,66 @@ function bindInputs() {
       : 0.4;
     state.hoiMode = 'percent';
     syncHoiInput('percent');
+    recalc();
+  });
+
+  const propTaxEl = document.getElementById('propTaxRate');
+  if (propTaxEl) {
+    propTaxEl.addEventListener('input', () => {
+      const v = parseFloat(propTaxEl.value);
+      const val = isNaN(v) ? 0 : v;
+      if (state.propTaxMode === 'dollar') {
+        state.annualPropTax = val;
+      } else {
+        state.propTaxRate = val;
+      }
+      recalc();
+    });
+  }
+
+  document.getElementById('propTaxModeDollarRvb')?.addEventListener('click', () => {
+    if (state.propTaxMode === 'dollar') return;
+    state.annualPropTax = state.purchasePrice > 0
+      ? Math.round(state.purchasePrice * state.propTaxRate / 100)
+      : 4500;
+    state.propTaxMode = 'dollar';
+    syncPropTaxInput('dollar');
+    recalc();
+  });
+  document.getElementById('propTaxModePctRvb')?.addEventListener('click', () => {
+    if (state.propTaxMode === 'percent') return;
+    state.propTaxMode = 'percent';
+    syncPropTaxInput('percent');
+    recalc();
+  });
+
+  const maintenanceEl = document.getElementById('maintenancePct');
+  if (maintenanceEl) {
+    maintenanceEl.addEventListener('input', () => {
+      const v = parseFloat(maintenanceEl.value);
+      const val = isNaN(v) ? 0 : v;
+      if (state.maintenanceMode === 'dollar') {
+        state.annualMaintenance = val;
+      } else {
+        state.maintenancePct = val;
+      }
+      recalc();
+    });
+  }
+
+  document.getElementById('maintenanceModeDollarRvb')?.addEventListener('click', () => {
+    if (state.maintenanceMode === 'dollar') return;
+    state.annualMaintenance = state.purchasePrice > 0
+      ? Math.round(state.purchasePrice * state.maintenancePct / 100)
+      : 4500;
+    state.maintenanceMode = 'dollar';
+    syncMaintenanceInput('dollar');
+    recalc();
+  });
+  document.getElementById('maintenanceModePctRvb')?.addEventListener('click', () => {
+    if (state.maintenanceMode === 'percent') return;
+    state.maintenanceMode = 'percent';
+    syncMaintenanceInput('percent');
     recalc();
   });
 

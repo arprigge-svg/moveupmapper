@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=73">
+  <link rel="stylesheet" href="styles.css?v=77">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -280,12 +280,16 @@
 
           <div class="three-col">
             <div class="field">
-              <label>PROPERTY TAX RATE</label>
-              <div class="input-wrap suffix">
+              <label>PROPERTY TAX</label>
+              <div class="input-wrap other-costs-wrap" id="propTaxInputWrapRvb">
+                <span class="affix" id="propTaxPrefix" style="display:none">$</span>
                 <input type="number" id="propTaxRate" min="0" max="5" step="0.05">
-                <span class="affix">%</span>
+                <div class="other-costs-unit-toggle">
+                  <button class="other-costs-btn" id="propTaxModeDollarRvb">$</button>
+                  <button class="other-costs-btn active" id="propTaxModePctRvb">%</button>
+                </div>
               </div>
-              <div class="helper">Annual % of home price</div>
+              <div class="helper" id="propTaxHelperRvb">Annual % of home price</div>
             </div>
             <div class="field">
               <div class="label-tip-row"><label>TAX GROWTH / YR</label><button class="tip-btn" aria-label="Learn more" data-tip="The annual rate your property tax bill increases. Even if your assessed value stays flat, many jurisdictions apply an automatic levy increase each year. Typical range is 1–3%.">?</button></div>
@@ -308,11 +312,15 @@
           <div class="three-col">
             <div class="field">
               <div class="label-tip-row"><label>HOME MAINTENANCE</label><button class="tip-btn" aria-label="Learn more" data-tip="Annual upkeep as a % of your home&#39;s current value: repairs, appliances, HVAC, roofing, and landscaping. The common 1% rule is a starting point; older homes and coastal markets typically run higher.">?</button></div>
-              <div class="input-wrap suffix">
+              <div class="input-wrap other-costs-wrap" id="maintenanceInputWrapRvb">
+                <span class="affix" id="maintenancePrefix" style="display:none">$</span>
                 <input type="number" id="maintenancePct" min="0" max="10" step="0.1" value="1">
-                <span class="affix">%</span>
+                <div class="other-costs-unit-toggle">
+                  <button class="other-costs-btn" id="maintenanceModeDollarRvb">$</button>
+                  <button class="other-costs-btn active" id="maintenanceModePctRvb">%</button>
+                </div>
               </div>
-              <div class="helper">Annual upkeep as % of home value (typically 1–2%)</div>
+              <div class="helper" id="maintenanceHelperRvb">Annual upkeep as % of home value (typically 1–2%)</div>
             </div>
             <div class="field">
               <label>MONTHLY HOA</label>
@@ -837,7 +845,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="mortgage-rates.js?v=1"></script>
-<script src="rvb.js?v=12"></script>
+<script src="rvb.js?v=13"></script>
 <script>
   (function() {
     var hdr = document.getElementById('assumptionsToggle');
