@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=77">
+  <link rel="stylesheet" href="styles.css?v=78">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -323,10 +323,6 @@
               <input type="number" id="interestRate" min="0" max="30" step="0.05">
               <span class="affix">%</span>
             </div>
-            <div class="rate-hint" data-mortgage-rate-widget style="display:none" title="Freddie Mac PMMS, via FRED">
-              Today's avg: <button type="button" class="rate-hint-value" data-mortgage-rate="30" data-fill-target="interestRate">—</button> 30-yr
-              · <button type="button" class="rate-hint-value" data-mortgage-rate="15" data-fill-target="interestRate">—</button> 15-yr
-            </div>
           </div>
           <div class="field">
             <label>LOAN TERM</label>
@@ -341,6 +337,11 @@
             </div>
             <div class="helper">New mortgage term</div>
           </div>
+        </div>
+
+        <div class="rate-hint" data-mortgage-rate-widget style="display:none;margin-top:-16px;margin-bottom:24px" title="Freddie Mac PMMS, via FRED">
+          Today's avg: <button type="button" class="rate-hint-value" data-mortgage-rate="30" data-fill-target="interestRate">—</button> 30-yr
+          · <button type="button" class="rate-hint-value" data-mortgage-rate="15" data-fill-target="interestRate">—</button> 15-yr
         </div>
 
         <div class="two-col">
@@ -724,7 +725,7 @@
           <span class="leg-item leg-comfort">● Comfort (28%)</span>
           <span class="leg-item leg-ceiling">● Ceiling (36%)</span>
           <span class="leg-item leg-dp">· · Down payment</span>
-          <span class="leg-item leg-burden">● Annual cost burden</span>
+          <button type="button" class="leg-item leg-burden leg-toggle" id="legToggleCostBurden" aria-pressed="false">● Annual cost burden</button>
           <span class="leg-item leg-target" id="leg-targetPrice">– – Target price (fixed)</span>
         </div>
         <p class="chart-footnote" id="bp-footnote"></p>

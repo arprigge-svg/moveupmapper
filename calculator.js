@@ -79,6 +79,12 @@ let activeScenario = 'a';
 // once per accumulated listener.
 let listenersBound = false;
 
+// Chart display preference, not a real input — shared across scenario tabs,
+// not persisted/shared via URL. Annual cost burden defaults to hidden since
+// its ~$15-20k scale reads as a near-flat line next to the other three
+// ~$400-800k series and mostly adds visual noise until a user asks for it.
+let showCostBurden = false;
+
 function getState() { return scenarios[activeScenario]; }
 
 function setState(patch) {
@@ -420,6 +426,7 @@ function updateBpChart(c, s) {
       pointRadius: 3,
       fill: false,
       yAxisID: 'y1',
+      hidden: !showCostBurden,
     },
     {
       label: tpLabel,
@@ -431,7 +438,11 @@ function updateBpChart(c, s) {
       fill: false,
     },
   ];
+  bpChart.options.scales.y1.display = showCostBurden;
   bpChart.update();
+
+  document.getElementById('legToggleCostBurden')?.classList.toggle('active', showCostBurden);
+  document.getElementById('legToggleCostBurden')?.setAttribute('aria-pressed', showCostBurden);
 }
 
 
@@ -1062,6 +1073,12 @@ function init() {
     setState({ equityMode: 'loanBalance', equityValue: Math.max(0, cur.homeValuation - cur.equityValue) });
     const evEl = $('equityValue');
     if (evEl) evEl.value = getState().equityValue;
+  });
+
+  // Annual cost burden chart line (bound once — view preference, not real input)
+  $('legToggleCostBurden')?.addEventListener('click', () => {
+    showCostBurden = !showCostBurden;
+    recalcAndRender();
   });
 
   // Tax mode toggle (bound once)

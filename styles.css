@@ -986,6 +986,17 @@ input[type=range]::-moz-range-thumb {
 .leg-dp       { color: var(--indigo); }
 .leg-burden   { color: var(--red); }
 .leg-target   { color: #dc262699; }
+.leg-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  opacity: .4;
+  transition: opacity .15s;
+}
+.leg-toggle:hover { opacity: .7; }
+.leg-toggle.active { opacity: 1; }
 .leg-rent     { color: var(--amber); }
 .leg-buy      { color: var(--indigo); }
 .chart-footnote {
