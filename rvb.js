@@ -15,6 +15,7 @@ const RVB_LS_KEY = 'rvbCalc_v3';
 const DEFAULTS = {
   opportunityCost: 7,
   rent: 2200,
+  additionalFees: 0,
   rentersInsurance: 15,
   rentIncrease: 4,
   inflation: 3,
@@ -195,7 +196,7 @@ function calculate(s) {
 
   for (let t = 0; t <= YEARS; t++) {
     const rentMonthly = s.rent * Math.pow(1 + s.rentIncrease / 100, t)
-                      + s.rentersInsurance * Math.pow(1 + s.inflation / 100, t);
+                      + (s.rentersInsurance + s.additionalFees) * Math.pow(1 + s.inflation / 100, t);
     rentMonthlyCosts.push(rentMonthly);
 
     const homeVal           = s.purchasePrice * Math.pow(1 + s.homeGrowth / 100, t);
@@ -307,15 +308,6 @@ function render(c, s) {
   setText('stat-monthly-rent', fmt(c.rentMonthlyCosts[0]));
   setText('stat-monthly-buy',  fmt(c.buyMonthlyCosts[0]));
   setText('stat-dp-pct',       c.dpPct.toFixed(1) + '% down · ' + fmt(c.loan) + ' loan');
-
-  // PMI status
-  const pmiEl = document.getElementById('stat-pmi-dropoff');
-  if (pmiEl) {
-    if (s.monthlyPMI <= 0)            pmiEl.textContent = 'Not entered';
-    else if (!c.pmiRequired)          pmiEl.textContent = 'N/A (≥20% down)';
-    else if (!isFinite(c.pmiDropOff)) pmiEl.textContent = '> loan term';
-    else                              pmiEl.textContent = `Year ${c.pmiDropOffYear}`;
-  }
 
   // Cost crossover
   const ccEl = document.getElementById('stat-cost-crossover');
@@ -685,7 +677,7 @@ function decodeShareParam(search) {
 function populateFields() {
   const fields = [
     'opportunityCost',
-    'rent', 'rentersInsurance', 'rentIncrease', 'inflation',
+    'rent', 'additionalFees', 'rentersInsurance', 'rentIncrease', 'inflation',
     'purchasePrice', 'mortgageRate', 'mortgageTerm', 'homeGrowth',
     'propTaxGrowth', 'monthlyPMI', 'monthlyHOA', 'closingCosts',
     'stateTaxRate',
@@ -745,7 +737,7 @@ function bindInputs() {
   }
 
   ['opportunityCost',
-   'rent', 'rentersInsurance', 'rentIncrease', 'inflation',
+   'rent', 'additionalFees', 'rentersInsurance', 'rentIncrease', 'inflation',
    'mortgageRate', 'mortgageTerm', 'homeGrowth',
    'propTaxGrowth', 'monthlyPMI', 'monthlyHOA', 'closingCosts',
    'stateTaxRate',
@@ -940,6 +932,19 @@ function bindInputs() {
   document.getElementById('printBtn')?.addEventListener('click', () => window.print());
 }
 
+function bindRateHintTermSync() {
+  document.querySelectorAll('.rate-hint-value[data-mortgage-rate]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const term = parseInt(btn.getAttribute('data-mortgage-rate'), 10);
+      const termEl = document.getElementById('mortgageTerm');
+      if (termEl && parseFloat(termEl.value) !== term) {
+        termEl.value = term;
+        termEl.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  });
+}
+
 function init() {
   load();
   const shared = decodeShareParam(location.search);
@@ -951,6 +956,7 @@ function init() {
   initCharts();
   populateFields();
   bindInputs();
+  bindRateHintTermSync();
   recalc();
 }
 

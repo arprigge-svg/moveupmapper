@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=78">
+  <link rel="stylesheet" href="styles.css?v=82">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -96,6 +96,10 @@
     <div>
       <h1>Rent vs. Buy Analysis</h1>
       <p class="header-sub">Compare the true long-term cost of renting versus buying</p>
+      <div class="rate-hint" data-mortgage-rate-widget style="display:none;margin-top:4px" title="Freddie Mac PMMS, via FRED">
+        Today's avg: <button type="button" class="rate-hint-value" data-mortgage-rate="30" data-fill-target="mortgageRate">—</button> 30-yr
+        · <button type="button" class="rate-hint-value" data-mortgage-rate="15" data-fill-target="mortgageRate">—</button> 15-yr
+      </div>
     </div>
     <div class="header-actions" style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-shrink:0">
       <button class="btn-text" id="resetBtn">Reset</button>
@@ -149,6 +153,15 @@
         </div>
 
         <div class="field">
+          <div class="label-tip-row"><label>ADDITIONAL FEES</label><button class="tip-btn" aria-label="Learn more" data-tip="Recurring monthly costs beyond base rent that aren&#39;t part of your lease's headline number: parking, trash/valet, amenity fees (pool, gym), pet rent, storage, etc.">?</button></div>
+          <div class="input-wrap prefix">
+            <span class="affix">$</span>
+            <input type="number" id="additionalFees" min="0" step="5">
+          </div>
+          <div class="helper">Parking, trash, amenities, pet fees, etc.</div>
+        </div>
+
+        <div class="field">
           <label>RENTERS INSURANCE</label>
           <div class="input-wrap prefix">
             <span class="affix">$</span>
@@ -157,7 +170,20 @@
           <div class="helper">Monthly renters insurance cost</div>
         </div>
 
-        <div class="two-col">
+      </div>
+
+      <div class="card-section" style="border-top: 1px solid var(--border)">
+
+        <button type="button" class="section-collapse-hdr" id="rentAssumptionsToggle" aria-expanded="false">
+          <div class="section-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            GROWTH &amp; ASSUMPTIONS
+          </div>
+          <svg class="collapse-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <div class="section-collapse-body" id="rentAssumptionsBody" style="max-height:0;overflow:hidden">
+
           <div class="field">
             <label>ANNUAL RENT INCREASE</label>
             <div class="input-wrap suffix">
@@ -165,23 +191,25 @@
               <span class="affix">%</span>
             </div>
           </div>
+
           <div class="field">
             <label>INFLATION RATE</label>
             <div class="input-wrap suffix">
               <input type="number" id="inflation" min="0" max="20" step="0.1">
               <span class="affix">%</span>
             </div>
-            <div class="helper">General inflation (affects renters &amp; homeowners insurance)</div>
+            <div class="helper">Affects renters &amp; homeowners insurance</div>
           </div>
-        </div>
 
-        <div class="field">
-          <div class="label-tip-row"><label>OPPORTUNITY COST</label><button class="tip-btn" aria-label="Learn more" data-tip="The annual return you&#39;d earn by investing your down payment and closing costs in the market instead of buying. The chart&#39;s Invested Capital line models this compounding. Default of 7% reflects approximate long-run U.S. equity returns.">?</button></div>
-          <div class="input-wrap suffix">
-            <input type="number" id="opportunityCost" min="0" max="30" step="0.1">
-            <span class="affix">%</span>
+          <div class="field">
+            <div class="label-tip-row"><label>OPPORTUNITY COST</label><button class="tip-btn" aria-label="Learn more" data-tip="The annual return you&#39;d earn by investing your down payment and closing costs in the market instead of buying. The chart&#39;s Invested Capital line models this compounding. Default of 7% reflects approximate long-run U.S. equity returns.">?</button></div>
+            <div class="input-wrap suffix">
+              <input type="number" id="opportunityCost" min="0" max="30" step="0.1">
+              <span class="affix">%</span>
+            </div>
+            <div class="helper">Annual return if down payment &amp; closing costs were invested instead</div>
           </div>
-          <div class="helper">Annual return if down payment &amp; closing costs were invested instead</div>
+
         </div>
 
       </div>
@@ -201,11 +229,6 @@
         </div>
       </div>
       <div class="card-section">
-
-        <div class="section-label">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-          PURCHASE &amp; FINANCING
-        </div>
 
         <div class="three-col">
           <div class="field">
@@ -244,16 +267,17 @@
               <input type="number" id="mortgageRate" min="0" max="30" step="0.05">
               <span class="affix">%</span>
             </div>
-            <div class="rate-hint" data-mortgage-rate-widget style="display:none" title="Freddie Mac PMMS, via FRED">
-              Today's avg: <button type="button" class="rate-hint-value" data-mortgage-rate="30" data-fill-target="mortgageRate">—</button> 30-yr
-              · <button type="button" class="rate-hint-value" data-mortgage-rate="15" data-fill-target="mortgageRate">—</button> 15-yr
-            </div>
           </div>
           <div class="field">
             <label>LOAN TERM</label>
-            <div class="input-wrap suffix">
-              <input type="number" id="mortgageTerm" min="1" max="40" step="1">
-              <span class="affix">yrs</span>
+            <div class="input-wrap" style="padding:0">
+              <select id="mortgageTerm" class="input-select" style="height:36px;padding:0 10px;width:100%">
+                <option value="10">10 years</option>
+                <option value="15">15 years</option>
+                <option value="20">20 years</option>
+                <option value="25">25 years</option>
+                <option value="30" selected>30 years</option>
+              </select>
             </div>
           </div>
           <div class="field">
@@ -267,7 +291,7 @@
         </div>
 
       </div>
-      <div class="card-section" style="border-top: 1px solid var(--border)">
+      <div class="card-section" id="taxesGrowthSection" style="border-top: 1px solid var(--border)">
 
         <button type="button" class="section-collapse-hdr" id="assumptionsToggle" aria-expanded="false">
           <div class="section-label">
@@ -349,7 +373,7 @@
 
       </div>
 
-      <div class="card-section" style="border-top: 1px solid var(--border)">
+      <div class="card-section" id="taxBenefitsSection" style="border-top: 1px solid var(--border)">
 
         <button type="button" class="section-collapse-hdr" id="taxBenefitsToggle" aria-expanded="false">
           <div class="section-label">
@@ -431,7 +455,7 @@
   <!-- ── Summary Stats ── -->
 
   <div class="card wide-card">
-    <div class="rvb-stats-grid">
+    <div class="rvb-stats-grid rvb-stats-grid--5">
 
       <div class="bp-stat">
         <div class="bp-stat-label">MONTHLY RENT (YR 1)</div>
@@ -443,12 +467,6 @@
         <div class="bp-stat-label">MONTHLY BUY COST (YR 1)<span id="buy-stat-tax-label" style="display:none;font-weight:400;text-transform:none;font-size:10px;letter-spacing:0"> · after tax</span></div>
         <div class="bp-stat-value" id="stat-monthly-buy">—</div>
         <div class="bp-stat-delta" id="stat-dp-pct">—</div>
-      </div>
-
-      <div class="bp-stat">
-        <div class="bp-stat-label">PMI DROPS OFF</div>
-        <div class="bp-stat-value" style="font-size:18px;padding-top:3px" id="stat-pmi-dropoff">—</div>
-        <div class="bp-stat-delta">once LTV reaches 80%</div>
       </div>
 
       <div class="bp-stat">
@@ -491,7 +509,7 @@
           <canvas id="costChart"></canvas>
         </div>
         <div class="chart-footnote">
-          <strong>Rent</strong> compounds at your annual rent increase rate; renters insurance grows with inflation.
+          <strong>Rent</strong> compounds at your annual rent increase rate; additional fees and renters insurance grow with inflation.
           <strong>Buy</strong> includes fixed P&amp;I, property taxes (growing at your tax increase rate), PMI until
           LTV reaches 80%, maintenance (your % × current home value each year), HOA (flat monthly), and homeowners insurance (grows with inflation).
           <span id="chart-tax-note" style="display:none"><strong>Tax savings</strong> are subtracted from the buy line each year based on your bracket and state rate — estimated annual savings, not a guaranteed monthly cash flow.</span>
@@ -748,7 +766,7 @@
         <div class="gloss-grid">
           <div class="gloss-item">
             <div class="gloss-term">Monthly Cost Comparison (Chart 1)</div>
-            <div class="gloss-def">Each year's buying cost sums six components: mortgage P&amp;I (fixed for the life of the loan), property tax (grows annually), PMI (drops once the loan reaches 80% LTV), home maintenance (grows with home value), HOA (flat), and homeowners insurance (grows with inflation). Renting cost adds rent (grows annually) and renters insurance (grows with inflation). The chart plots both over your horizon so you can see when — and by how much — one becomes cheaper than the other.</div>
+            <div class="gloss-def">Each year's buying cost sums six components: mortgage P&amp;I (fixed for the life of the loan), property tax (grows annually), PMI (drops once the loan reaches 80% LTV), home maintenance (grows with home value), HOA (flat), and homeowners insurance (grows with inflation). Renting cost adds rent (grows annually) plus additional fees and renters insurance (both grow with inflation). The chart plots both over your horizon so you can see when — and by how much — one becomes cheaper than the other.</div>
           </div>
           <div class="gloss-item">
             <div class="gloss-term">Equity Break-Even Year</div>
@@ -847,37 +865,43 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="mortgage-rates.js?v=1"></script>
-<script src="rvb.js?v=13"></script>
+<script src="rvb.js?v=16"></script>
 <script>
   (function() {
-    var hdr = document.getElementById('assumptionsToggle');
-    var body = document.getElementById('assumptionsBody');
-    hdr.addEventListener('click', function() {
-      var expanded = hdr.getAttribute('aria-expanded') === 'true';
-      hdr.setAttribute('aria-expanded', String(!expanded));
-      if (expanded) {
-        // Closing: pin current height first so CSS has a value to animate FROM,
-        // then collapse to 0 on the next two frames (double rAF ensures paint).
-        body.style.overflow = 'hidden';
-        body.style.maxHeight = body.scrollHeight + 'px';
-        requestAnimationFrame(function() {
+    function bindCollapseToggle(hdrId, bodyId) {
+      var hdr = document.getElementById(hdrId);
+      var body = document.getElementById(bodyId);
+      if (!hdr || !body) return;
+      hdr.addEventListener('click', function() {
+        var expanded = hdr.getAttribute('aria-expanded') === 'true';
+        hdr.setAttribute('aria-expanded', String(!expanded));
+        if (expanded) {
+          // Closing: pin current height first so CSS has a value to animate FROM,
+          // then collapse to 0 on the next two frames (double rAF ensures paint).
+          body.style.overflow = 'hidden';
+          body.style.maxHeight = body.scrollHeight + 'px';
           requestAnimationFrame(function() {
-            body.style.maxHeight = '0';
+            requestAnimationFrame(function() {
+              body.style.maxHeight = '0';
+            });
           });
-        });
-      } else {
-        // Opening: animate to content height, then lift the clip so helper
-        // text shown on field focus is never cut off.
-        body.style.overflow = 'hidden';
-        body.style.maxHeight = body.scrollHeight + 'px';
-        setTimeout(function() {
-          if (hdr.getAttribute('aria-expanded') === 'true') {
-            body.style.overflow = 'visible';
-            body.style.maxHeight = 'none';
-          }
-        }, 350);
-      }
-    });
+        } else {
+          // Opening: animate to content height, then lift the clip so helper
+          // text shown on field focus is never cut off.
+          body.style.overflow = 'hidden';
+          body.style.maxHeight = body.scrollHeight + 'px';
+          setTimeout(function() {
+            if (hdr.getAttribute('aria-expanded') === 'true') {
+              body.style.overflow = 'visible';
+              body.style.maxHeight = 'none';
+            }
+          }, 350);
+        }
+      });
+    }
+    bindCollapseToggle('assumptionsToggle', 'assumptionsBody');
+    bindCollapseToggle('rentAssumptionsToggle', 'rentAssumptionsBody');
+    bindCollapseToggle('taxBenefitsToggle', 'taxBenefitsBody');
   })();
 </script>
 <script>
@@ -906,34 +930,6 @@
 
     syncMirrors();
   });
-</script>
-<script>
-  (function() {
-    var hdr = document.getElementById('taxBenefitsToggle');
-    var body = document.getElementById('taxBenefitsBody');
-    hdr.addEventListener('click', function() {
-      var expanded = hdr.getAttribute('aria-expanded') === 'true';
-      hdr.setAttribute('aria-expanded', String(!expanded));
-      if (expanded) {
-        body.style.overflow = 'hidden';
-        body.style.maxHeight = body.scrollHeight + 'px';
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            body.style.maxHeight = '0';
-          });
-        });
-      } else {
-        body.style.overflow = 'hidden';
-        body.style.maxHeight = body.scrollHeight + 'px';
-        setTimeout(function() {
-          if (hdr.getAttribute('aria-expanded') === 'true') {
-            body.style.overflow = 'visible';
-            body.style.maxHeight = 'none';
-          }
-        }, 350);
-      }
-    });
-  })();
 </script>
 <script>
 /* ── Field tip tooltips ── */

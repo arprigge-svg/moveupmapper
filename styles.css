@@ -270,6 +270,23 @@ canvas { display: block; width: 100% !important; }
 .field { margin-bottom: 16px; }
 .field:last-child { margin-bottom: 0; }
 #loanDetailsFields { margin-bottom: 16px; }
+
+/* Rent vs. Buy: extra breathing room between fields in the Renting/Buying
+   Scenario cards, scoped to this page's grid so other calculators are
+   unaffected. */
+.calc-grid--2col .field { margin-bottom: 24px; }
+.calc-grid--2col .two-col,
+.calc-grid--2col .three-col { margin-bottom: 24px; }
+.calc-grid--2col .field:last-child { margin-bottom: 0; }
+.calc-grid--2col .two-col:last-child,
+.calc-grid--2col .three-col:last-child { margin-bottom: 0; }
+@media (min-width: 901px) {
+  /* Lines up the Buying card's TAX BENEFITS toggle with the Renting card's
+     GROWTH & ASSUMPTIONS toggle in their default (collapsed) state, while
+     splitting the gap evenly above and below TAXES, GROWTH & COSTS. */
+  #taxesGrowthSection { padding-top: 26.25px; }
+  #taxBenefitsSection { padding-top: 26.25px; }
+}
 label {
   display: block;
   font-size: 11px;
@@ -1417,7 +1434,12 @@ details[open] > .faq-q::after {
   background: var(--border);
 }
 .rvb-stats-grid--5 { grid-template-columns: repeat(5, 1fr); }
-@media (max-width: 900px) { .rvb-stats-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px) {
+  .rvb-stats-grid { grid-template-columns: repeat(3, 1fr); }
+  /* 5 tiles leaves a dangling empty cell in both the 3-col and 2-col
+     layouts below — stretch the last tile to close the gap. */
+  .rvb-stats-grid--5 .bp-stat:last-child { grid-column: span 2; }
+}
 @media (max-width: 500px) { .rvb-stats-grid { grid-template-columns: repeat(2, 1fr); } }
 .rvb-stats-grid .bp-stat { background: white; }
 
