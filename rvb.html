@@ -517,7 +517,7 @@
       </div>
       <div class="bp-controls">
         <div class="ctrl-section">
-          <div class="ctrl-section-title">YEAR 1 MONTHLY BREAKDOWN</div>
+          <div class="ctrl-section-title">YEAR 1 BUY BREAKDOWN · MONTHLY</div>
           <div class="net-section">
             <div class="net-row">
               <span>Principal &amp; interest</span>
@@ -527,7 +527,7 @@
               <span>Property tax</span>
               <span id="side-proptax" style="font-weight:500">—</span>
             </div>
-            <div class="net-row" style="margin-top:4px">
+            <div class="net-row" id="side-pmi-yr1-row" style="margin-top:4px">
               <span>PMI</span>
               <span id="side-pmi-yr1" style="font-weight:500">—</span>
             </div>
@@ -535,7 +535,7 @@
               <span>Maintenance</span>
               <span id="side-maintenance-yr1" style="font-weight:500">—</span>
             </div>
-            <div class="net-row" style="margin-top:4px">
+            <div class="net-row" id="side-hoa-yr1-row" style="margin-top:4px">
               <span>HOA</span>
               <span id="side-hoa-yr1" style="font-weight:500">—</span>
             </div>
@@ -551,6 +551,28 @@
             <div class="net-row r-bold">
               <span style="color:var(--text)">Total buy cost</span>
               <span id="side-buytotal">—</span>
+            </div>
+          </div>
+        </div>
+        <div class="ctrl-section">
+          <div class="ctrl-section-title">YEAR 1 RENT BREAKDOWN · MONTHLY</div>
+          <div class="net-section">
+            <div class="net-row">
+              <span>Rent</span>
+              <span id="side-rent-yr1" style="font-weight:500">—</span>
+            </div>
+            <div class="net-row" id="side-fees-yr1-row" style="margin-top:4px">
+              <span>Additional fees</span>
+              <span id="side-fees-yr1" style="font-weight:500">—</span>
+            </div>
+            <div class="net-row" style="margin-top:4px">
+              <span>Renters insurance</span>
+              <span id="side-insurance-yr1" style="font-weight:500">—</span>
+            </div>
+            <div class="r-divider"></div>
+            <div class="net-row r-bold">
+              <span style="color:var(--text)">Total rent cost</span>
+              <span id="side-renttotal-yr1">—</span>
             </div>
           </div>
         </div>
@@ -576,29 +598,6 @@
             <div class="net-row" style="margin-top:4px">
               <span style="color:#16a34a;font-weight:600">Total prop. taxes</span>
               <span id="side-totalptax">—</span>
-            </div>
-          </div>
-        </div>
-        <div class="ctrl-section">
-          <div class="ctrl-section-title">GROWTH RATES</div>
-          <div class="ctrl-row">
-            <div class="ctrl-info">
-              <div class="ctrl-icon headwind-icon">↑</div>
-              <div><div class="ctrl-name">Rent increase</div><div class="ctrl-sub">Annual</div></div>
-            </div>
-            <div class="ctrl-input">
-              <input type="number" id="rentIncrease2" tabindex="-1" readonly style="pointer-events:none;background:transparent">
-              <span class="ctrl-unit">%</span>
-            </div>
-          </div>
-          <div class="ctrl-row">
-            <div class="ctrl-info">
-              <div class="ctrl-icon headwind-icon">↑</div>
-              <div><div class="ctrl-name">Prop. tax increase</div><div class="ctrl-sub">Annual</div></div>
-            </div>
-            <div class="ctrl-input">
-              <input type="number" id="propTaxGrowth2" tabindex="-1" readonly style="pointer-events:none;background:transparent">
-              <span class="ctrl-unit">%</span>
             </div>
           </div>
         </div>
@@ -632,9 +631,8 @@
       </div>
       <div class="bp-controls">
         <div class="ctrl-section">
-          <div class="ctrl-section-title">AMORTIZATION: YR 1 VS YR <span class="dynamic-yr-label">10</span></div>
+          <div class="ctrl-section-title">AMORTIZATION: YEAR 1</div>
           <div class="net-section">
-            <div style="font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--text-muted);margin-bottom:5px">YEAR 1 (of annual P&amp;I payments)</div>
             <div class="net-row">
               <span>→ Principal paid</span>
               <span id="side-principal-yr1" style="font-weight:500;color:#16a34a">—</span>
@@ -643,7 +641,11 @@
               <span>→ Interest paid</span>
               <span id="side-interest-yr1" style="font-weight:500;color:var(--red)">—</span>
             </div>
-            <div style="font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--text-muted);margin:10px 0 5px">YEAR <span class="dynamic-yr-label">10</span> (of annual P&amp;I payments)</div>
+          </div>
+        </div>
+        <div class="ctrl-section">
+          <div class="ctrl-section-title">AMORTIZATION: YEAR <span class="dynamic-yr-label">10</span></div>
+          <div class="net-section">
             <div class="net-row">
               <span>→ Principal paid</span>
               <span id="side-principal-yr-last" style="font-weight:500;color:#16a34a">—</span>
@@ -671,29 +673,6 @@
           <div class="ctrl-section-title">BREAK-EVEN</div>
           <div style="font-size:22px;font-weight:700;color:var(--text);padding:4px 0" id="stat-break-even-2">—</div>
           <div style="font-size:11px;color:var(--text-muted)">Year home equity built surpasses invested capital</div>
-        </div>
-        <div class="ctrl-section">
-          <div class="ctrl-section-title">GROWTH RATES</div>
-          <div class="ctrl-row">
-            <div class="ctrl-info">
-              <div class="ctrl-icon growth-icon">↗</div>
-              <div><div class="ctrl-name">Home appreciation</div><div class="ctrl-sub">Annual</div></div>
-            </div>
-            <div class="ctrl-input">
-              <input type="number" id="homeGrowth2" tabindex="-1" readonly style="pointer-events:none;background:transparent">
-              <span class="ctrl-unit">%</span>
-            </div>
-          </div>
-          <div class="ctrl-row">
-            <div class="ctrl-info">
-              <div class="ctrl-icon growth-icon">↗</div>
-              <div><div class="ctrl-name">Opportunity cost</div><div class="ctrl-sub">Investment return</div></div>
-            </div>
-            <div class="ctrl-input">
-              <input type="number" id="opportunityCost2" tabindex="-1" readonly style="pointer-events:none;background:transparent">
-              <span class="ctrl-unit">%</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -865,7 +844,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="mortgage-rates.js?v=1"></script>
-<script src="rvb.js?v=16"></script>
+<script src="rvb.js?v=17"></script>
 <script>
   (function() {
     function bindCollapseToggle(hdrId, bodyId) {
@@ -903,33 +882,6 @@
     bindCollapseToggle('rentAssumptionsToggle', 'rentAssumptionsBody');
     bindCollapseToggle('taxBenefitsToggle', 'taxBenefitsBody');
   })();
-</script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Mirror read-only display values in side panel assumption rows
-    const mirrors = [
-      ['rentIncrease',   'rentIncrease2'],
-      ['propTaxGrowth',  'propTaxGrowth2'],
-      ['homeGrowth',     'homeGrowth2'],
-      ['opportunityCost','opportunityCost2'],
-    ];
-    function syncMirrors() {
-      mirrors.forEach(([src, dst]) => {
-        const s = document.getElementById(src);
-        const d = document.getElementById(dst);
-        if (s && d) d.value = s.value;
-      });
-    }
-    mirrors.forEach(([src]) => document.getElementById(src)?.addEventListener('input', syncMirrors));
-
-    // Exposed for rvb.js's populateFields(), which sets source field values
-    // programmatically (e.g. on Reset) without dispatching an 'input' event —
-    // without this hook, these read-only mirrors would keep showing their
-    // pre-reset values after Reset even though every real field updated.
-    window.syncMirrors = syncMirrors;
-
-    syncMirrors();
-  });
 </script>
 <script>
 /* ── Field tip tooltips ── */

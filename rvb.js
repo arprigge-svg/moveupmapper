@@ -369,11 +369,26 @@ function render(c, s) {
   // Chart 1 side panel
   setText('side-pi',               fmt(c.pi));
   setText('side-proptax',          fmt(c.propTaxMonthlyYr1));
-  setText('side-pmi-yr1',          c.pmiMonthlyYr1 > 0 ? fmt(c.pmiMonthlyYr1) : '—');
+  setText('side-pmi-yr1',          fmt(c.pmiMonthlyYr1));
   setText('side-maintenance-yr1',  fmt(c.maintenanceMonthlyYr1));
   setText('side-hoa-yr1',          fmt(c.hoaMonthlyYr1));
   setText('side-hoi-yr1',          fmt(c.hoiMonthlyYr1));
   setText('side-buytotal',         fmt(c.buyMonthlyCosts[0]));
+
+  // Rows that only add noise when there's nothing to show
+  const pmiRowEl = document.getElementById('side-pmi-yr1-row');
+  if (pmiRowEl) pmiRowEl.style.display = c.pmiMonthlyYr1 > 0 ? 'flex' : 'none';
+  const hoaRowEl = document.getElementById('side-hoa-yr1-row');
+  if (hoaRowEl) hoaRowEl.style.display = c.hoaMonthlyYr1 > 0 ? 'flex' : 'none';
+
+  // Year 1 rent breakdown
+  setText('side-rent-yr1',      fmt(s.rent));
+  setText('side-fees-yr1',      fmt(s.additionalFees));
+  setText('side-insurance-yr1', fmt(s.rentersInsurance));
+  setText('side-renttotal-yr1', fmt(c.rentMonthlyCosts[0]));
+  const feesRowEl = document.getElementById('side-fees-yr1-row');
+  if (feesRowEl) feesRowEl.style.display = s.additionalFees > 0 ? 'flex' : 'none';
+
   setText('side-totalrent',      fmt(c.totalRentPaid));
   setText('side-totalpi',        fmt(c.totalPIPaid));
   setText('side-total-principal', fmt(c.totalPrincipalPaid));
@@ -703,7 +718,6 @@ function populateFields() {
   syncHoiInput(state.hoiMode ?? 'dollar');
   syncPropTaxInput(state.propTaxMode ?? 'percent');
   syncMaintenanceInput(state.maintenanceMode ?? 'percent');
-  window.syncMirrors?.();
 }
 
 function bindInputs() {
