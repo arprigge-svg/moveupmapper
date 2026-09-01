@@ -578,6 +578,45 @@ label {
 .section-collapse-hdr[aria-expanded="true"] .collapse-chevron {
   transform: rotate(180deg);
 }
+.section-collapse-hdr[data-tooltip] { position: relative; }
+.section-collapse-hdr[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(240px, 80vw);
+  background: #1f2937;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.5;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+.section-collapse-hdr[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #1f2937;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+.section-collapse-hdr[data-tooltip]:hover::after,
+.section-collapse-hdr[data-tooltip]:hover::before { opacity: 1; }
 .section-collapse-body {
   transition: max-height 0.3s ease;
   padding-right: 4px;
