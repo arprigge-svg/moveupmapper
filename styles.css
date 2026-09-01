@@ -243,7 +243,7 @@ canvas { display: block; width: 100% !important; }
   color: white;
 }
 .icon-home     { background: var(--indigo); }
-.icon-building { background: var(--indigo-mid); }
+.icon-building { background: #0d9488; }
 .icon-light    { background: #eab308; color: #713f12; }
 .icon-chart    { background: #6366f1; color: white; }
 .icon-scale    { background: #0891b2; color: white; }
@@ -649,9 +649,24 @@ label {
 @media (max-width: 900px) {
   .card-body-spacer { display: none; }
 }
-/* Roomier input spacing on the swap page's two top tiles */
+/* Swap page only: don't stretch the two input cards to match each other's
+   height. With stretch (the .calc-grid default), expanding Selling Costs on
+   one tile taller than the other drags the sibling's Buying/Selling Costs
+   toggle down too, via card-body-spacer filling the stretched space — even
+   though that tile's own content didn't change. Sizing each card to its own
+   content keeps each toggle pinned directly under its own tile's fields. */
+.swap-input-grid { align-items: start; }
+/* Roomier input spacing on the swap page's two top tiles. The direct-child
+   selector can't reach fields nested inside a wrapper div (owner/first-time
+   toggle, collapsible sections), so each wrapper's id is listed explicitly —
+   add any new one here or its fields silently fall back to 16px and the
+   two tiles drift out of alignment. */
 .swap-tile-body > .field,
+#homeOwnerFields > .field,
 #loanDetailsFields > .field,
+#financialDetailsBody > .field,
+#sellCostsBody > .field,
+#housingCostsBody > .field,
 #buyCostsBody > .field {
   margin-bottom: 24px;
 }
@@ -661,6 +676,15 @@ label {
   align-items: stretch;
 }
 #loanDetailsFields { margin-bottom: 24px; }
+/* Financial Details and Monthly Costs each sit directly under a plain field
+   (no room-taking collapsible body above them, unlike Selling/Buying Costs'
+   siblings), so the default .mt-sm reads as more space above than below —
+   set both to match Selling/Buying Costs' own (also overridden below) top
+   margin, keeping all four gaps in both tiles equal. */
+#financialDetailsToggle { margin-top: 0; }
+#housingCostsToggle { margin-top: 0; }
+#sellCostsToggle,
+#buyCostsToggle { margin-top: 24px; }
 
 .swap-results-card {
   margin-top: 16px;

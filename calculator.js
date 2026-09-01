@@ -27,11 +27,13 @@ const DEFAULTS = {
   interestRate:   6.875,   // updated at runtime by fetchMortgageRate()
   prospectiveTerm: 30,
   monthlyPMI:     336,
+  monthlyPMIManual: false,
   currentHOA:     0,
   newHOA:         0,
   taxMode:        'dollar',   // 'percent' | 'dollar'
   propertyTaxDollar:  7000,
   propertyTaxPercent: 1.0,
+  propertyTaxManual: false,   // true once the user types a $ value directly
   // Selling costs
   realtorFee:      5,
   transferTaxPct:  0,
@@ -59,13 +61,17 @@ const DEFAULTS = {
   inflationRate:   3,
   maintenanceGrowth: 2,
   // Target price assumption
-  targetPriceMode:   'fixed',   // 'fixed' | 'rising'
+  targetPriceMode:   'rising',   // 'fixed' | 'rising'
   targetPriceGrowth: 3,
   // Recurring ownership costs
   homeownersInsurance: 150,
+  homeownersInsuranceManual: false,
   hoiMode:             'dollar',
   hoiPct:              0.4,
-  maintenanceRate:    1.0,   // % of purchase price per year
+  maintenanceMode:     'percent',   // 'percent' | 'dollar'
+  maintenanceRate:     0.5,   // % of purchase price per year
+  maintenanceDollar:   3500,  // $ per year
+  maintenanceManual:   false,
 };
 
 /* ── State ── */
@@ -78,6 +84,12 @@ let activeScenario = 'a';
 // keystroke after a few tab switches fired setState()/recalcAndRender()
 // once per accumulated listener.
 let listenersBound = false;
+
+// Tracks which buyerMode the Financial Details auto-expand/collapse last
+// reacted to — syncBuyerMode() runs on every render (any input edit), so
+// without this it would fight a user who manually toggled the section
+// open/closed while staying in the same mode.
+let lastSyncedBuyerMode = null;
 
 // Chart display preference, not a real input — shared across scenario tabs,
 // not persisted/shared via URL. Annual cost burden defaults to hidden since
@@ -178,6 +190,11 @@ function calcAnnualPropertyTax(s, price) {
   return s.propertyTaxDollar;
 }
 
+function calcAnnualMaintenance(s, price) {
+  if (s.maintenanceMode === 'dollar') return s.maintenanceDollar;
+  return price * s.maintenanceRate / 100;
+}
+
 function calcAffordablePrice(s, targetMonthly, dpPool, hoiMonthly, hoaMonthly) {
   const K = mortgageFactor(s.interestRate, (s.prospectiveTerm || 30) * 12);
   const dp = Math.max(0, dpPool);
@@ -186,15 +203,16 @@ function calcAffordablePrice(s, targetMonthly, dpPool, hoiMonthly, hoaMonthly) {
   // HOI and HOA are fixed monthly costs independent of price — deduct before solving
   const budget = Math.max(0, targetMonthly - hoi - hoa);
 
-  // Max price affordable at a given P&I+tax budget (PMI excluded)
+  // Max price affordable at a given P&I+tax+maintenance budget (PMI excluded).
+  // Percent-mode tax/maintenance scale with the price being solved for, so
+  // they fold into the rate; dollar-mode costs are price-independent, so
+  // they're subtracted up front alongside HOI/HOA.
   const priceForBudget = (b) => {
-    if (s.taxMode === 'percent') {
-      const taxMonthly = s.propertyTaxPercent / 100 / 12;
-      return Math.max(0, (b + dp * K) / (K + taxMonthly));
-    }
-    const fixedTaxMonthly = s.propertyTaxDollar / 12;
-    const loanPayment = b - fixedTaxMonthly;
-    return loanPayment > 0 ? dp + loanPayment / K : dp;
+    const taxRate    = s.taxMode === 'percent' ? s.propertyTaxPercent / 100 / 12 : 0;
+    const maintRate  = s.maintenanceMode === 'percent' ? s.maintenanceRate / 100 / 12 : 0;
+    const fixedCosts = (s.taxMode === 'dollar' ? s.propertyTaxDollar / 12 : 0)
+                     + (s.maintenanceMode === 'dollar' ? s.maintenanceDollar / 12 : 0);
+    return Math.max(0, (b - fixedCosts + dp * K) / (K + taxRate + maintRate));
   };
 
   const priceNoPMI = priceForBudget(budget);
@@ -229,6 +247,8 @@ function calculate(s) {
   const annualTax = calcAnnualPropertyTax(s, s.purchasePrice);
   const taxMonthly = annualTax / 12;
   const hoiMonthly = s.hoiMode === 'percent' ? s.purchasePrice * s.hoiPct / 100 / 12 : s.homeownersInsurance;
+  const annualMaintenance = calcAnnualMaintenance(s, s.purchasePrice);
+  const maintenanceMonthly = annualMaintenance / 12;
   const autoEscrow = s.purchasePrice > 0 ? Math.round((taxMonthly + hoiMonthly) * 3) : 0;
   const effectiveEscrow = s.prePaidEscrowManual ? s.prePaidEscrow : autoEscrow;
   const buyerTransferTax = s.purchasePrice * (s.buyerTransferTaxPct / 100);
@@ -248,7 +268,7 @@ function calculate(s) {
   const loan = Math.max(0, s.purchasePrice - downPayment);
   const mortgagePI = loan * K;
   const pmi = dpPct < 0.20 ? s.monthlyPMI : 0;
-  const totalMonthly = mortgagePI + taxMonthly + pmi + hoiMonthly + s.newHOA;
+  const totalMonthly = mortgagePI + taxMonthly + pmi + hoiMonthly + s.newHOA + maintenanceMonthly;
   const ratio = s.monthlyIncome > 0 ? totalMonthly / s.monthlyIncome : 0;
   const monthlyRemaining = s.monthlyIncome - totalMonthly;
 
@@ -260,6 +280,7 @@ function calculate(s) {
 
   // Property tax helper text
   const taxPctOfPrice = s.purchasePrice > 0 ? annualTax / s.purchasePrice * 100 : 0;
+  const maintenancePctOfPrice = s.purchasePrice > 0 ? annualMaintenance / s.purchasePrice * 100 : 0;
 
   // Buying power over 10 years
   // Amortization-based equity: active when loan balance mode + rate + term are filled
@@ -305,7 +326,7 @@ function calculate(s) {
     const comfort_t = calcAffordablePrice(s, income_t * 0.28, dpPool_t, hoi_t, hoa_t);
     const ceiling_t = calcAffordablePrice(s, income_t * 0.36, dpPool_t, hoi_t, hoa_t);
     const annualTax_t   = annualTax * Math.pow(1 + effPropTaxGrowth / 100, t);
-    const annualMaint_t = s.purchasePrice * (s.maintenanceRate / 100) * Math.pow(1 + effMaintenanceGrowth / 100, t);
+    const annualMaint_t = annualMaintenance * Math.pow(1 + effMaintenanceGrowth / 100, t);
     const costBurden_t  = annualTax_t + annualMaint_t + hoi_t * 12;
     const targetPrice_t = s.targetPriceMode === 'rising'
       ? s.purchasePrice * Math.pow(1 + s.targetPriceGrowth / 100, t)
@@ -329,8 +350,8 @@ function calculate(s) {
 
   return {
     equity, realtorFees, transferTax, sellingCosts, saleProceeds, totalCash, buyingCosts, downPayment, cashRemaining,
-    dpPct, loan, mortgagePI, annualTax, taxMonthly, pmi, hoiMonthly, totalMonthly, ratio, monthlyRemaining,
-    K, dpPool, taxPctOfPrice,
+    dpPct, loan, mortgagePI, annualTax, taxMonthly, pmi, hoiMonthly, annualMaintenance, maintenanceMonthly, totalMonthly, ratio, monthlyRemaining,
+    K, dpPool, taxPctOfPrice, maintenancePctOfPrice,
     targetMonthly, ceilingMonthly, targetPrice, ceilingPrice,
     bpData, avgGrowth, avgHeadwind, netRate,
     autoEscrow, effectiveEscrow,
@@ -520,8 +541,10 @@ function render(c, s) {
   crEl.className = c.cashRemaining > 0 ? 'green' : c.cashRemaining < 0 ? 'red' : '';
 
   // Section cost hints
+  setText('financialDetailsSummary', fmt(s.expendableCash));
   setText('sellCostsSummary', s.buyerMode === 'firstTime' ? '' : '≈ ' + fmt(c.sellingCosts));
   setText('buyCostsSummary', '≈ ' + fmt(c.buyingCosts));
+  setText('housingCostsSummary', '≈ ' + fmt(c.pmi + c.hoiMonthly + c.taxMonthly + s.newHOA + c.maintenanceMonthly) + '/mo');
 
   // Monthly Costs
   setText('r-mortgageLabel', 'Mortgage (P&I on ' + fmt(c.loan) + ')');
@@ -540,6 +563,7 @@ function render(c, s) {
     }
   }
   setText('r-hoi', fmt(c.hoiMonthly));
+  setText('r-maintenance', fmt(c.maintenanceMonthly));
 
   // HOA row
   const hoaRow = $('r-hoaRow');
@@ -606,6 +630,13 @@ function render(c, s) {
     setText('taxHelper', '≈' + fmt(c.annualTax) + '/yr on this purchase price');
   }
 
+  // Maintenance helper
+  if (s.maintenanceMode === 'dollar') {
+    setText('maintenanceHelper', '≈' + fmtPct(c.maintenancePctOfPrice) + ' of purchase price');
+  } else {
+    setText('maintenanceHelper', '≈' + fmt(c.annualMaintenance) + '/yr on this purchase price');
+  }
+
   // Equity/loan balance toggle + loan detail fields visibility
   const equityHelper = $('equityHelper');
   const loanFields   = $('loanDetailsFields');
@@ -668,9 +699,12 @@ function render(c, s) {
   netEl.textContent = (c.netRate >= 0 ? '+' : '') + fmtPct(c.netRate);
   netEl.style.color = c.netRate >= 0 ? 'var(--green)' : 'var(--red)';
 
+  const maintDesc = s.maintenanceMode === 'dollar'
+    ? fmt(s.maintenanceDollar) + '/yr'
+    : fmtPct(s.maintenanceRate) + ' of prospective home price/yr';
   setText('bp-footnote',
     '* Interest rate held constant at ' + fmtPct(s.interestRate) +
-    '. Maintenance estimated at ' + fmtPct(s.maintenanceRate) + ' of prospective home price/yr. ' +
+    '. Maintenance estimated at ' + maintDesc + '. ' +
     'Annual cost burden includes property taxes, maintenance, and homeowners insurance. ' +
     'Homeowners insurance and buying costs (lender fees, title/escrow, repairs, pre-paid escrow, moving) inflate at the Inflation Rate each year. ' +
     'Selling costs (agent commission, transfer tax) scale with projected home value; pre-sale repairs and seller title fees inflate at the Inflation Rate. ' +
@@ -754,19 +788,41 @@ function syncBuyerMode(mode) {
   const currentHOAField = $('currentHOAField');
   if (currentHOAField) currentHOAField.style.display = isFirst ? 'none' : '';
 
+  // First-time buyers land on a card with nothing else visible but the
+  // note above — auto-open Financial Details so the inputs that matter
+  // (savings, income) aren't hidden behind an extra click. Switching back
+  // to Owner reverses it, restoring the default collapsed view. Only acts
+  // on an actual mode change, not every render, so it doesn't fight a
+  // manual toggle made while staying in the same mode.
+  if (mode !== lastSyncedBuyerMode) {
+    const fdToggle = $('financialDetailsToggle');
+    if (fdToggle) {
+      const isOpen = fdToggle.getAttribute('aria-expanded') === 'true';
+      if (isFirst && !isOpen) fdToggle.click();
+      else if (!isFirst && isOpen) fdToggle.click();
+    }
+    lastSyncedBuyerMode = mode;
+  }
+
   setText('currentHomeTitle', isFirst ? 'Your Financial Profile'            : 'Your Current Home');
   setText('currentHomeSub',   isFirst ? 'No current home — first-time buyer' : 'What you\'re working with today');
   if (cashLabel)  cashLabel.textContent  = isFirst ? 'AVAILABLE SAVINGS'                        : 'EXPENDABLE CASH';
   if (cashHelper) cashHelper.textContent = isFirst ? 'Total savings available for a down payment' : 'Savings you can put toward the purchase';
 
-  // Grey out / restore the growth-rate inputs that only apply to current homeowners
+  // Grey out / restore the growth-rate inputs that only apply to current
+  // homeowners. syncBuyerMode() runs on every render (any field's input
+  // event), so only touch .value on an actual disabled-state transition —
+  // otherwise this stomps on partially-typed decimals (e.g. "3." gets
+  // reset to "3" mid-keystroke, blocking anything past the decimal point).
   const ownerOnlyInputs = ['homeValGrowth'];
   const s = getState();
   for (const id of ownerOnlyInputs) {
     const el = $(id);
     if (!el) continue;
+    if (el.disabled !== isFirst) {
+      el.value = isFirst ? 0 : s[id];
+    }
     el.disabled = isFirst;
-    el.value    = isFirst ? 0 : (s ? s[id] : el.value);
   }
 }
 
@@ -809,7 +865,11 @@ function bindInputs() {
 
   // Current home
   num('homeValuation');
-  num('mortgageTerm');
+  const mtermSel = $('mortgageTerm');
+  if (mtermSel) {
+    mtermSel.value = s.mortgageTerm || 30;
+    if (!listenersBound) mtermSel.addEventListener('change', () => setState({ mortgageTerm: parseInt(mtermSel.value) }));
+  }
   num('termRemainder');
   num('currentMortgageRate');
   num('expendableCash');
@@ -820,7 +880,43 @@ function bindInputs() {
   if (!listenersBound) evEl.addEventListener('input', () => setState({ equityValue: parseFloat(evEl.value) || 0 }));
 
   // Prospective home
-  num('purchasePrice');
+  const priceEl = $('purchasePrice');
+  if (priceEl) {
+    priceEl.value = s.purchasePrice;
+    if (!listenersBound) priceEl.addEventListener('input', () => {
+      const newPrice = parseFloat(priceEl.value) || 0;
+      const cur = getState();
+      const patch = { purchasePrice: newPrice };
+
+      // Dollar-mode costs default to tracking price at their last-known rate
+      // until the user types a real number directly — mirrors the
+      // prepaidsManual/prePaidEscrowManual pattern used for buying costs.
+      if (cur.taxMode === 'dollar' && !cur.propertyTaxManual) {
+        patch.propertyTaxDollar = Math.round(newPrice * cur.propertyTaxPercent / 100);
+      }
+      if (cur.hoiMode === 'dollar' && !cur.homeownersInsuranceManual) {
+        patch.homeownersInsurance = Math.round(newPrice * cur.hoiPct / 100 / 12);
+      }
+      if (cur.maintenanceMode === 'dollar' && !cur.maintenanceManual) {
+        patch.maintenanceDollar = Math.round(newPrice * cur.maintenanceRate / 100);
+      }
+      if (!cur.monthlyPMIManual) {
+        const projected = calculate({ ...cur, ...patch });
+        if (projected.loan > 0 && projected.dpPct < 0.20) {
+          patch.monthlyPMI = Math.round(projected.loan * 0.007 / 12);
+        }
+      }
+
+      setState(patch);
+
+      // render() doesn't touch these inputs' own .value — update them here
+      // so the recomputed numbers are actually visible, not just applied.
+      if (patch.propertyTaxDollar !== undefined) { const el = $('propertyTax'); if (el) el.value = patch.propertyTaxDollar; }
+      if (patch.homeownersInsurance !== undefined) { const el = $('homeownersInsurance'); if (el) el.value = patch.homeownersInsurance; }
+      if (patch.maintenanceDollar !== undefined) { const el = $('homeMaintenance'); if (el) el.value = patch.maintenanceDollar; }
+      if (patch.monthlyPMI !== undefined) { const el = $('monthlyPMI'); if (el) el.value = patch.monthlyPMI; }
+    });
+  }
   num('interestRate');
 
   const ptermSel = $('prospectiveTerm');
@@ -828,7 +924,13 @@ function bindInputs() {
     ptermSel.value = s.prospectiveTerm || 30;
     if (!listenersBound) ptermSel.addEventListener('change', () => setState({ prospectiveTerm: parseInt(ptermSel.value) }));
   }
-  num('monthlyPMI');
+  const pmiEl = $('monthlyPMI');
+  if (pmiEl) {
+    pmiEl.value = s.monthlyPMI;
+    if (!listenersBound) pmiEl.addEventListener('input', () => {
+      setState({ monthlyPMI: parseFloat(pmiEl.value) || 0, monthlyPMIManual: true });
+    });
+  }
   num('currentHOA');
   num('newHOA');
   const hoiEl = $('homeownersInsurance');
@@ -839,7 +941,7 @@ function bindInputs() {
       if (getState().hoiMode === 'percent') {
         setState({ hoiPct: v });
       } else {
-        setState({ homeownersInsurance: v });
+        setState({ homeownersInsurance: v, homeownersInsuranceManual: true });
       }
     });
   }
@@ -871,9 +973,19 @@ function bindInputs() {
   ptEl.value = s.taxMode === 'dollar' ? s.propertyTaxDollar : s.propertyTaxPercent;
   if (!listenersBound) ptEl.addEventListener('input', () => {
     const v = parseFloat(ptEl.value) || 0;
-    if (getState().taxMode === 'dollar') setState({ propertyTaxDollar: v });
+    if (getState().taxMode === 'dollar') setState({ propertyTaxDollar: v, propertyTaxManual: true });
     else setState({ propertyTaxPercent: v });
   });
+
+  const maintEl = $('homeMaintenance');
+  if (maintEl) {
+    maintEl.value = s.maintenanceMode === 'dollar' ? s.maintenanceDollar : s.maintenanceRate;
+    if (!listenersBound) maintEl.addEventListener('input', () => {
+      const v = parseFloat(maintEl.value) || 0;
+      if (getState().maintenanceMode === 'dollar') setState({ maintenanceDollar: v, maintenanceManual: true });
+      else setState({ maintenanceRate: v });
+    });
+  }
 
   // Growth rates
   function numCtrl(id, key) {
@@ -890,7 +1002,6 @@ function bindInputs() {
   numCtrl('propTaxGrowth',       'propTaxGrowth');
   numCtrl('inflationRate',       'inflationRate');
   numCtrl('maintenanceGrowth',   'maintenanceGrowth');
-  numCtrl('maintenanceRate',     'maintenanceRate');
   numCtrl('targetPriceGrowth',   'targetPriceGrowth');
 
   // Slider (input only — click handlers bound once in init)
@@ -901,6 +1012,37 @@ function bindInputs() {
   });
 
   listenersBound = true;
+}
+
+// Loan Balance mode adds three extra fields to the Current Home card, and
+// First-Time Buyer mode strips it down to just a note + Financial Details —
+// both make the two cards noticeably mismatched in height. They otherwise
+// size independently (so expanding Selling/Buying Costs on one doesn't drag
+// the other's toggle down) — this pins whichever card is shorter to match
+// the other specifically when one of those two toggles fires, by measuring
+// at that moment rather than on every render.
+function syncProspectiveHeight() {
+  const leftCard = $('homeValuation')?.closest('.card');
+  const rightCard = $('purchasePrice')?.closest('.card');
+  if (!leftCard || !rightCard) return;
+  // Cards stack in a single column below 901px, so matching heights would
+  // just add dead space under the shorter tile's content.
+  if (window.innerWidth <= 900) {
+    leftCard.style.minHeight = '';
+    rightCard.style.minHeight = '';
+    return;
+  }
+  // Clear first so the measurement below reflects natural content height,
+  // not a min-height left over from the previous toggle state.
+  leftCard.style.minHeight = '';
+  rightCard.style.minHeight = '';
+  const leftH = leftCard.getBoundingClientRect().height;
+  const rightH = rightCard.getBoundingClientRect().height;
+  if (leftH > rightH) {
+    rightCard.style.minHeight = leftH + 'px';
+  } else if (rightH > leftH) {
+    leftCard.style.minHeight = rightH + 'px';
+  }
 }
 
 function syncTaxInput(mode) {
@@ -936,6 +1078,24 @@ function syncHoiInput(mode) {
   $('hoiModePct')?.classList.toggle('active', mode === 'percent');
 }
 
+function syncMaintenanceInput(mode) {
+  const s = getState();
+  const el = $('homeMaintenance');
+  const prefix = $('maintenancePrefix');
+  if (!el) return;
+  if (mode === 'percent') {
+    if (prefix) prefix.style.display = 'none';
+    el.step = '0.1';
+    el.value = s.maintenanceRate;
+  } else {
+    if (prefix) prefix.style.display = '';
+    el.step = '100';
+    el.value = s.maintenanceDollar;
+  }
+  $('maintenanceModeDollar')?.classList.toggle('active', mode === 'dollar');
+  $('maintenanceModePercent')?.classList.toggle('active', mode === 'percent');
+}
+
 /* ── Scenario switching ── */
 function switchScenario(to) {
   activeScenario = to;
@@ -950,7 +1110,9 @@ function switchScenario(to) {
   bindInputs();
   syncTaxInput(getState().taxMode);
   syncHoiInput(getState().hoiMode || 'dollar');
+  syncMaintenanceInput(getState().maintenanceMode || 'percent');
   recalcAndRender();
+  syncProspectiveHeight();
 }
 
 /* ── Live mortgage rate ── */
@@ -1014,6 +1176,24 @@ function init() {
 
   fetchMortgageRate();
 
+  // Re-check the desktop/mobile breakpoint used by syncProspectiveHeight()
+  // if the window is resized across it while Loan Balance mode is active.
+  window.addEventListener('resize', syncProspectiveHeight);
+
+  // Today's-avg rate hint also syncs the Prospective Home loan term when
+  // the term it implies differs — the current home's own loan is a past
+  // decision the rate hint has no bearing on, so it's excluded.
+  document.querySelectorAll('.rate-hint-value[data-mortgage-rate]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const term = parseInt(btn.getAttribute('data-mortgage-rate'), 10);
+      const termEl = $('prospectiveTerm');
+      if (termEl && parseInt(termEl.value, 10) !== term) {
+        termEl.value = term;
+        termEl.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  });
+
   // Scenario tab clicks
   document.querySelectorAll('.scenario-tab').forEach(btn => {
     btn.addEventListener('click', () => switchScenario(btn.dataset.scenario));
@@ -1040,8 +1220,18 @@ function init() {
   });
 
   // Buyer mode toggle (bound once)
-  $('buyerModeOwner').addEventListener('click', () => setState({ buyerMode: 'owner' }));
-  $('buyerModeFirst').addEventListener('click', () => setState({ buyerMode: 'firstTime' }));
+  $('buyerModeOwner').addEventListener('click', () => {
+    setState({ buyerMode: 'owner' });
+    syncProspectiveHeight();
+    // Financial Details may be auto-collapsing (0.3s transition) as a side
+    // effect — re-measure once it settles so the height match is accurate.
+    setTimeout(syncProspectiveHeight, 320);
+  });
+  $('buyerModeFirst').addEventListener('click', () => {
+    setState({ buyerMode: 'firstTime' });
+    syncProspectiveHeight();
+    setTimeout(syncProspectiveHeight, 320);
+  });
 
   // Target price mode toggle (bound once)
   $('tpModeFixed').addEventListener('click', () => {
@@ -1066,6 +1256,7 @@ function init() {
     setState({ equityMode: 'equity', equityValue: Math.max(0, cur.homeValuation - cur.equityValue) });
     const evEl = $('equityValue');
     if (evEl) evEl.value = getState().equityValue;
+    syncProspectiveHeight();
   });
   $('equityModeLoan').addEventListener('click', () => {
     const cur = getState();
@@ -1073,6 +1264,7 @@ function init() {
     setState({ equityMode: 'loanBalance', equityValue: Math.max(0, cur.homeValuation - cur.equityValue) });
     const evEl = $('equityValue');
     if (evEl) evEl.value = getState().equityValue;
+    syncProspectiveHeight();
   });
 
   // Annual cost burden chart line (bound once — view preference, not real input)
@@ -1094,7 +1286,7 @@ function init() {
     const cur = getState();
     if (cur.taxMode !== 'dollar') {
       const dol = cur.purchasePrice * cur.propertyTaxPercent / 100;
-      setState({ taxMode: 'dollar', propertyTaxDollar: Math.round(dol) });
+      setState({ taxMode: 'dollar', propertyTaxDollar: Math.round(dol), propertyTaxManual: false });
       syncTaxInput('dollar');
     }
   });
@@ -1103,7 +1295,7 @@ function init() {
   $('hoiModeDollar')?.addEventListener('click', () => {
     const cur = getState();
     if (cur.hoiMode === 'dollar') return;
-    setState({ hoiMode: 'dollar' });
+    setState({ hoiMode: 'dollar', homeownersInsuranceManual: false });
     syncHoiInput('dollar');
   });
   $('hoiModePct')?.addEventListener('click', () => {
@@ -1114,6 +1306,24 @@ function init() {
       : 0.4;
     setState({ hoiMode: 'percent', hoiPct: pct });
     syncHoiInput('percent');
+  });
+
+  // Maintenance mode toggle (bound once)
+  $('maintenanceModeDollar')?.addEventListener('click', () => {
+    const cur = getState();
+    if (cur.maintenanceMode === 'dollar') return;
+    const dol = Math.round(cur.purchasePrice * cur.maintenanceRate / 100);
+    setState({ maintenanceMode: 'dollar', maintenanceDollar: dol, maintenanceManual: false });
+    syncMaintenanceInput('dollar');
+  });
+  $('maintenanceModePercent')?.addEventListener('click', () => {
+    const cur = getState();
+    if (cur.maintenanceMode === 'percent') return;
+    const pct = cur.purchasePrice > 0
+      ? parseFloat((cur.maintenanceDollar / cur.purchasePrice * 100).toFixed(2))
+      : 1.0;
+    setState({ maintenanceMode: 'percent', maintenanceRate: pct });
+    syncMaintenanceInput('percent');
   });
 
   // Fill estimates
