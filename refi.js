@@ -146,9 +146,7 @@ function renderChart(r) {
   }
 
   const stayIdx = unknown ? -1 : Math.round(state.stayYears * 12);
-  const stayLineData = stayIdx >= 0 && stayIdx < labels.length
-    ? labels.map(function(_, i) { return i === stayIdx ? Math.max(...savingsData, r.outOfPocket) * 1.1 : null; })
-    : labels.map(function() { return null; });
+  const showStayLine = stayIdx >= 0 && stayIdx < labels.length;
 
   if (refiChart) { refiChart.destroy(); refiChart = null; }
 
@@ -177,16 +175,6 @@ function renderChart(r) {
           fill: false,
           tension: 0,
         },
-        {
-          label: 'Your stay horizon',
-          data: stayLineData,
-          borderColor: '#818cf8',
-          borderDash: [3, 3],
-          borderWidth: 1.5,
-          pointRadius: 0,
-          showLine: false,
-          fill: false,
-        },
       ],
     },
     options: {
@@ -203,11 +191,22 @@ function renderChart(r) {
         tooltip: {
           callbacks: {
             label: function(ctx) {
-              if (ctx.datasetIndex === 2) return null;
               const v = ctx.parsed.y;
               return ctx.dataset.label + ': ' + (v >= 0 ? '$' : '-$') + Math.abs(Math.round(v)).toLocaleString();
             },
           },
+        },
+        annotation: {
+          annotations: showStayLine ? {
+            stayLine: {
+              type: 'line',
+              xMin: stayIdx,
+              xMax: stayIdx,
+              borderColor: '#818cf8',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+            },
+          } : {},
         },
       },
       scales: {
@@ -729,6 +728,17 @@ document.addEventListener('DOMContentLoaded', function () {
       setVal('newTermYears', parseInt(termSel.value));
     });
   }
+
+  // Rate-hint buttons ("Today's avg" in header) sync both the rate and term fields
+  document.querySelectorAll('.rate-hint-value[data-mortgage-rate]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const term = parseInt(btn.getAttribute('data-mortgage-rate'), 10);
+      if (termSel && parseInt(termSel.value, 10) !== term) {
+        termSel.value = term;
+        termSel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  });
 
   // Stay horizon slider
   const slider = document.getElementById('staySlider');

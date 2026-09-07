@@ -725,6 +725,20 @@ label {
 #sellCostsToggle,
 #buyCostsToggle { margin-top: 24px; }
 
+/* Roomier input spacing on the refi page's two top tiles, matching swap/rvb. */
+.refi-tile-body > .field,
+.refi-tile-body > .two-col,
+#advBody > .field,
+#advBody > .two-col {
+  margin-bottom: 24px;
+}
+.refi-tile-body > .field:last-child,
+.refi-tile-body > .two-col:last-child,
+#advBody > .field:last-child,
+#advBody > .two-col:last-child {
+  margin-bottom: 0;
+}
+
 .swap-results-card {
   margin-top: 16px;
 }
@@ -1769,22 +1783,34 @@ details[open] > .faq-q::after {
   background: var(--border);
   flex-shrink: 0;
 }
-.compound-contrib-row {
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
-  flex-wrap: wrap;
+.contrib-freq-select {
+  align-self: stretch;
+  flex-shrink: 0;
+  border: none;
+  border-left: 1.5px solid var(--border);
+  background: var(--gray-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 8px center;
+  padding: 0 22px 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 }
-.compound-contrib-input {
-  flex: 0 0 calc((100% - 10px) / 2);
-  max-width: calc((100% - 10px) / 2);
+.contrib-freq-select:focus { outline: none; }
+
+/* Roomier input spacing on the compound page's three top tiles and the
+   withdrawal phase fields, matching refi/swap/rvb. */
+.compound-tile-body > .field,
+.compound-tile-body > .two-col,
+#withdrawalFields > .field {
+  margin-bottom: 24px;
 }
-.compound-contrib-freq {
-  flex: 1 1 auto;
-  display: flex;
-}
-.compound-contrib-freq .mode-btn {
-  flex: 1;
+.compound-tile-body > .field:last-child,
+.compound-tile-body > .two-col:last-child,
+#withdrawalFields > .field:last-child {
+  margin-bottom: 0;
 }
 
 /* Advanced collapsible section (compound page) */
@@ -1809,6 +1835,8 @@ details[open] > .faq-q::after {
 .adv-toggle.wd-disabled { cursor: default; }
 .adv-toggle.wd-disabled .adv-chevron { opacity: .35; }
 details.adv-section[open] > summary .adv-chevron { transform: rotate(180deg); }
+#withdrawalSummary.wd-disabled { cursor: default; }
+#withdrawalSummary.wd-disabled .adv-chevron { opacity: .35; }
 
 /* Scenario visibility toggles (chart) */
 .scenario-toggle {
@@ -2249,9 +2277,6 @@ details.adv-section[open] > summary .adv-chevron { transform: rotate(180deg); }
 
   /* Toggle buttons — slightly taller touch target */
   .mode-btn { padding: 5px 10px; }
-
-  /* Compound contribution frequency toggle — 5 buttons is tight at this width */
-  .compound-contrib-freq .mode-btn { padding: 5px 7px; font-size: 11px; }
 
   /* Larger slider thumb for touch accuracy */
   input[type=range]::-webkit-slider-thumb { width: 26px; height: 26px; margin-top: -10px; }

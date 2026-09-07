@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=96">
+  <link rel="stylesheet" href="styles.css?v=101">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -98,6 +98,10 @@
     <div>
       <h1>Refinance Break-Even Calculator</h1>
       <p class="header-sub">Find out if refinancing your mortgage makes financial sense</p>
+      <div class="rate-hint" data-mortgage-rate-widget style="display:none;margin-top:4px" title="Freddie Mac PMMS, via FRED">
+        Today's avg: <button type="button" class="rate-hint-value" data-mortgage-rate="30" data-fill-target="newRate">—</button> 30-yr
+        · <button type="button" class="rate-hint-value" data-mortgage-rate="15" data-fill-target="newRate">—</button> 15-yr
+      </div>
     </div>
     <div class="header-actions" style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-shrink:0">
       <button class="btn-text" id="resetBtn">Reset</button>
@@ -142,9 +146,9 @@
           <div class="card-sub">Your existing mortgage details</div>
         </div>
       </div>
-      <div class="card-body">
+      <div class="card-body refi-tile-body">
 
-        <div class="field">
+        <div class="field" style="margin-bottom:47px">
           <label>REMAINING LOAN BALANCE</label>
           <div class="input-wrap prefix">
             <span class="affix">$</span>
@@ -203,7 +207,7 @@
           <div class="card-sub">Proposed refinance terms</div>
         </div>
       </div>
-      <div class="card-body">
+      <div class="card-body refi-tile-body">
 
         <div class="two-col">
           <div class="field">
@@ -219,10 +223,6 @@
             </div>
             <div class="helper">Use the interest rate, not APR</div>
             <div class="helper" id="effectiveRateNote" style="display:none;color:var(--green);font-weight:500">Effective rate after points: <span id="effectiveRateVal"></span></div>
-            <div class="rate-hint" data-mortgage-rate-widget style="display:none" title="Freddie Mac PMMS, via FRED">
-              Today's avg: <button type="button" class="rate-hint-value" data-mortgage-rate="30" data-fill-target="newRate">—</button> 30-yr
-              · <button type="button" class="rate-hint-value" data-mortgage-rate="15" data-fill-target="newRate">—</button> 15-yr
-            </div>
           </div>
           <div class="field">
             <label>NEW LOAN TERM</label>
@@ -235,25 +235,6 @@
                 <option value="30" selected>30 years</option>
               </select>
             </div>
-          </div>
-        </div>
-
-        <div class="two-col">
-          <div class="field">
-            <div class="label-tip-row"><label>DISCOUNT POINTS</label><button class="tip-btn" aria-label="Learn more" data-tip="Discount points are an upfront fee paid to the lender to buy down your interest rate. 1 point = 1% of your loan balance. Enter the number of points your lender is quoting alongside the rate reduction per point — the calculator will apply the rate reduction and add the cost to your upfront expenses.">?</button></div>
-            <div class="input-wrap suffix">
-              <input type="number" id="points" min="0" max="4" step="0.25" value="0">
-              <span class="affix">pts</span>
-            </div>
-            <div class="helper" id="pointsCostDisplay">Each point = 1% of loan balance; rate reduction per point set above</div>
-          </div>
-          <div class="field">
-            <div class="label-tip-row"><label>RATE REDUCTION / POINT</label><button class="tip-btn" aria-label="Learn more" data-tip="How much your interest rate drops for each discount point paid. The common rule of thumb is 0.25% per point, but the actual reduction varies by lender, loan type, and market conditions. Ask your lender for a rate sheet showing options with and without points.">?</button></div>
-            <div class="input-wrap suffix">
-              <input type="number" id="pointsReduction" min="0.15" max="0.35" step="0.01" placeholder="0.25">
-              <span class="affix">%</span>
-            </div>
-            <div class="helper">Rate drop per point; ask your lender for their rate sheet</div>
           </div>
         </div>
 
@@ -312,8 +293,26 @@
         </button>
 
         <div class="section-collapse-body" id="advBody" style="max-height:0;overflow:hidden">
+          <div class="two-col">
+            <div class="field">
+              <div class="label-tip-row"><label>DISCOUNT POINTS</label><button class="tip-btn" aria-label="Learn more" data-tip="Discount points are an upfront fee paid to the lender to buy down your interest rate. 1 point = 1% of your loan balance. Enter the number of points your lender is quoting alongside the rate reduction per point — the calculator will apply the rate reduction and add the cost to your upfront expenses.">?</button></div>
+              <div class="input-wrap suffix">
+                <input type="number" id="points" min="0" max="4" step="0.25" value="0">
+                <span class="affix">pts</span>
+              </div>
+              <div class="helper" id="pointsCostDisplay">Each point = 1% of loan balance; rate reduction per point set above</div>
+            </div>
+            <div class="field">
+              <div class="label-tip-row"><label>RATE REDUCTION / POINT</label><button class="tip-btn" aria-label="Learn more" data-tip="How much your interest rate drops for each discount point paid. The common rule of thumb is 0.25% per point, but the actual reduction varies by lender, loan type, and market conditions. Ask your lender for a rate sheet showing options with and without points.">?</button></div>
+              <div class="input-wrap suffix">
+                <input type="number" id="pointsReduction" min="0.15" max="0.35" step="0.01" placeholder="0.25">
+                <span class="affix">%</span>
+              </div>
+              <div class="helper">Rate drop per point; ask your lender for their rate sheet</div>
+            </div>
+          </div>
           <div class="field">
-            <div class="label-tip-row"><label>INVESTMENT RETURN RATE</label><button class="tip-btn" aria-label="Learn more" data-tip="The annual return your closing costs could earn if invested instead of spent on the refinance. Used to calculate the true opportunity cost of the upfront expense. Default of 7% reflects approximate long-run U.S. equity returns.">?</button></div>
+            <div class="label-tip-row"><label>OPPORTUNITY COST OF REFINANCE</label><button class="tip-btn" aria-label="Learn more" data-tip="The annual return your closing costs could earn if invested instead of spent on the refinance. Used to calculate the true opportunity cost of the upfront expense. Default of 7% reflects approximate long-run U.S. equity returns.">?</button></div>
             <div class="input-wrap suffix">
               <input type="number" id="investmentReturn" min="0" max="20" step="0.1">
               <span class="affix">%</span>
@@ -585,8 +584,9 @@
 </main><!-- /app -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="mortgage-rates.js?v=1"></script>
-<script src="refi.js?v=11"></script>
+<script src="refi.js?v=13"></script>
 <script>
 /* ── Field tip tooltips ── */
 (function () {

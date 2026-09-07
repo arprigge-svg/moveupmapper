@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"></noscript>
-  <link rel="stylesheet" href="styles.css?v=96">
+  <link rel="stylesheet" href="styles.css?v=101">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-YCEFCLSHX0"></script>
   <script>
@@ -115,88 +115,95 @@
     </div>
   </div>
 
-  <!-- ── Input Card ── -->
-  <div class="card wide-card">
-    <div class="card-head">
-      <div class="card-icon" style="background:#0891b2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/>
-        </svg>
-      </div>
-      <div>
-        <div class="card-title">Portfolio Inputs</div>
-        <div class="card-sub">Starting balance, contribution schedule, return expectations, and inflation assumption</div>
-      </div>
-    </div>
+  <!-- ── Input Tiles ── -->
+  <div class="calc-grid">
 
-    <div class="card-section">
-      <div class="section-label">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        PORTFOLIO &amp; RETURNS
+    <!-- Portfolio & Returns -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon" style="background:#0891b2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Portfolio &amp; Returns</div>
+          <div class="card-sub">Starting balance and return expectations</div>
+        </div>
       </div>
+      <div class="card-body compound-tile-body">
 
-      <div class="three-col">
         <div class="field">
           <label>INITIAL BALANCE</label>
           <div class="input-wrap prefix">
             <span class="affix">$</span>
             <input type="number" id="initialBalance" min="0" step="500">
           </div>
-          <div class="helper">Starting value — savings, lump sum, or $0 to model contributions only</div>
+          <div class="helper">Starting value: savings, lump sum, or $0 to model contributions only</div>
         </div>
+
         <div class="field">
-          <label>ANNUAL RETURN RATE</label>
+          <div class="label-tip-row"><label>EXPECTED ANNUAL RETURN</label><button class="tip-btn" aria-label="Learn more" data-tip="The average annual growth rate you expect on your investments before fees. The S&amp;P 500 has historically averaged roughly 10% annually before inflation, or about 7% after inflation, over long periods.">?</button></div>
           <div class="input-wrap suffix">
             <input type="number" id="annualReturn" min="-20" max="50" step="0.1">
             <span class="affix">%</span>
           </div>
           <div class="helper">Expected average annual growth rate</div>
         </div>
-        <div class="field">
+
+        <div class="field" style="margin-bottom:0">
           <div class="label-tip-row"><label>RETURN RATE VARIANCE (±)</label><button class="tip-btn" aria-label="Learn more" data-tip="Adds an optimistic and pessimistic scenario band around your base return. A variance of 2% shows a low (base − 2%) and high (base + 2%) line on the chart, making visible how sensitive long-term outcomes are to small return differences.">?</button></div>
           <div class="input-wrap suffix">
             <input type="number" id="returnVariance" min="0" max="20" step="0.1">
             <span class="affix">%</span>
           </div>
-          <div class="helper">Shows an optimistic/pessimistic band around your base return — set to 0 to hide</div>
+          <div class="helper">Shows an optimistic/pessimistic band around your base return; set to 0 to hide</div>
         </div>
+
       </div>
     </div>
 
-    <div class="card-section" style="border-top: 1px solid var(--border)">
-      <div class="section-label">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        CONTRIBUTIONS &amp; INFLATION
+    <!-- Contributions -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon" style="background:#6366f1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Contributions</div>
+          <div class="card-sub">Contribution schedule and inflation assumption</div>
+        </div>
       </div>
+      <div class="card-body compound-tile-body">
 
-      <div class="field">
-        <label>CONTRIBUTION AMOUNT</label>
-        <div class="compound-contrib-row">
-          <div class="input-wrap prefix compound-contrib-input">
+        <div class="field">
+          <label>CONTRIBUTION AMOUNT</label>
+          <div class="input-wrap prefix">
             <span class="affix">$</span>
             <input type="number" id="contribution" min="0" step="50">
+            <select id="contribFrequency" class="contrib-freq-select">
+              <option value="52">Weekly</option>
+              <option value="26">Biweekly</option>
+              <option value="12" selected>Monthly</option>
+              <option value="4">Quarterly</option>
+              <option value="1">Annually</option>
+            </select>
           </div>
-          <div class="mode-toggle compound-contrib-freq" style="gap:0">
-            <button class="mode-btn" data-freq="52">Weekly</button>
-            <button class="mode-btn" data-freq="26">Biweekly</button>
-            <button class="mode-btn active" data-freq="12">Monthly</button>
-            <button class="mode-btn" data-freq="4">Quarterly</button>
-            <button class="mode-btn" data-freq="1">Annually</button>
-          </div>
+          <div class="helper" id="contrib-helper">= $6,000/yr · grows 3% annually</div>
         </div>
-        <div class="helper" id="contrib-helper">= $6,000/yr · grows 3% annually</div>
-      </div>
 
-      <div class="two-col">
         <div class="field">
           <div class="label-tip-row"><label>ANNUAL CONTRIBUTION GROWTH</label><button class="tip-btn" aria-label="Learn more" data-tip="The rate your contribution amount increases each year. If you save a fixed percentage of a growing salary, this should match your expected income growth rate. Even modest growth here compounds significantly over long horizons.">?</button></div>
           <div class="input-wrap suffix">
             <input type="number" id="contribGrowth" min="0" max="30" step="0.1">
             <span class="affix">%</span>
           </div>
-          <div class="helper">How much your contributions increase each year — matches salary growth if saving a fixed % of income</div>
+          <div class="helper">How much your contributions increase each year, matching salary growth if saving a fixed % of income</div>
         </div>
-        <div class="field">
+
+        <div class="field" style="margin-bottom:0">
           <label>INFLATION RATE</label>
           <div class="input-wrap suffix">
             <input type="number" id="inflationRate" min="0" max="20" step="0.1">
@@ -204,57 +211,60 @@
           </div>
           <div class="helper">Used to express your final balance in today's purchasing power</div>
         </div>
+
       </div>
     </div>
 
-    <!-- ── Advanced: Fees & Account Type ── -->
-    <details class="adv-section" id="advancedSection">
-      <summary class="adv-toggle">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-        </svg>
-        Advanced: Fees &amp; Account Type
-        <svg class="adv-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </summary>
+    <!-- Advanced -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon" style="background:#6b7280">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Advanced</div>
+          <div class="card-sub">Fees, account type, and tax drag</div>
+        </div>
+      </div>
+      <div class="card-body compound-tile-body">
 
-      <div class="card-section">
-        <div class="field" style="margin-bottom:16px">
+        <div class="field">
           <label>ACCOUNT TYPE</label>
-          <div class="mode-toggle" style="gap:0">
-            <button class="mode-btn active" data-acct="taxable">Taxable</button>
-            <button class="mode-btn" data-acct="tax-deferred">Tax-Deferred</button>
-            <button class="mode-btn" data-acct="roth">Roth</button>
-          </div>
-          <div class="helper" id="acct-type-helper">Taxable brokerage account — dividends and capital distributions are taxed annually, reducing effective return.</div>
+          <select id="accountType" class="input-select">
+            <option value="taxable">Taxable</option>
+            <option value="tax-deferred">Tax-Deferred</option>
+            <option value="roth">Roth</option>
+          </select>
+          <div class="helper" id="acct-type-helper">Taxable brokerage account: dividends and capital distributions are taxed annually, reducing effective return.</div>
         </div>
 
-        <div class="three-col">
-          <div class="field">
-            <div class="label-tip-row"><label>EXPENSE RATIO</label><button class="tip-btn" aria-label="Learn more" data-tip="The annual fund management fee as a % of assets. On a $500K portfolio, a 0.5% expense ratio costs $2,500/year before any growth. Low-cost index funds typically charge 0.03–0.20%; actively managed funds often charge 0.5–1%+.">?</button></div>
-            <div class="input-wrap suffix">
-              <input type="number" id="expenseRatio" min="0" max="5" step="0.01" value="0">
-              <span class="affix">%</span>
-            </div>
-            <div class="helper">Annual fund fee — e.g. 0.03% for a total-market index fund, 0.5–1% for actively managed funds</div>
+        <div class="field">
+          <div class="label-tip-row"><label>EXPENSE RATIO</label><button class="tip-btn" aria-label="Learn more" data-tip="The annual fund management fee as a % of assets. On a $500K portfolio, a 0.5% expense ratio costs $2,500/year before any growth. Low-cost index funds typically charge 0.03–0.20%; actively managed funds often charge 0.5–1%+.">?</button></div>
+          <div class="input-wrap suffix">
+            <input type="number" id="expenseRatio" min="0" max="5" step="0.01" value="0">
+            <span class="affix">%</span>
           </div>
-          <div class="field">
-            <div class="label-tip-row"><label>ADVISORY / MGMT FEE</label><button class="tip-btn" aria-label="Learn more" data-tip="Fee paid to a financial advisor or robo-advisor, typically 0.25–1% per year. Stacks on top of the expense ratio. Both are subtracted from your return rate before the simulation runs, so their compounding drag is fully captured.">?</button></div>
-            <div class="input-wrap suffix">
-              <input type="number" id="managementFee" min="0" max="5" step="0.05" value="0">
-              <span class="affix">%</span>
-            </div>
-            <div class="helper">Annual advisor or platform fee — typical range 0.25–1% of assets under management</div>
+          <div class="helper">Annual fund fee, e.g. 0.03% for a total-market index fund, 0.5–1% for actively managed funds</div>
+        </div>
+
+        <div class="field">
+          <div class="label-tip-row"><label>ADVISORY / MGMT FEE</label><button class="tip-btn" aria-label="Learn more" data-tip="Fee paid to a financial advisor or robo-advisor, typically 0.25–1% per year. Stacks on top of the expense ratio. Both are subtracted from your return rate before the simulation runs, so their compounding drag is fully captured.">?</button></div>
+          <div class="input-wrap suffix">
+            <input type="number" id="managementFee" min="0" max="5" step="0.05" value="0">
+            <span class="affix">%</span>
           </div>
-          <div class="field" id="annualTaxDragField">
-            <div class="label-tip-row"><label>ANNUAL TAX DRAG</label><button class="tip-btn" aria-label="Learn more" data-tip="The annual tax cost of dividends and capital gains distributions in a taxable account. Even if you don&#39;t sell, fund distributions create a tax bill each year. Typical range for a diversified equity index fund: 0.3–0.8%.">?</button></div>
-            <div class="input-wrap suffix">
-              <input type="number" id="annualTaxDrag" min="0" max="5" step="0.1" value="0">
-              <span class="affix">%</span>
-            </div>
-            <div class="helper">Taxable accounts: estimated drag from annual dividend &amp; capital gains taxes — typically 0.3–0.8% for diversified equity index funds</div>
+          <div class="helper">Annual advisor or platform fee (typical range 0.25–1% of assets under management)</div>
+        </div>
+
+        <div class="field" id="annualTaxDragField">
+          <div class="label-tip-row"><label>ANNUAL TAX DRAG</label><button class="tip-btn" aria-label="Learn more" data-tip="The annual tax cost of dividends and capital gains distributions in a taxable account. Even if you don&#39;t sell, fund distributions create a tax bill each year. Typical range for a diversified equity index fund: 0.3–0.8%.">?</button></div>
+          <div class="input-wrap suffix">
+            <input type="number" id="annualTaxDrag" min="0" max="5" step="0.1" value="0">
+            <span class="affix">%</span>
           </div>
+          <div class="helper">Taxable accounts: estimated drag from annual dividend &amp; capital gains taxes, typically 0.3–0.8% for diversified equity index funds</div>
         </div>
 
         <div class="net-section" style="margin-top:12px;display:none" id="advResultRow">
@@ -268,90 +278,99 @@
           </div>
         </div>
 
-        <div class="rvb-info-box" style="margin-top:12px">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span id="acct-type-detail-text">Annual tax drag reduces your effective return each year.</span>
-        </div>
-      </div>
-    </details>
+        <details class="adv-section" style="border-top:none;margin-top:8px">
+          <summary class="adv-toggle" style="font-size:12px;padding:6px 0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Tax treatment details
+            <svg class="adv-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="rvb-info-box" style="margin-top:8px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="acct-type-detail-text">Annual tax drag reduces your effective return each year.</span>
+          </div>
+        </details>
 
-    <!-- ── Withdrawal Phase ── -->
-    <details class="adv-section" id="withdrawalSection">
-      <summary class="adv-toggle" id="withdrawalSummary">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      </div>
+    </div>
+
+  </div><!-- /calc-grid -->
+
+  <!-- ── Withdrawal Phase ── -->
+  <details class="card wide-card glossary-card" id="withdrawalSection">
+    <summary class="card-head" id="withdrawalSummary">
+      <div class="card-icon" style="background:#c2554d">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2v20M2 12l10 10 10-10"/>
         </svg>
-        Withdrawal Phase
-        <svg class="adv-chevron" style="margin-left:0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-        <div class="mode-toggle" style="gap:0; margin-left:auto" onclick="event.preventDefault()">
+      </div>
+      <div>
+        <div class="card-title">Withdrawal Phase</div>
+        <div class="card-sub">Model a retirement drawdown after the accumulation phase ends</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div class="mode-toggle" style="gap:0" onclick="event.preventDefault()">
           <button class="mode-btn active" data-wd-enable="false">Off</button>
           <button class="mode-btn" data-wd-enable="true">On</button>
         </div>
-      </summary>
+        <svg class="adv-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+    </summary>
 
-      <div class="card-section">
-        <div id="withdrawalFields" style="display:none">
-          <div class="field" style="margin-bottom:16px">
-            <label>ANNUAL WITHDRAWAL</label>
-            <div class="input-wrap other-costs-wrap">
-              <span class="affix" id="wdDollarPrefix">$</span>
-              <input type="number" id="withdrawalAmount" min="0" step="1000">
-              <input type="number" id="withdrawalPercent" min="0" max="100" step="0.1" style="display:none">
-              <div class="other-costs-unit-toggle">
-                <button class="other-costs-btn active" data-wd-type="fixed">$</button>
-                <button class="other-costs-btn" data-wd-type="percent">%</button>
-              </div>
+    <div class="card-section">
+      <div id="withdrawalFields" style="display:none">
+        <div class="field" style="margin-bottom:16px">
+          <label>ANNUAL WITHDRAWAL</label>
+          <div class="input-wrap other-costs-wrap">
+            <span class="affix" id="wdDollarPrefix">$</span>
+            <input type="number" id="withdrawalAmount" min="0" step="1000">
+            <input type="number" id="withdrawalPercent" min="0" max="100" step="0.1" style="display:none">
+            <div class="other-costs-unit-toggle">
+              <button class="other-costs-btn active" data-wd-type="fixed">$</button>
+              <button class="other-costs-btn" data-wd-type="percent">%</button>
             </div>
-            <div class="helper" id="withdrawal-amount-helper">Annual dollar amount withdrawn from the portfolio each year</div>
-            <div id="wd-infl-hint" class="wd-infl-hint" style="display:none"></div>
-          <div id="wd-four-pct-hint" class="wd-four-pct-hint" style="display:none">
-            <span id="wd-four-pct-text"></span>
-            <button type="button" id="wd-use-four-pct" class="wd-use-four-pct-btn">Use 4%</button>
           </div>
-          </div>
+          <div class="helper" id="withdrawal-amount-helper">Annual dollar amount withdrawn from the portfolio each year</div>
+          <div id="wd-infl-hint" class="wd-infl-hint" style="display:none"></div>
+        <div id="wd-four-pct-hint" class="wd-four-pct-hint" style="display:none">
+          <span id="wd-four-pct-text"></span>
+          <button type="button" id="wd-use-four-pct" class="wd-use-four-pct-btn">Use 4%</button>
+        </div>
+        </div>
 
-          <div class="field" style="margin-top:12px">
-            <div class="field-row-head">
-              <label>INFLATION ADJUSTED</label>
-              <div class="mode-toggle" style="gap:0">
-                <button class="mode-btn active" data-wd-infladj="false">No</button>
-                <button class="mode-btn" data-wd-infladj="true">Yes</button>
-              </div>
+        <div class="field" style="margin-top:12px">
+          <div class="field-row-head">
+            <label>INFLATION ADJUSTED</label>
+            <div class="mode-toggle" style="gap:0">
+              <button class="mode-btn active" data-wd-infladj="false">No</button>
+              <button class="mode-btn" data-wd-infladj="true">Yes</button>
             </div>
-            <div class="helper" id="wd-infladj-helper">Grows your withdrawal each year by the inflation rate to maintain the same purchasing power — this shortens runway compared to a fixed amount, so factor it into your target</div>
           </div>
+          <div class="helper" id="wd-infladj-helper">Grows your withdrawal each year by the inflation rate to maintain the same purchasing power. This shortens runway compared to a fixed amount, so factor it into your target</div>
+        </div>
 
-          <details class="adv-section" style="border-top:none;margin-top:10px">
-            <summary class="adv-toggle" style="font-size:12px;padding:6px 0">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-              Advanced
-              <svg class="adv-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </summary>
-            <div class="field" style="padding-top:10px">
-              <div class="field-row-head">
-                <label>CONTINUE CONTRIBUTIONS</label>
-                <div class="mode-toggle" style="gap:0">
-                  <button class="mode-btn active" data-wd-contribs="false">No</button>
-                  <button class="mode-btn" data-wd-contribs="true">Yes</button>
-                </div>
-              </div>
-              <div class="helper">Keep adding contributions during the withdrawal period — models phased retirement or part-time income alongside drawdown</div>
+        <div class="field" style="margin-top:12px">
+          <div class="field-row-head">
+            <label>CONTINUE CONTRIBUTIONS</label>
+            <div class="mode-toggle" style="gap:0">
+              <button class="mode-btn active" data-wd-contribs="false">No</button>
+              <button class="mode-btn" data-wd-contribs="true">Yes</button>
             </div>
-            <div class="field" id="wd-contribs-amount-field" style="display:none; margin-top:12px">
-              <label>ANNUAL CONTRIBUTION (RETIREMENT)</label>
-              <div class="input-wrap prefix">
-                <span class="affix">$</span>
-                <input type="number" id="withdrawalContribAmount" min="0" step="500">
-              </div>
-              <div class="helper">Annual amount added during the withdrawal phase — typically lower than your accumulation rate, e.g. part-time income or rental income</div>
-            </div>
-          </details>
+          </div>
+          <div class="helper">Keep adding contributions during the withdrawal period. Models phased retirement or part-time income alongside drawdown</div>
+        </div>
+        <div class="field" id="wd-contribs-amount-field" style="display:none; margin-top:12px">
+          <label>ANNUAL CONTRIBUTION (RETIREMENT)</label>
+          <div class="input-wrap prefix">
+            <span class="affix">$</span>
+            <input type="number" id="withdrawalContribAmount" min="0" step="500">
+          </div>
+          <div class="helper">Annual amount added during the withdrawal phase, typically lower than your accumulation rate, e.g. part-time income or rental income</div>
         </div>
       </div>
-    </details>
-  </div>
+    </div>
+  </details>
 
   <!-- ── Purchasing Power Adjustment ── -->
   <div class="card wide-card">
@@ -384,24 +403,24 @@
         <div class="compound-infl-stat">
           <div class="compound-infl-label">Total gain (returns)</div>
           <div class="compound-infl-value" id="stat-total-gain">—</div>
-          <div class="compound-infl-note">Growth from compound returns only — nominal value minus total invested</div>
+          <div class="compound-infl-note">Growth from compound returns only: nominal value minus total invested</div>
         </div>
         <div class="compound-infl-divider"></div>
         <div class="compound-infl-stat">
           <div class="compound-infl-label">Purchasing power erosion</div>
           <div class="compound-infl-value" style="color:var(--red)" id="infl-shortfall">—</div>
-          <div class="compound-infl-note">The nominal–real gap — not money lost, but how much further each future dollar needs to stretch</div>
+          <div class="compound-infl-note">The nominal–real gap: not money lost, but how much further each future dollar needs to stretch</div>
         </div>
         <div class="compound-infl-divider"></div>
         <div class="compound-infl-stat">
           <div class="compound-infl-label">Compounding leads contributions</div>
           <div class="compound-infl-value" id="stat-compounds-leads">—</div>
-          <div class="compound-infl-note">The first year your portfolio earns more from returns than you contribute — the "snowball point"</div>
+          <div class="compound-infl-note">The first year your portfolio earns more from returns than you contribute (the "snowball point")</div>
         </div>
       </div>
       <div class="rvb-info-box" style="margin-top:14px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span>The nominal–real gap is not a loss. Your portfolio still contains the full nominal amount — inflation adjustment shows how much buying power that balance represents relative to today's prices. A dollar in <span id="infl-years-2" style="font-weight:600">20</span> years buys less than a dollar today; this section makes that concrete.</span>
+        <span>The nominal–real gap is not a loss. Your portfolio still contains the full nominal amount. Inflation adjustment shows how much buying power that balance represents relative to today's prices. A dollar in <span id="infl-years-2" style="font-weight:600">20</span> years buys less than a dollar today; this section makes that concrete.</span>
       </div>
     </div>
   </div>
@@ -416,7 +435,7 @@
       </div>
       <div>
         <div class="card-title">Portfolio Growth Over Time</div>
-        <div class="card-sub">Accumulation phase — base projection with return range band versus contributions only</div>
+        <div class="card-sub">Accumulation phase: base projection with return range band versus contributions only</div>
       </div>
     </div>
 
@@ -438,7 +457,7 @@
         <div class="chart-footnote">
           <strong>Base</strong> uses your expected return rate compounded at your chosen contribution frequency.
           <strong>Optimistic / Pessimistic</strong> bands apply ±your variance to the base rate.
-          <strong>Contributions only</strong> shows what you'd hold at 0% return — the gap above it is pure compound return.
+          <strong>Contributions only</strong> shows what you'd hold at 0% return; the gap above it is pure compound return.
           Contributions grow annually at your contribution growth rate, producing a non-linear accelerating curve.
         </div>
       </div>
@@ -543,7 +562,7 @@
       </div>
       <div>
         <div class="card-title">Withdrawal Phase</div>
-        <div class="card-sub">Portfolio runway from year <span id="wd-card-start-yr">20</span> — base, optimistic, and pessimistic drawdown trajectories</div>
+        <div class="card-sub">Portfolio runway from year <span id="wd-card-start-yr">20</span>: base, optimistic, and pessimistic drawdown trajectories</div>
       </div>
     </div>
 
@@ -589,12 +608,12 @@
       </div>
       <div class="chart-footnote">
         <strong>Base</strong> trajectory uses your expected return rate.
-        <strong>Optimistic / Pessimistic</strong> lines apply ±your variance — same scenario toggles as the growth chart above.
+        <strong>Optimistic / Pessimistic</strong> lines apply ±your variance, using the same scenario toggles as the growth chart above.
         Year 0 is your portfolio value at the start of the withdrawal phase; the line ends at depletion or 50 years, whichever comes first.
       </div>
       <div class="rvb-info-box" style="margin-top:12px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span>The <strong>sustainable withdrawal</strong> is the annual amount your portfolio can pay out indefinitely — the point where withdrawals equal your portfolio's annual return. Withdrawing above this rate will eventually deplete the portfolio; below it, the portfolio continues to grow.</span>
+        <span>The <strong>sustainable withdrawal</strong> is the annual amount your portfolio can pay out indefinitely: the point where withdrawals equal your portfolio's annual return. Withdrawing above this rate will eventually deplete the portfolio; below it, the portfolio continues to grow.</span>
       </div>
     </div>
   </div>
@@ -629,33 +648,33 @@
 
           <div class="gloss-item">
             <div class="gloss-term">Growing Contribution Schedule</div>
-            <div class="gloss-def">In year Y, the annual contribution is: baseAnnualContrib × (1 + contribGrowthRate)^(Y − 1). This models a rising savings rate — for example, someone saving 15% of a salary that grows 4% per year effectively contributes 4% more each year. The result is a non-linear deposit curve that accelerates over time, compounding more capital into the portfolio in later years than a flat contribution schedule would. The side panel's Year 1 vs. Year N comparison makes this growth visible.</div>
+            <div class="gloss-def">In year Y, the annual contribution is: baseAnnualContrib × (1 + contribGrowthRate)^(Y − 1). This models a rising savings rate. For example, someone saving 15% of a salary that grows 4% per year effectively contributes 4% more each year. The result is a non-linear deposit curve that accelerates over time, compounding more capital into the portfolio in later years than a flat contribution schedule would. The side panel's Year 1 vs. Year N comparison makes this growth visible.</div>
           </div>
 
           <div class="gloss-item">
             <div class="gloss-term">Return Rate Variance Band</div>
-            <div class="gloss-def">When variance is set above 0%, the chart adds an optimistic scenario (base + variance) and a pessimistic scenario (base − variance), with the region between them shaded. The band is not a confidence interval or probability range — it is a simple sensitivity test showing how much outcomes diverge if your actual return is consistently higher or lower than expected. Real returns fluctuate year to year; this tool models a constant rate, so the band helps approximate that uncertainty.</div>
+            <div class="gloss-def">When variance is set above 0%, the chart adds an optimistic scenario (base + variance) and a pessimistic scenario (base − variance), with the region between them shaded. The band is not a confidence interval or probability range; it is a simple sensitivity test showing how much outcomes diverge if your actual return is consistently higher or lower than expected. Real returns fluctuate year to year; this tool models a constant rate, so the band helps approximate that uncertainty.</div>
           </div>
 
           <div class="gloss-item">
             <div class="gloss-term">Inflation Adjustment (Real vs. Nominal)</div>
-            <div class="gloss-def">Your nominal final balance is divided by (1 + inflationRate)^years to produce the real (inflation-adjusted) value. This answers: "How much could I actually buy with this money in today's terms?" If $500,000 is your nominal balance in 20 years and inflation averaged 3%, the real value is approximately $277,000 — meaning your purchasing power is equivalent to $277,000 today, not $500,000. The nominal amount is real money in your account; the real value is context for what it's worth.</div>
+            <div class="gloss-def">Your nominal final balance is divided by (1 + inflationRate)^years to produce the real (inflation-adjusted) value. This answers: "How much could I actually buy with this money in today's terms?" If $500,000 is your nominal balance in 20 years and inflation averaged 3%, the real value is approximately $277,000, meaning your purchasing power is equivalent to $277,000 today, not $500,000. The nominal amount is real money in your account; the real value is context for what it's worth.</div>
           </div>
 
           <div class="gloss-item">
             <div class="gloss-term">Purchasing Power Erosion</div>
-            <div class="gloss-def">Purchasing power is the real-world quantity of goods and services a sum of money can buy. Inflation reduces this systematically over time — not because money leaves your account, but because prices rise and each dollar stretches less far. At a consistent 3% annual inflation rate, purchasing power is cut roughly in half in about 24 years (the rule of 72: 72 ÷ 3). A $1,000,000 nominal portfolio in 30 years represents approximately $412,000 in today's purchasing power at that same rate.
-The erosion compounds in reverse, just as investment returns compound forward: each year's price increase applies to an already-elevated price level. A 3% annual rise over 30 years doesn't produce 90% total inflation — it produces 143% (1.03^30 − 1). This is why long-term projections can look large on paper while representing a more modest real improvement in living standards. Importantly, this is not money lost — your portfolio contains the full nominal balance. The erosion figure is a translation: it tells you what that balance is worth in today's terms, so you can set realistic expectations for what financial independence at a given balance actually means in future years.</div>
+            <div class="gloss-def">Purchasing power is the real-world quantity of goods and services a sum of money can buy. Inflation reduces this systematically over time, not because money leaves your account, but because prices rise and each dollar stretches less far. At a consistent 3% annual inflation rate, purchasing power is cut roughly in half in about 24 years (the rule of 72: 72 ÷ 3). A $1,000,000 nominal portfolio in 30 years represents approximately $412,000 in today's purchasing power at that same rate.
+The erosion compounds in reverse, just as investment returns compound forward: each year's price increase applies to an already-elevated price level. A 3% annual rise over 30 years doesn't produce 90% total inflation; it produces 143% (1.03^30 − 1). This is why long-term projections can look large on paper while representing a more modest real improvement in living standards. Importantly, this is not money lost: your portfolio contains the full nominal balance. The erosion figure is a translation: it tells you what that balance is worth in today's terms, so you can set realistic expectations for what financial independence at a given balance actually means in future years.</div>
           </div>
 
           <div class="gloss-item">
             <div class="gloss-term">Compounding Leads Contributions Year</div>
-            <div class="gloss-def">This is the first year in which your portfolio's annual return on its existing balance — calculated as portfolioValue × annualReturnRate — equals or exceeds that year's total contribution. Before this year, deposits are the primary driver of growth. After it, compounding takes over and your money earns more in a year than you add. This crossover, sometimes called the "snowball point," is a key milestone in long-term wealth building and is particularly sensitive to starting early and maintaining a high return rate.</div>
+            <div class="gloss-def">This is the first year in which your portfolio's annual return on its existing balance, calculated as portfolioValue × annualReturnRate, equals or exceeds that year's total contribution. Before this year, deposits are the primary driver of growth. After it, compounding takes over and your money earns more in a year than you add. This crossover, sometimes called the "snowball point," is a key milestone in long-term wealth building and is particularly sensitive to starting early and maintaining a high return rate.</div>
           </div>
 
           <div class="gloss-item">
             <div class="gloss-term">Contributions Only (0% Return) Baseline</div>
-            <div class="gloss-def">The gray dashed line on the chart shows what your portfolio would hold if every contribution was kept in cash with zero return. The gap between this line and the base projection is purely the effect of compounding — no contribution differences, no initial balance differences. This visual gap widens non-linearly over time and is the clearest illustration of why time in the market matters: the same dollar contributed in year 1 compounds for much longer than a dollar contributed in year 20.</div>
+            <div class="gloss-def">The gray dashed line on the chart shows what your portfolio would hold if every contribution was kept in cash with zero return. The gap between this line and the base projection is purely the effect of compounding: no contribution differences, no initial balance differences. This visual gap widens non-linearly over time and is the clearest illustration of why time in the market matters: the same dollar contributed in year 1 compounds for much longer than a dollar contributed in year 20.</div>
           </div>
 
         </div>
@@ -667,22 +686,22 @@ The erosion compounds in reverse, just as investment returns compound forward: e
 
           <div class="gloss-item">
             <div class="gloss-term">Constant Annual Return</div>
-            <div class="gloss-def">The model applies a constant return rate every year. Real investment returns are volatile — equities may return 25% one year and −15% the next. A constant rate approximates the long-run average but understates the sequence-of-returns risk: poor returns early in the investment period reduce the base on which future gains compound, which can meaningfully hurt long-term outcomes compared to what a constant-rate model predicts.</div>
+            <div class="gloss-def">The model applies a constant return rate every year. Real investment returns are volatile; equities may return 25% one year and −15% the next. A constant rate approximates the long-run average but understates the sequence-of-returns risk: poor returns early in the investment period reduce the base on which future gains compound, which can meaningfully hurt long-term outcomes compared to what a constant-rate model predicts.</div>
           </div>
 
           <div class="gloss-item">
             <div class="gloss-term">Constant Inflation Rate</div>
-            <div class="gloss-def">A single inflation rate is applied uniformly over the full horizon to compute the purchasing power adjustment. In practice, inflation varies year by year. The adjustment shown is an estimate, not a guarantee — actual purchasing power at the end of your horizon depends on realized inflation rates that cannot be predicted with precision.</div>
+            <div class="gloss-def">A single inflation rate is applied uniformly over the full horizon to compute the purchasing power adjustment. In practice, inflation varies year by year. The adjustment shown is an estimate, not a guarantee; actual purchasing power at the end of your horizon depends on realized inflation rates that cannot be predicted with precision.</div>
           </div>
 
           <div class="gloss-item">
             <div class="gloss-term">Fees &amp; Account Type (Advanced)</div>
-            <div class="gloss-def">Fund expense ratios and advisory fees can be entered in the Advanced section — they are subtracted from your annual return before any simulation is run, so their compounding drag is fully captured over your horizon. For taxable brokerage accounts, an annual tax drag field models the return reduction from dividend distributions and capital gains taxes. Tax-deferred (Traditional 401k/IRA) and Roth accounts carry no annual drag; the difference is when taxes are paid — on the way in (Roth) or on the way out (tax-deferred). When all fee fields are set to 0, the projection is a pre-fee, pre-tax upper bound.</div>
+            <div class="gloss-def">Fund expense ratios and advisory fees can be entered in the Advanced section; they are subtracted from your annual return before any simulation is run, so their compounding drag is fully captured over your horizon. For taxable brokerage accounts, an annual tax drag field models the return reduction from dividend distributions and capital gains taxes. Tax-deferred (Traditional 401k/IRA) and Roth accounts carry no annual drag; the difference is when taxes are paid: on the way in (Roth) or on the way out (tax-deferred). When all fee fields are set to 0, the projection is a pre-fee, pre-tax upper bound.</div>
           </div>
 
           <div class="gloss-item">
             <div class="gloss-term">Contribution Timing</div>
-            <div class="gloss-def">Contributions are modeled as end-of-period deposits — each amount is added after the growth for that period is applied. Beginning-of-period deposits would produce marginally higher results because contributions earn that period's return. The difference is small across most scenarios but grows with higher return rates and shorter contribution periods (e.g., weekly vs. annual).</div>
+            <div class="gloss-def">Contributions are modeled as end-of-period deposits: each amount is added after the growth for that period is applied. Beginning-of-period deposits would produce marginally higher results because contributions earn that period's return. The difference is small across most scenarios but grows with higher return rates and shorter contribution periods (e.g., weekly vs. annual).</div>
           </div>
 
         </div>
@@ -697,43 +716,43 @@ The erosion compounds in reverse, just as investment returns compound forward: e
   <!-- ── Retirement Goal Planner Tab ── -->
   <div id="tab-goal" class="tab-panel" style="display:none">
 
-    <!-- Input Card -->
-    <div class="card wide-card">
-      <div class="card-head">
-        <div class="card-icon" style="background:#7c3aed">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-          </svg>
-        </div>
-        <div>
-          <div class="card-title">Retirement Goal Planner</div>
-          <div class="card-sub">Enter your retirement income goal — we'll calculate what you need to save to get there</div>
-        </div>
-      </div>
+    <!-- Input Tiles -->
+    <div class="calc-grid calc-grid--equal">
 
-      <div class="card-section">
-        <div class="section-label">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-          PORTFOLIO &amp; RETURNS
+      <!-- Portfolio & Returns -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon" style="background:#0891b2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Portfolio &amp; Returns</div>
+            <div class="card-sub">Current savings and return expectations</div>
+          </div>
         </div>
-        <div class="three-col">
+        <div class="card-body compound-tile-body">
+
           <div class="field">
             <label>CURRENT SAVINGS</label>
             <div class="input-wrap prefix">
               <span class="affix">$</span>
               <input type="number" id="g-currentSavings" min="0" step="1000">
             </div>
-            <div class="helper">What you've already saved — enter $0 to model from scratch</div>
+            <div class="helper">What you've already saved (enter $0 to model from scratch)</div>
           </div>
+
           <div class="field">
-            <label>EXPECTED ANNUAL RETURN</label>
+            <div class="label-tip-row"><label>EXPECTED ANNUAL RETURN</label><button class="tip-btn" aria-label="Learn more" data-tip="The average annual growth rate you expect on your investments before fees. The S&amp;P 500 has historically averaged roughly 10% annually before inflation, or about 7% after inflation, over long periods.">?</button></div>
             <div class="input-wrap suffix">
               <input type="number" id="g-annualReturn" min="-20" max="50" step="0.1">
               <span class="affix">%</span>
             </div>
             <div class="helper">Expected average annual growth rate on investments</div>
           </div>
-          <div class="field">
+
+          <div class="field" style="margin-bottom:0">
             <label>INFLATION RATE</label>
             <div class="input-wrap suffix">
               <input type="number" id="g-inflation" min="0" max="20" step="0.1">
@@ -741,59 +760,66 @@ The erosion compounds in reverse, just as investment returns compound forward: e
             </div>
             <div class="helper">Used to convert today's dollars to nominal retirement values</div>
           </div>
+
         </div>
       </div>
 
-      <div class="card-section" style="border-top:1px solid var(--border)">
-        <div class="section-label">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          YOUR RETIREMENT GOAL
-        </div>
-        <div class="three-col">
-          <div class="field">
-            <label>YEARS UNTIL RETIREMENT</label>
-            <div class="input-wrap suffix">
-              <input type="number" id="g-yearsToRetirement" min="1" max="60" step="1">
-              <span class="affix">yrs</span>
-            </div>
-            <div class="helper">How many years you have to build your nest egg</div>
+      <!-- Retirement Goal -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon" style="background:#7c3aed">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
           </div>
+          <div>
+            <div class="card-title">Retirement Goal</div>
+            <div class="card-sub">Your income goal and savings target</div>
+          </div>
+        </div>
+        <div class="card-body compound-tile-body">
+
+          <div class="two-col">
+            <div class="field">
+              <label>YEARS UNTIL RETIREMENT</label>
+              <div class="input-wrap suffix">
+                <input type="number" id="g-yearsToRetirement" min="1" max="60" step="1">
+                <span class="affix">yrs</span>
+              </div>
+              <div class="helper">Years to build your nest egg</div>
+            </div>
+            <div class="field">
+              <div class="label-tip-row"><label>YEARS OF RETIREMENT TO FUND</label><button class="tip-btn" aria-label="Learn more" data-tip="How many years your nest egg needs to last. A 65-year-old has roughly a 50% chance of living past 85. Planning for 25–30 years significantly reduces the risk of outliving your savings.">?</button></div>
+              <div class="input-wrap suffix">
+                <input type="number" id="g-withdrawalYears" min="1" max="60" step="1">
+                <span class="affix">yrs</span>
+              </div>
+              <div class="helper">Plan for 25–30 years for safety</div>
+            </div>
+          </div>
+
           <div class="field">
             <div class="label-tip-row"><label>ANNUAL RETIREMENT WITHDRAWAL</label><button class="tip-btn" aria-label="Learn more" data-tip="Enter your desired annual spending in today's dollars. The calculator adjusts for inflation to find the equivalent nominal amount at retirement. A common target is 70–80% of current income.">?</button></div>
             <div class="input-wrap prefix">
               <span class="affix">$</span>
               <input type="number" id="g-annualWithdrawal" min="0" step="1000">
             </div>
-            <div class="helper">In today's dollars — inflation-adjusted to retirement-era amounts</div>
+            <div class="helper">In today's dollars, inflation-adjusted to retirement-era amounts</div>
           </div>
-          <div class="field">
-            <div class="label-tip-row"><label>YEARS OF RETIREMENT TO FUND</label><button class="tip-btn" aria-label="Learn more" data-tip="How many years your nest egg needs to last. A 65-year-old has roughly a 50% chance of living past 85. Planning for 25–30 years significantly reduces the risk of outliving your savings.">?</button></div>
-            <div class="input-wrap suffix">
-              <input type="number" id="g-withdrawalYears" min="1" max="60" step="1">
-              <span class="affix">yrs</span>
-            </div>
-            <div class="helper">Plan for 25–30 years for a comfortable safety margin</div>
-          </div>
-        </div>
-      </div>
 
-      <div class="card-section" style="border-top:1px solid var(--border)">
-        <div class="section-label">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          GROWING CONTRIBUTIONS SCENARIO
-        </div>
-        <div style="max-width:340px">
-          <div class="field">
-            <div class="label-tip-row"><label>ANNUAL SAVINGS GROWTH RATE</label><button class="tip-btn" aria-label="Learn more" data-tip="The rate at which you plan to increase your annual savings each year. If you save a fixed percentage of a salary that grows 3% per year, your contributions also grow 3% annually. Starting lower but growing faster often requires less sacrifice in early years while reaching the same end goal.">?</button></div>
+          <div class="field" style="margin-bottom:0">
+            <div class="label-tip-row"><label>ANNUAL CONTRIBUTION GROWTH</label><button class="tip-btn" aria-label="Learn more" data-tip="The rate at which you plan to increase your annual savings each year. If you save a fixed percentage of a salary that grows 3% per year, your contributions also grow 3% annually. Starting lower but growing faster often requires less sacrifice in early years while reaching the same end goal.">?</button></div>
             <div class="input-wrap suffix">
               <input type="number" id="g-contribGrowth" min="0" max="20" step="0.1">
               <span class="affix">%/yr</span>
             </div>
-            <div class="helper">Rate your annual savings increases — matches income growth if saving a fixed % of salary</div>
+            <div class="helper">Rate your annual savings increases, matching income growth if saving a fixed % of salary</div>
           </div>
+
         </div>
       </div>
-    </div>
+
+    </div><!-- /calc-grid -->
 
     <!-- Summary Stats -->
     <div class="card wide-card">
@@ -831,13 +857,13 @@ The erosion compounds in reverse, just as investment returns compound forward: e
         </div>
         <div>
           <div class="card-title">Savings Scenarios</div>
-          <div class="card-sub">Two paths to the same goal — flat contributions versus a rising schedule</div>
+          <div class="card-sub">Two paths to the same goal: flat contributions versus a rising schedule</div>
         </div>
       </div>
       <div class="card-section" id="g-scenarios-body">
         <div class="goal-scenarios">
           <div class="goal-scenario">
-            <div class="goal-scenario-label">Option A — Flat Contributions</div>
+            <div class="goal-scenario-label">Option A: Flat Contributions</div>
             <div class="goal-scenario-primary" id="g-flat-annual">—</div>
             <div class="goal-scenario-sub" id="g-flat-sub">per year</div>
             <div class="goal-scenario-rows">
@@ -856,7 +882,7 @@ The erosion compounds in reverse, just as investment returns compound forward: e
             </div>
           </div>
           <div class="goal-scenario featured">
-            <div class="goal-scenario-label">Option B — Growing Contributions (<span class="g-cgr-label">3</span>%/yr)</div>
+            <div class="goal-scenario-label">Option B: Growing Contributions (<span class="g-cgr-label">3</span>%/yr)</div>
             <div class="goal-scenario-primary" id="g-growing-annual">—</div>
             <div class="goal-scenario-sub" id="g-growing-sub">in year 1</div>
             <div class="goal-scenario-rows">
@@ -877,13 +903,13 @@ The erosion compounds in reverse, just as investment returns compound forward: e
         </div>
         <div class="rvb-info-box" style="margin-top:16px">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span>Your target of <strong id="g-ctx-today-wd">—</strong> in today's dollars equals <strong id="g-ctx-nominal-wd">—</strong> in nominal terms at retirement — adjusted at <span id="g-ctx-infl">3</span> inflation over <span id="g-ctx-years">30</span> years. The nest egg funds that income for <span id="g-ctx-wd-years">25</span> years, with withdrawals growing at inflation to preserve purchasing power.</span>
+          <span>Your target of <strong id="g-ctx-today-wd">—</strong> in today's dollars equals <strong id="g-ctx-nominal-wd">—</strong> in nominal terms at retirement, adjusted at <span id="g-ctx-infl">3</span> inflation over <span id="g-ctx-years">30</span> years. The nest egg funds that income for <span id="g-ctx-wd-years">25</span> years, with withdrawals growing at inflation to preserve purchasing power.</span>
         </div>
       </div>
       <div class="card-section" id="g-no-contrib-msg" style="display:none">
         <div class="rvb-info-box" style="border-color:#16a34a;background:#f0fdf4">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="color:#16a34a;font-weight:600">Your current savings alone will meet this goal — no additional contributions required.</span>
+          <span style="color:#16a34a;font-weight:600">Your current savings alone will meet this goal; no additional contributions required.</span>
         </div>
       </div>
     </div>
@@ -908,7 +934,7 @@ The erosion compounds in reverse, just as investment returns compound forward: e
         <div class="chart-footnote">
           <strong>Flat contributions</strong> keeps your annual savings constant throughout.
           <strong>Growing contributions</strong> starts lower and increases by your savings growth rate each year.
-          The <strong>target line</strong> marks the required nest egg — both paths converge there at year <span class="g-n-label">30</span>, unless your current savings alone already exceed the goal, in which case both simply track savings growth above the line.
+          The <strong>target line</strong> marks the required nest egg: both paths converge there at year <span class="g-n-label">30</span>, unless your current savings alone already exceed the goal, in which case both simply track savings growth above the line.
           Returns from current savings are included in both trajectories.
         </div>
       </div>
@@ -939,12 +965,12 @@ The erosion compounds in reverse, just as investment returns compound forward: e
 
             <div class="gloss-item">
               <div class="gloss-term">Required Nest Egg</div>
-              <div class="gloss-def">The nest egg is the portfolio balance you need at the moment you retire. It is calculated as the present value of a growing annuity-due: a stream of withdrawals that starts immediately at retirement and increases each year at the inflation rate to preserve purchasing power. The formula is: NestEgg = W₁ × [1 − ((1+i)/(1+r))ᵈ] / (r − i) × (1+r), where W₁ is the first nominal withdrawal (paid at retirement start), r is your expected return, i is inflation, and d is the number of retirement years. When r equals i, this simplifies to NestEgg = W₁ × d. The annuity-due convention assumes the first withdrawal occurs on day one of retirement — a conservative and realistic assumption. The nest egg grows larger when the withdrawal period is longer, when inflation is higher, or when the portfolio return is lower.</div>
+              <div class="gloss-def">The nest egg is the portfolio balance you need at the moment you retire. It is calculated as the present value of a growing annuity-due: a stream of withdrawals that starts immediately at retirement and increases each year at the inflation rate to preserve purchasing power. The formula is: NestEgg = W₁ × [1 − ((1+i)/(1+r))ᵈ] / (r − i) × (1+r), where W₁ is the first nominal withdrawal (paid at retirement start), r is your expected return, i is inflation, and d is the number of retirement years. When r equals i, this simplifies to NestEgg = W₁ × d. The annuity-due convention assumes the first withdrawal occurs on day one of retirement, a conservative and realistic assumption. The nest egg grows larger when the withdrawal period is longer, when inflation is higher, or when the portfolio return is lower.</div>
             </div>
 
             <div class="gloss-item">
               <div class="gloss-term">Annual Income in Today's Dollars</div>
-              <div class="gloss-def">You enter your retirement income target in today's purchasing power — the amount in today's terms, not the nominal figure you'll actually withdraw. The calculator converts it to a nominal retirement-era amount using your inflation rate: NominalWithdrawal = TodaysDollars × (1 + inflation)^yearsToRetirement. Entering in today's dollars is more intuitive because you can compare directly to your current spending. A target of $80,000/yr in today's dollars at 3% inflation over 30 years becomes roughly $194,000/yr in nominal terms — but both represent the same real standard of living.</div>
+              <div class="gloss-def">You enter your retirement income target in today's purchasing power: the amount in today's terms, not the nominal figure you'll actually withdraw. The calculator converts it to a nominal retirement-era amount using your inflation rate: NominalWithdrawal = TodaysDollars × (1 + inflation)^yearsToRetirement. Entering in today's dollars is more intuitive because you can compare directly to your current spending. A target of $80,000/yr in today's dollars at 3% inflation over 30 years becomes roughly $194,000/yr in nominal terms, but both represent the same real standard of living.</div>
             </div>
 
             <div class="gloss-item">
@@ -954,7 +980,7 @@ The erosion compounds in reverse, just as investment returns compound forward: e
 
             <div class="gloss-item">
               <div class="gloss-term">Flat vs. Growing Contributions</div>
-              <div class="gloss-def">Option A (flat) solves for a single constant annual savings amount using the future value of an ordinary annuity: FV = PMT × [(1+r)ⁿ − 1] / r. Rearranged: PMT = Gap × r / [(1+r)ⁿ − 1]. Option B (growing) solves for a first-year amount that then increases at your savings growth rate each year, using the future value of a growing annuity: FV = PMT₁ × [(1+r)ⁿ − (1+g)ⁿ] / (r − g). The growing scenario typically requires a lower year-1 commitment because later, larger contributions benefit from higher compounding — but the total amount contributed is often similar. The choice between them depends on whether you prefer a predictable fixed amount or a schedule that rises alongside income.</div>
+              <div class="gloss-def">Option A (flat) solves for a single constant annual savings amount using the future value of an ordinary annuity: FV = PMT × [(1+r)ⁿ − 1] / r. Rearranged: PMT = Gap × r / [(1+r)ⁿ − 1]. Option B (growing) solves for a first-year amount that then increases at your savings growth rate each year, using the future value of a growing annuity: FV = PMT₁ × [(1+r)ⁿ − (1+g)ⁿ] / (r − g). The growing scenario typically requires a lower year-1 commitment because later, larger contributions benefit from higher compounding, but the total amount contributed is often similar. The choice between them depends on whether you prefer a predictable fixed amount or a schedule that rises alongside income.</div>
             </div>
 
           </div>
@@ -966,22 +992,22 @@ The erosion compounds in reverse, just as investment returns compound forward: e
 
             <div class="gloss-item">
               <div class="gloss-term">Constant Return Rate</div>
-              <div class="gloss-def">The model applies the same annual return every year through both the accumulation and retirement phases. Real portfolio returns fluctuate — a bad sequence of returns early in retirement (when the portfolio is largest and withdrawals are starting) can deplete savings far faster than a constant-rate model suggests. This is called sequence-of-returns risk, and it is not captured here. The nest egg this calculator targets is a reasonable starting point, but many financial planners recommend building in a buffer — sizing for a 3–4% withdrawal rate rather than the portfolio's full expected return.</div>
+              <div class="gloss-def">The model applies the same annual return every year through both the accumulation and retirement phases. Real portfolio returns fluctuate; a bad sequence of returns early in retirement (when the portfolio is largest and withdrawals are starting) can deplete savings far faster than a constant-rate model suggests. This is called sequence-of-returns risk, and it is not captured here. The nest egg this calculator targets is a reasonable starting point, but many financial planners recommend building in a buffer: sizing for a 3–4% withdrawal rate rather than the portfolio's full expected return.</div>
             </div>
 
             <div class="gloss-item">
               <div class="gloss-term">Constant Inflation Rate</div>
-              <div class="gloss-def">A single inflation rate is applied uniformly to convert today's dollars to retirement-era nominal amounts and to grow withdrawals throughout retirement. Actual inflation varies year to year and may be higher for retirees — healthcare costs, for example, have historically inflated faster than the broad CPI. The results here are estimates based on your assumption, not a guarantee of purchasing power. Using a slightly higher inflation rate (e.g., 3.5% instead of 2.5%) produces a more conservative nest egg target.</div>
+              <div class="gloss-def">A single inflation rate is applied uniformly to convert today's dollars to retirement-era nominal amounts and to grow withdrawals throughout retirement. Actual inflation varies year to year and may be higher for retirees; healthcare costs, for example, have historically inflated faster than the broad CPI. The results here are estimates based on your assumption, not a guarantee of purchasing power. Using a slightly higher inflation rate (e.g., 3.5% instead of 2.5%) produces a more conservative nest egg target.</div>
             </div>
 
             <div class="gloss-item">
               <div class="gloss-term">No Other Income Sources</div>
-              <div class="gloss-def">The model assumes your entire retirement income comes from your investment portfolio. It does not account for Social Security benefits, a pension, rental income, part-time work, or an inheritance. If you expect meaningful income from other sources, reduce your annual income target by that amount before entering it — for example, if Social Security will cover $30,000/yr, and you want $80,000/yr total, enter $50,000 as your portfolio income target. This produces a smaller, more accurate nest egg and lower required savings.</div>
+              <div class="gloss-def">The model assumes your entire retirement income comes from your investment portfolio. It does not account for Social Security benefits, a pension, rental income, part-time work, or an inheritance. If you expect meaningful income from other sources, reduce your annual income target by that amount before entering it. For example, if Social Security will cover $30,000/yr, and you want $80,000/yr total, enter $50,000 as your portfolio income target. This produces a smaller, more accurate nest egg and lower required savings.</div>
             </div>
 
             <div class="gloss-item">
               <div class="gloss-term">End-of-Year Contribution Timing</div>
-              <div class="gloss-def">Contributions are modeled as a single annual deposit at the end of each year. Beginning-of-year deposits would produce marginally higher results because they compound for the full year rather than nothing in year one. For the flat scenario, the actual optimal contribution schedule is monthly (as in the Growth Projector tab), but the annual model used here is a standard simplification that slightly understates the benefit of more frequent contributions — a conservative and commonly accepted assumption for this type of planning calculation.</div>
+              <div class="gloss-def">Contributions are modeled as a single annual deposit at the end of each year. Beginning-of-year deposits would produce marginally higher results because they compound for the full year rather than nothing in year one. For the flat scenario, the actual optimal contribution schedule is monthly (as in the Growth Projector tab), but the annual model used here is a standard simplification that slightly understates the benefit of more frequent contributions, a conservative and commonly accepted assumption for this type of planning calculation.</div>
             </div>
 
           </div>
@@ -1031,7 +1057,7 @@ The erosion compounds in reverse, just as investment returns compound forward: e
 </main><!-- end .app -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="compound.js?v=23"></script>
+<script src="compound.js?v=25"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const slider = document.getElementById('durationSlider');

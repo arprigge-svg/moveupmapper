@@ -39,9 +39,9 @@ const DEFAULTS = {
 const FREQ_UNIT = { 52: 'wk', 26: '2 wks', 12: 'mo', 4: 'qtr', 1: 'yr' };
 
 const ACCT_HELPER = {
-  'taxable':      'Taxable brokerage account — dividends and capital distributions are taxed annually, reducing effective return. Enter an annual tax drag estimate below.',
-  'tax-deferred': 'Traditional 401(k) or IRA — contributions are pre-tax, growth is tax-deferred, and withdrawals are taxed as ordinary income. No annual tax drag during accumulation.',
-  'roth':         'Roth 401(k) or IRA — contributions are after-tax, qualified withdrawals (age 59½+, 5-year hold) are entirely tax-free. No annual tax drag or withdrawal taxes.',
+  'taxable':      'Taxable brokerage account: dividends and capital distributions are taxed annually, reducing effective return. Enter an annual tax drag estimate below.',
+  'tax-deferred': 'Traditional 401(k) or IRA: contributions are pre-tax, growth is tax-deferred, and withdrawals are taxed as ordinary income. No annual tax drag during accumulation.',
+  'roth':         'Roth 401(k) or IRA: contributions are after-tax, qualified withdrawals (age 59½+, 5-year hold) are entirely tax-free. No annual tax drag or withdrawal taxes.',
 };
 
 const ACCT_DETAIL = {
@@ -589,8 +589,8 @@ function render(c, s) {
     const sustainableSubEl = document.getElementById('wd-sustainable-sub');
     if (sustainableSubEl) {
       sustainableSubEl.textContent = wr.wdInflAdj
-        ? 'inflation-adjusted — maintains purchasing power indefinitely'
-        : 'portfolio return covers this indefinitely — Inflation Adjusted is off, so this fixed amount buys less each year';
+        ? 'inflation-adjusted, maintains purchasing power indefinitely'
+        : 'portfolio return covers this indefinitely; Inflation Adjusted is off, so this fixed amount buys less each year';
     }
     setText('wd-start-balance', fmt(wr.startBalance));
 
@@ -617,7 +617,7 @@ function render(c, s) {
       const realAmt = wdAmt / Math.pow(1 + inflRate / 100, years);
       if (s.withdrawalInflationAdj) {
         const annualInc = wdAmt * (inflRate / 100);
-        wdInflHint.textContent = `At ${inflRate}% inflation, this has the purchasing power of ${fmt(realAmt)}/yr in today's dollars by Year ${years} — increasing ${fmt(annualInc)}/yr each year.`;
+        wdInflHint.textContent = `At ${inflRate}% inflation, this has the purchasing power of ${fmt(realAmt)}/yr in today's dollars by Year ${years}, increasing ${fmt(annualInc)}/yr each year.`;
       } else {
         wdInflHint.textContent = `At ${inflRate}% inflation, this has the purchasing power of ${fmt(realAmt)}/yr in today's dollars by Year ${years}`;
       }
@@ -641,8 +641,8 @@ function render(c, s) {
   const advResultRow = document.getElementById('advResultRow');
   if (advResultRow) advResultRow.style.display = c.totalDrag > 0 ? '' : 'none';
 
-  document.querySelectorAll('[data-acct]').forEach(btn =>
-    btn.classList.toggle('active', btn.dataset.acct === acctType));
+  const acctTypeSelectEl = document.getElementById('accountType');
+  if (acctTypeSelectEl) acctTypeSelectEl.value = acctType;
 
   updateScenarioToggles(c);
   updateChart(c);
@@ -686,7 +686,7 @@ function updateWithdrawalHints(c, s) {
       const fmtProjAmt = projected >= 1e6
         ? '$' + (projected / 1e6).toFixed(1) + 'M'
         : '$' + Math.round(projected).toLocaleString('en-US');
-      hintText.textContent = `4% rule for your ${fmtProjAmt} projected balance — ${fmt(fourPct)}/yr`;
+      hintText.textContent = `4% rule for your ${fmtProjAmt} projected balance: ${fmt(fourPct)}/yr`;
       hintEl.style.display = '';
     } else {
       hintEl.style.display = 'none';
@@ -703,9 +703,9 @@ function updateWithdrawalHints(c, s) {
     const years   = c?.years           ?? 20;
     if (wdAmt > 0 && infl > 0) {
       const futureAmt = Math.round(wdAmt * Math.pow(1 + infl / 100, years));
-      inflAdj.textContent = `Grows your withdrawal each year at ${infl}% inflation — ${fmt(wdAmt)}/yr becomes ${fmt(futureAmt)}/yr after ${years} years of retirement, which shortens runway compared to a fixed amount`;
+      inflAdj.textContent = `Grows your withdrawal each year at ${infl}% inflation: ${fmt(wdAmt)}/yr becomes ${fmt(futureAmt)}/yr after ${years} years of retirement, which shortens runway compared to a fixed amount`;
     } else {
-      inflAdj.textContent = 'Grows your withdrawal each year by the inflation rate to maintain the same purchasing power — shortens runway compared to a fixed amount';
+      inflAdj.textContent = 'Grows your withdrawal each year by the inflation rate to maintain the same purchasing power; shortens runway compared to a fixed amount';
     }
   }
 }
@@ -757,12 +757,12 @@ function populateFields() {
   if (slider) slider.value = state.duration ?? 20;
   setText('durationDisplay', state.duration ?? 20);
 
-  document.querySelectorAll('[data-freq]').forEach(btn =>
-    btn.classList.toggle('active', parseInt(btn.dataset.freq) === (state.frequency ?? 12)));
+  const freqSelectEl = document.getElementById('contribFrequency');
+  if (freqSelectEl) freqSelectEl.value = state.frequency ?? 12;
 
   const acctType = state.accountType ?? 'taxable';
-  document.querySelectorAll('[data-acct]').forEach(btn =>
-    btn.classList.toggle('active', btn.dataset.acct === acctType));
+  const acctTypeSelectEl = document.getElementById('accountType');
+  if (acctTypeSelectEl) acctTypeSelectEl.value = acctType;
 
   const taxDragFieldEl = document.getElementById('annualTaxDragField');
   if (taxDragFieldEl) taxDragFieldEl.style.display = acctType === 'taxable' ? '' : 'none';
@@ -823,25 +823,25 @@ function bindInputs() {
   ['initialBalance', 'contribution', 'contribGrowth', 'annualReturn', 'returnVariance',
    'inflationRate', 'expenseRatio', 'managementFee', 'annualTaxDrag'].forEach(num);
 
-  document.querySelectorAll('[data-freq]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const f = parseInt(btn.dataset.freq);
+  const freqSelect = document.getElementById('contribFrequency');
+  if (freqSelect) {
+    freqSelect.addEventListener('change', () => {
+      const f = parseInt(freqSelect.value);
       if (state.frequency === f) return;
       state.frequency = f;
-      document.querySelectorAll('[data-freq]').forEach(b =>
-        b.classList.toggle('active', parseInt(b.dataset.freq) === f));
       recalc();
     });
-  });
+  }
 
-  document.querySelectorAll('[data-acct]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const t = btn.dataset.acct;
+  const acctTypeSelect = document.getElementById('accountType');
+  if (acctTypeSelect) {
+    acctTypeSelect.addEventListener('change', () => {
+      const t = acctTypeSelect.value;
       if (state.accountType === t) return;
       state.accountType = t;
       recalc();
     });
-  });
+  }
 
   function bindScenarioToggle(optId, pessId) {
     document.getElementById(optId)?.addEventListener('click', () => {
@@ -1183,7 +1183,7 @@ function renderGoal(g) {
   const coverSubEl = document.getElementById('g-stat-savings-cover-sub');
   if (coverSubEl) {
     if (g.gap === 0) {
-      coverSubEl.textContent = 'fully covers goal — no contributions needed';
+      coverSubEl.textContent = 'fully covers goal, no contributions needed';
       coverSubEl.style.color = '#16a34a';
     } else {
       const pct = g.targetNestEgg > 0 ? Math.round(g.savingsGrown / g.targetNestEgg * 100) : 0;
